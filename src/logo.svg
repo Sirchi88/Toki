@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 126 131">
+<defs>
+<linearGradient id="tg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#36b982"/><stop offset=".55" stop-color="#2a9c6b"/><stop offset="1" stop-color="#1d7650"/></linearGradient>
+<linearGradient id="tx" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c9f6c"/><stop offset="1" stop-color="#1e7a51"/></linearGradient>
+<filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="1.5" stdDeviation="1.6" flood-color="#000" flood-opacity=".35"/></filter>
+<filter id="in"><feOffset dy="1.2"/><feGaussianBlur stdDeviation="1"/><feComposite operator="out" in="SourceGraphic"/><feComponentTransfer><feFuncA type="linear" slope=".7"/></feComponentTransfer><feBlend in2="SourceGraphic" mode="normal"/></filter>
+</defs>
+<g filter="url(#sh)">
+<rect x="19" y="6" width="82" height="80" rx="15" fill="url(#tg)"/>
+<rect x="19.6" y="6.6" width="80.8" height="78.8" rx="14.4" fill="none" stroke="#7ff0bd" stroke-opacity=".22" stroke-width="1.2"/>
+</g>
+<path d="M37.5 21H80.5V34H65.5V69H52.5V34H37.5Z" fill="#1d2025" filter="url(#in)"/>
+<g fill="url(#tx)" filter="url(#sh)">
+<path d="M11 94H33V100.5H25.5V120H18.5V100.5H11Z"/>
+<path fill-rule="evenodd" d="M49.5 94C58.3 94 64.5 99.8 64.5 107S58.3 120 49.5 120 34.5 114.2 34.5 107 40.7 94 49.5 94ZM49.5 100.5C45 100.5 41.8 103.3 41.8 107S45 113.5 49.5 113.5 57.2 110.7 57.2 107 54 100.5 49.5 100.5Z"/>
+<path d="M68 94H75V104.2L85 94H94L82.6 105.3L94.5 120H85.6L77.5 109.8L75 112.3V120H68Z"/>
+<path d="M98 94H105V120H98Z"/>
+</g>
+</svg>
