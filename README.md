@@ -34,11 +34,14 @@ src/
   core.js       Rechenkern (reine Funktionen, auch in Node nutzbar)
   app.js        Oberfläche, alle Reiter
   fx.js         animierte Design-Hintergründe
+  sync.js       Cloud-Sync mit Supabase (Login per E-Mail-Link)
   style.css     Layout und Designs
   index.html    HTML-Vorlage
   logo*.svg     Logo
 tests/
   core.test.js  Tests für den Rechenkern
+supabase/
+  schema.sql    Tabelle und Zugriffsregeln für den Cloud-Sync
 build.py        baut alles zu einer einzigen index.html zusammen
 index.html      fertige App (gebaut, direkt nutzbar)
 assets/         Logo als PNG/SVG
@@ -57,9 +60,13 @@ Nach jeder Änderung in `src/` einmal `build.py` laufen lassen und die neue `ind
 
 Im Repository unter **Settings → Pages** als Quelle den Branch `main` und den Ordner `/ (root)` wählen. Danach ist Toki unter `https://<benutzer>.github.io/<repo>/` erreichbar und lässt sich am Handy über „Zum Home-Bildschirm“ wie eine App ablegen.
 
-## Daten
+## Daten & Cloud-Sync
 
-Alle Daten liegen nur im Browser des jeweiligen Geräts (localStorage). Handy ↔ PC über **Mehr → Datentransport** (Export/Import). Ein Cloud-Sync mit Login (z. B. Supabase) kann später ergänzt werden.
+- Ohne Anmeldung liegen alle Daten nur im Browser des jeweiligen Geräts (localStorage). Übertragen per **Mehr → Datentransport** (Export/Import).
+- **Mit Anmeldung** (Mehr → Konto & Cloud-Sync): Login per E-Mail-Link über Supabase. Danach werden die Daten automatisch gespeichert und auf allen Geräten gleich gehalten (neuester Stand gewinnt; beim ersten Login auf einem Gerät mit eigenen Daten wird gefragt, welche Version gilt).
+- Jede Person hat genau einen Datensatz; Row Level Security sorgt dafür, dass niemand fremde Daten sieht. Tabelle & Regeln: `supabase/schema.sql`.
+- Supabase-Einstellungen: **Authentication → URL Configuration** → Site URL und Redirect URL = Adresse der App (z. B. `https://sirchi88.github.io/Toki/`).
+- Der Cloud-Sync funktioniert nur unter der eigenen Adresse (GitHub Pages), nicht in der Claude-Vorschau.
 
 ---
 Keine Gewähr für Netto- und Steuerwerte – maßgeblich ist die Lohnabrechnung.

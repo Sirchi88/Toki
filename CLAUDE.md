@@ -12,4 +12,5 @@
   - ZK-Urlaubstag senkt das Wochensoll um 7 h; Plus derselben Woche wird zuerst damit verrechnet.
   - Tarifurlaub gilt bis 31.03. des Folgejahres; T-Zug nur im Kalenderjahr; halbe Tage nur bei Tarifurlaub oder Zeitkonto.
   - Urlaubsgeld je Tarifurlaubstag: Grundlohn ÷ 21,75 × 0,5.
+- Cloud-Sync: `src/sync.js` spricht die Supabase-REST/Auth-API direkt per `fetch` an (keine Bibliothek). Tabelle `toki_daten` (eine Zeile pro Nutzer, Spalte `daten` = kompletter App-Zustand als JSON), Schema in `supabase/schema.sql`. Nur der Publishable Key gehört in den Code, niemals der Secret Key.
 - Keine echten Vereins-/Markenlogos oder -namen in Designs.

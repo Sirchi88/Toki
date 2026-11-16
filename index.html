@@ -353,6 +353,13 @@ div.field.big2{font-size:19px;white-space:nowrap;overflow:hidden}
 .pvapp{position:relative}
 .pvapp{transform:scale(.86);transform-origin:top center;padding:14px;pointer-events:none}
 .pvfront{z-index:2}.pvfront>div{bottom:8px!important}
+
+/* Cloud-Sync */
+.top{position:relative}
+.cloudbtn{display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 10px;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--fg);font-size:16px;cursor:pointer}
+.syncdot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--muted)}
+.syncdot.ok,.syncdot.idle{background:var(--success)}.syncdot.busy{background:var(--warn);animation:pulse 1s infinite}.syncdot.err{background:var(--danger)}
+@keyframes pulse{50%{opacity:.3}}
 </style>
 </head>
 <body data-theme="standard">
@@ -1068,6 +1075,80 @@ const FX = (() => {
   return { set, preview };
 })();
 </script>
+<script>/* Toki – Cloud-Sync mit Supabase (Login per E-Mail-Link, eine Zeile pro Person). Keine Bibliothek nötig. */
+const Sync = (() => {
+  'use strict';
+  const BASE = 'https://niqkdhjzcpmyjuopgrnu.supabase.co';
+  // Publishable Key: darf öffentlich im Code stehen, Zugriff regeln die RLS-Policies der Tabelle.
+  const KEY = 'sb_publishable_6yXuxHgXlb12TCTrcKYkUg_Z7l6HXxA';
+  const SKEY = 'toki-session';
+  const TABLE = 'toki_daten';
+
+  const read = () => { try { return JSON.parse(localStorage.getItem(SKEY)); } catch { return null; } };
+  let session = read();
+  const store = (s) => { session = s; try { if (s) localStorage.setItem(SKEY, JSON.stringify(s)); else localStorage.removeItem(SKEY); } catch { /* */ } };
+  const jwt = (t) => { try { return JSON.parse(decodeURIComponent(escape(atob(t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))))); } catch { return {}; } };
+  const headers = (extra = {}) => ({ apikey: KEY, 'Content-Type': 'application/json', ...extra });
+  const errText = async (r) => { const j = await r.json().catch(() => ({})); return j.msg || j.error_description || j.message || j.error || `Fehler ${r.status}`; };
+
+  /** Läuft die Seite an einem Ort, von dem aus Supabase erreichbar ist? (nicht in der Claude-Vorschau / als Datei) */
+  const available = () => /^https?:$/.test(location.protocol) && !/(^|\.)claude\.ai$|claudeusercontent|anthropic/.test(location.hostname);
+
+  /** Nach dem Klick auf den Login-Link stehen die Tokens im #-Teil der Adresse. */
+  function fromHash() {
+    const h = location.hash || '';
+    if (!/access_token=|error=|error_description=/.test(h)) return null;
+    const p = new URLSearchParams(h.slice(1));
+    try { history.replaceState(null, '', location.pathname + location.search); } catch { /* */ }
+    if (p.get('error') || p.get('error_description')) return { error: (p.get('error_description') || p.get('error')).replace(/\+/g, ' ') };
+    const at = p.get('access_token');
+    const pl = jwt(at);
+    store({ access_token: at, refresh_token: p.get('refresh_token'), expires_at: Number(p.get('expires_at')) || Math.floor(Date.now() / 1000) + Number(p.get('expires_in') || 3600), user: { id: pl.sub, email: pl.email } });
+    return { ok: true };
+  }
+
+  async function token() {
+    if (!session) throw new Error('Nicht angemeldet');
+    if (session.expires_at - 60 > Date.now() / 1000) return session.access_token;
+    const r = await fetch(`${BASE}/auth/v1/token?grant_type=refresh_token`, { method: 'POST', headers: headers(), body: JSON.stringify({ refresh_token: session.refresh_token }) });
+    if (!r.ok) { if (r.status === 400 || r.status === 401) store(null); throw new Error('Anmeldung abgelaufen – bitte neu anmelden'); }
+    const j = await r.json();
+    store({ access_token: j.access_token, refresh_token: j.refresh_token, expires_at: j.expires_at || Math.floor(Date.now() / 1000) + (j.expires_in || 3600), user: { id: (j.user && j.user.id) || session.user.id, email: (j.user && j.user.email) || session.user.email } });
+    return session.access_token;
+  }
+
+  async function sendLink(email, redirectTo) {
+    const r = await fetch(`${BASE}/auth/v1/otp?redirect_to=${encodeURIComponent(redirectTo)}`, { method: 'POST', headers: headers(), body: JSON.stringify({ email, create_user: true }) });
+    if (!r.ok) throw new Error(await errText(r));
+  }
+
+  /** Eigenen Datensatz holen: { daten, aktualisiert } oder null */
+  async function pull() {
+    const t = await token();
+    const r = await fetch(`${BASE}/rest/v1/${TABLE}?select=daten,aktualisiert`, { headers: headers({ Authorization: `Bearer ${t}` }) });
+    if (!r.ok) throw new Error(await errText(r));
+    const rows = await r.json();
+    return rows[0] || null;
+  }
+
+  async function push(daten, updatedMs) {
+    const t = await token();
+    const r = await fetch(`${BASE}/rest/v1/${TABLE}?on_conflict=user_id`, {
+      method: 'POST',
+      headers: headers({ Authorization: `Bearer ${t}`, Prefer: 'resolution=merge-duplicates,return=minimal' }),
+      body: JSON.stringify({ user_id: session.user.id, daten, aktualisiert: new Date(updatedMs || Date.now()).toISOString() }),
+    });
+    if (!r.ok) throw new Error(await errText(r));
+  }
+
+  async function logout() {
+    try { if (session) await fetch(`${BASE}/auth/v1/logout`, { method: 'POST', headers: headers({ Authorization: `Bearer ${session.access_token}` }) }); } catch { /* egal */ }
+    store(null);
+  }
+
+  return { get session() { return session; }, available, fromHash, sendLink, pull, push, logout };
+})();
+</script>
 <script>/* Toki – Oberfläche */
 (() => {
   'use strict';
@@ -1081,7 +1162,7 @@ const FX = (() => {
     const settings = C.merge(C.defaults(), d.settings || {});
     if (!THEME_IDS.includes(settings.theme)) settings.theme = 'standard';
     const absences = (d.absences || []).map((a) => (a.created ? a : { ...a, created: Date.now() }));
-    return { settings, entries: d.entries || {}, absences, kontingent: d.kontingent || {}, nach: d.nach || [], pref: d.pref || {} };
+    return { meta: d.meta || {}, settings, entries: d.entries || {}, absences, kontingent: d.kontingent || {}, nach: d.nach || [], pref: d.pref || {} };
   };
   const THEMES = [
     ['dark', 'Dark', 'linear-gradient(135deg,#2a2c31 0 50%,#1b1c20 50%)'],
@@ -1102,9 +1183,84 @@ const FX = (() => {
   }
   let st = load();
   const S = () => st.settings;
+  function persist() {
+    try { localStorage.setItem(KEY, JSON.stringify(st)); storageOk = true; } catch { storageOk = false; }
+  }
   function save() {
     st.pref = { ...st.pref, start: ui.start, bz: ui.bz, mi: ui.mi };
-    try { localStorage.setItem(KEY, JSON.stringify(st)); storageOk = true; } catch { storageOk = false; }
+    st.meta = { ...(st.meta || {}), updated: Date.now() };
+    persist();
+    schedulePush();
+  }
+
+  // ---------- Cloud-Sync ----------
+  const sync = { status: Sync.session ? 'idle' : 'off', msg: '', busy: false };
+  let pushT = null;
+  function setSync(status, msg = '') {
+    sync.status = status; sync.msg = msg;
+    const el = document.getElementById('syncdot'); if (el) { el.className = `syncdot ${status}`; el.title = syncLabel(); }
+    const box = document.getElementById('syncinfo'); if (box) box.innerHTML = syncInfoHtml();
+  }
+  function syncLabel() {
+    return { off: 'Nicht angemeldet', idle: 'Cloud verbunden', busy: 'Synchronisiere …', ok: 'Gespeichert in der Cloud', err: `Sync-Fehler: ${sync.msg}` }[sync.status] || '';
+  }
+  function schedulePush() {
+    if (!Sync.session || !Sync.available()) return;
+    clearTimeout(pushT);
+    pushT = setTimeout(() => pushNow(), 1500);
+  }
+  async function pushNow() {
+    if (!Sync.session) return;
+    try { setSync('busy'); await Sync.push(st, st.meta.updated); st.meta.syncedAt = Date.now(); persist(); setSync('ok'); }
+    catch (e) { setSync('err', e.message); if (!Sync.session) render(); }
+  }
+  async function syncNow(manual = false) {
+    if (!Sync.session || !Sync.available() || sync.busy) return;
+    sync.busy = true; setSync('busy');
+    try {
+      const remote = await Sync.pull();
+      const localUp = Number(st.meta && st.meta.updated) || 0;
+      const remoteUp = remote ? Date.parse(remote.aktualisiert) || 0 : 0;
+      const localHasData = Object.keys(st.entries).length > 0 || st.absences.length > 0;
+      if (!remote || !remote.daten || !remote.daten.settings) {
+        if (!st.meta.updated) st.meta.updated = Date.now();
+        await Sync.push(st, st.meta.updated);
+        st.meta.syncedAt = Date.now(); persist(); setSync('ok');
+        if (manual || localHasData) toast('✓ Deine Daten liegen jetzt in der Cloud', 2600, 'ok');
+      } else if (!st.meta.syncedAt && localHasData && Math.abs(remoteUp - localUp) > 1000) {
+        // Erstes Anmelden auf einem Gerät, das schon eigene Daten hat: fragen
+        sync.busy = false; setSync('idle');
+        sheet(`<h3>Welche Daten behalten?</h3><p class="small">In der Cloud liegen schon Daten (Stand ${new Date(remoteUp).toLocaleString('de-DE')}), und auf diesem Gerät auch (Stand ${localUp ? new Date(localUp).toLocaleString('de-DE') : 'unbekannt'}).</p>
+          <div class="grid2 mt"><button class="btn soft" id="useLocal">Dieses Gerät</button><button class="btn" id="useCloud">Cloud</button></div><p class="hint">Die andere Version wird überschrieben.</p>`, (el) => {
+          el.querySelector('#useCloud').addEventListener('click', () => { closeSheet(); applyRemote(remote, remoteUp); toast('✓ Daten aus der Cloud übernommen', 2600, 'ok'); });
+          el.querySelector('#useLocal').addEventListener('click', async () => { closeSheet(); st.meta.updated = Date.now(); persist(); await pushNow(); toast('✓ Daten dieses Geräts in die Cloud übernommen', 2600, 'ok'); });
+        });
+        return;
+      } else if (remoteUp > localUp) {
+        applyRemote(remote, remoteUp);
+        if (manual) toast('✓ Neueste Daten geladen', 2200, 'ok');
+      } else if (localUp > remoteUp) {
+        await Sync.push(st, localUp); st.meta.syncedAt = Date.now(); persist(); setSync('ok');
+        if (manual) toast('✓ In die Cloud gespeichert', 2200, 'ok');
+      } else { st.meta.syncedAt = Date.now(); persist(); setSync('ok'); if (manual) toast('✓ Alles aktuell', 2000, 'ok'); }
+    } catch (e) { setSync('err', e.message); if (manual) toast(`⚠ ${e.message}`, 3500); if (!Sync.session) render(); }
+    finally { sync.busy = false; }
+  }
+  function applyRemote(remote, remoteUp) {
+    const keepPref = st.pref;
+    st = norm(remote.daten);
+    st.pref = { ...keepPref, ...(remote.daten.pref || {}) };
+    st.meta = { ...(st.meta || {}), updated: remoteUp, syncedAt: Date.now() };
+    persist(); loadDate(ui.date); setSync('ok'); render();
+  }
+  function syncInfoHtml() {
+    if (!Sync.available()) return '<div class="notice warn"><div>Die Cloud funktioniert nur, wenn Toki unter seiner eigenen Adresse läuft (<b>sirchi88.github.io/Toki</b>) – nicht in der Claude-Vorschau.</div></div>';
+    if (!Sync.session) return `<p class="small muted">Melde dich mit deiner E-Mail an – du bekommst einen Login-Link. Danach sind deine Daten auf Handy und PC gleich.</p>
+      <div class="grid2"><input class="field" id="loginMail" type="email" inputmode="email" autocomplete="email" placeholder="deine@email.de" value="${esc(st.pref.mail || '')}"><button class="btn" data-act="sendLink">Login-Link senden</button></div>
+      ${st.pref.linkSent ? `<p class="hint">📧 Link an <b>${esc(st.pref.linkSent)}</b> geschickt – Mail öffnen und auf den Link tippen (am besten im selben Browser). Auch im Spam schauen.</p>` : ''}`;
+    const last = st.meta && st.meta.syncedAt ? new Date(st.meta.syncedAt).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '–';
+    return `<div class="between"><div><b>☁ ${esc(Sync.session.user.email || 'Angemeldet')}</b><div class="xs muted">${esc(syncLabel())} · zuletzt ${last}</div></div><span class="syncdot ${sync.status}"></span></div>
+      <div class="grid2 mt"><button class="btn soft" data-act="syncNow">Jetzt synchronisieren</button><button class="btn ghost" data-act="logout">Abmelden</button></div>`;
   }
 
   const today = C.todayIso();
@@ -1825,6 +1981,7 @@ const FX = (() => {
       <div class="grid2">${fld(`Geburtsjahr ${info('alter')}`, 'steuer.geburtsjahr', s.steuer.geburtsjahr || '', 'inputmode="numeric" placeholder="z. B. 1990"')}<div></div></div>
       ${sw('Kirchensteuer', 'steuer.kirche', s.steuer.kirche)}
       ${!s.steuer.geprueft ? '<button class="btn soft sm" data-act="steuerOk">✓ Angaben stimmen so</button>' : '<p class="xs muted">✓ Steuerdaten geprüft</p>'}`)}
+    ${sec('konto', 'Konto & Cloud-Sync', '<div id="syncinfo">' + syncInfoHtml() + '</div>')}
     ${sec('daten', 'Datentransport', `<p class="small muted">Deine Daten liegen nur in diesem Browser auf diesem Gerät. Für Handy ↔ PC: hier exportieren und am anderen Gerät importieren.</p>
       <div class="grid2"><button class="btn" data-act="export">Exportieren</button><label class="btn soft" style="position:relative">Importieren<input type="file" accept=".json,application/json" data-act="importFile" style="position:absolute;inset:0;opacity:0"></label></div>
       <button class="btn ghost mt-s" data-act="importPaste">Aus Text einfügen</button>
@@ -1841,7 +1998,7 @@ const FX = (() => {
     const s = S();
     document.body.dataset.theme = s.theme;
     const page = { feierabend: pageFeierabend, mehrarbeit: pageMehrarbeit, urlaub: pageUrlaub, netto: pageNetto, einstellungen: pageSettings }[ui.tab] || pageFeierabend;
-    root.innerHTML = `<div class="top"><div class="brand"><img src="${LOGO}" alt=""><span>TOKI</span></div></div>${page()}`;
+    root.innerHTML = `<div class="top"><div class="brand"><img src="${LOGO}" alt=""><span>TOKI</span></div>${Sync.session ? `<button class="cloudbtn" data-act="goSet" data-sec="konto" title="${esc(syncLabel())}">☁<span id="syncdot" class="syncdot ${sync.status}"></span></button>` : ''}</div>${page()}`;
     document.getElementById('nav').innerHTML = `<div class="in">${TABS.map(([id, l, ic]) => `<button data-act="tab" data-tab="${id}" ${ui.tab === id ? 'aria-current="page"' : ''}>${ic}<span>${l}</span></button>`).join('')}</div>`;
     if (keepScroll) window.scrollTo(0, y);
     applyTheme();
@@ -1866,6 +2023,19 @@ const FX = (() => {
   function delEntry(d) { confirmBox('Eintrag löschen?', `Arbeitszeit vom ${dLong(d)} (${esc(st.entries[d].start)}–${esc(st.entries[d].end)}) wird gelöscht.`, 'Löschen', () => { delete st.entries[d]; save(); if (ui.date === d) loadDate(d); render(); toast('Eintrag gelöscht'); }); }
   const A = {
     tab: (t) => setTab(t.dataset.tab),
+    sendLink: async (t) => {
+      const mail = (document.getElementById('loginMail') || {}).value || '';
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail.trim())) return toast('Bitte eine gültige E-Mail eintragen');
+      t.disabled = true; t.textContent = 'Sende …';
+      try {
+        await Sync.sendLink(mail.trim(), location.origin + location.pathname);
+        st.pref.mail = mail.trim(); st.pref.linkSent = mail.trim(); persist();
+        toast('📧 Login-Link verschickt – schau in dein Postfach', 3500, 'ok');
+      } catch (e) { toast(`⚠ ${e.message}`, 4000); }
+      render();
+    },
+    syncNow: () => syncNow(true),
+    logout: () => confirmBox('Abmelden?', 'Die Daten bleiben auf diesem Gerät und in der Cloud erhalten. Änderungen werden erst nach erneutem Anmelden wieder synchronisiert.', 'Abmelden', async () => { await Sync.logout(); st.meta.syncedAt = 0; persist(); setSync('off'); render(); toast('Abgemeldet'); }, false),
     pickDate: () => { ui.pickM = ui.date.slice(0, 7); openPicker(); },
     pickDay: (t) => { loadDate(t.dataset.d); closeSheet(); render(); },
     pickNav: (t) => { ui.pickM = shiftMonth(ui.pickM, Number(t.dataset.d)); openPicker(); },
@@ -2045,13 +2215,22 @@ const FX = (() => {
       }
     }
   });
-  window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (TABS.some((x) => x[0] === h) && h !== ui.tab) { ui.tab = h; render(false); } });
+  window.addEventListener('hashchange', () => {
+    const lg = Sync.fromHash();
+    if (lg) { if (lg.ok) { st.pref.linkSent = ''; persist(); toast(`✓ Angemeldet als ${Sync.session.user.email || ''}`, 3000, 'ok'); render(); syncNow(false); } else toast(`⚠ Login fehlgeschlagen: ${lg.error}`, 5000); return; }
+    const h = location.hash.slice(1); if (TABS.some((x) => x[0] === h) && h !== ui.tab) { ui.tab = h; render(false); } });
 
   // Start
+  const login = Sync.fromHash();
+  if (login && login.ok) { st.pref.linkSent = ''; persist(); ui.setOpen = 'konto'; }
   const h0 = location.hash.slice(1);
   if (TABS.some((x) => x[0] === h0)) ui.tab = h0;
   loadDate(today);
   render(false);
+  if (login && login.error) toast(`⚠ Login fehlgeschlagen: ${login.error}`, 5000);
+  if (login && login.ok) toast(`✓ Angemeldet als ${Sync.session.user.email || ''}`, 3000, 'ok');
+  if (Sync.session) syncNow(false);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') syncNow(false); });
 })();
 </script>
 </body>

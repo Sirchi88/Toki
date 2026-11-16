@@ -339,3 +339,10 @@ div.field.big2{font-size:19px;white-space:nowrap;overflow:hidden}
 .pvapp{position:relative}
 .pvapp{transform:scale(.86);transform-origin:top center;padding:14px;pointer-events:none}
 .pvfront{z-index:2}.pvfront>div{bottom:8px!important}
+
+/* Cloud-Sync */
+.top{position:relative}
+.cloudbtn{display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 10px;border-radius:99px;border:1.5px solid var(--border);background:var(--card);color:var(--fg);font-size:16px;cursor:pointer}
+.syncdot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--muted)}
+.syncdot.ok,.syncdot.idle{background:var(--success)}.syncdot.busy{background:var(--warn);animation:pulse 1s infinite}.syncdot.err{background:var(--danger)}
+@keyframes pulse{50%{opacity:.3}}
