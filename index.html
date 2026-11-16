@@ -1,0 +1,2058 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#b4521f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Toki">
+<meta name="description" content="Toki – Feierabend, Mehrarbeit, Zeitkonto, Urlaub und Netto im Blick.">
+<title>Toki</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjE1IDMgOTAgODgiPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJ0ZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzM2Yjk4MiIvPjxzdG9wIG9mZnNldD0iLjU1IiBzdG9wLWNvbG9yPSIjMmE5YzZiIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWQ3NjUwIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJ0eCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzJjOWY2YyIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzFlN2E1MSIvPjwvbGluZWFyR3JhZGllbnQ+CjxmaWx0ZXIgaWQ9InNoIiB4PSItMjAlIiB5PSItMjAlIiB3aWR0aD0iMTQwJSIgaGVpZ2h0PSIxNDAlIj48ZmVEcm9wU2hhZG93IGR4PSIwIiBkeT0iMS41IiBzdGREZXZpYXRpb249IjEuNiIgZmxvb2QtY29sb3I9IiMwMDAiIGZsb29kLW9wYWNpdHk9Ii4zNSIvPjwvZmlsdGVyPgo8ZmlsdGVyIGlkPSJpbiI+PGZlT2Zmc2V0IGR5PSIxLjIiLz48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIxIi8+PGZlQ29tcG9zaXRlIG9wZXJhdG9yPSJvdXQiIGluPSJTb3VyY2VHcmFwaGljIi8+PGZlQ29tcG9uZW50VHJhbnNmZXI+PGZlRnVuY0EgdHlwZT0ibGluZWFyIiBzbG9wZT0iLjciLz48L2ZlQ29tcG9uZW50VHJhbnNmZXI+PGZlQmxlbmQgaW4yPSJTb3VyY2VHcmFwaGljIiBtb2RlPSJub3JtYWwiLz48L2ZpbHRlcj4KPC9kZWZzPgo8ZyBmaWx0ZXI9InVybCgjc2gpIj4KPHJlY3QgeD0iMTkiIHk9IjYiIHdpZHRoPSI4MiIgaGVpZ2h0PSI4MCIgcng9IjE1IiBmaWxsPSJ1cmwoI3RnKSIvPgo8cmVjdCB4PSIxOS42IiB5PSI2LjYiIHdpZHRoPSI4MC44IiBoZWlnaHQ9Ijc4LjgiIHJ4PSIxNC40IiBmaWxsPSJub25lIiBzdHJva2U9IiM3ZmYwYmQiIHN0cm9rZS1vcGFjaXR5PSIuMjIiIHN0cm9rZS13aWR0aD0iMS4yIi8+CjwvZz4KPHBhdGggZD0iTTM3LjUgMjFIODAuNVYzNEg2NS41VjY5SDUyLjVWMzRIMzcuNVoiIGZpbGw9IiMxZDIwMjUiIGZpbHRlcj0idXJsKCNpbikiLz4KPC9zdmc+Cg=="><link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjE1IDMgOTAgODgiPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJ0ZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzM2Yjk4MiIvPjxzdG9wIG9mZnNldD0iLjU1IiBzdG9wLWNvbG9yPSIjMmE5YzZiIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWQ3NjUwIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJ0eCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzJjOWY2YyIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzFlN2E1MSIvPjwvbGluZWFyR3JhZGllbnQ+CjxmaWx0ZXIgaWQ9InNoIiB4PSItMjAlIiB5PSItMjAlIiB3aWR0aD0iMTQwJSIgaGVpZ2h0PSIxNDAlIj48ZmVEcm9wU2hhZG93IGR4PSIwIiBkeT0iMS41IiBzdGREZXZpYXRpb249IjEuNiIgZmxvb2QtY29sb3I9IiMwMDAiIGZsb29kLW9wYWNpdHk9Ii4zNSIvPjwvZmlsdGVyPgo8ZmlsdGVyIGlkPSJpbiI+PGZlT2Zmc2V0IGR5PSIxLjIiLz48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIxIi8+PGZlQ29tcG9zaXRlIG9wZXJhdG9yPSJvdXQiIGluPSJTb3VyY2VHcmFwaGljIi8+PGZlQ29tcG9uZW50VHJhbnNmZXI+PGZlRnVuY0EgdHlwZT0ibGluZWFyIiBzbG9wZT0iLjciLz48L2ZlQ29tcG9uZW50VHJhbnNmZXI+PGZlQmxlbmQgaW4yPSJTb3VyY2VHcmFwaGljIiBtb2RlPSJub3JtYWwiLz48L2ZpbHRlcj4KPC9kZWZzPgo8ZyBmaWx0ZXI9InVybCgjc2gpIj4KPHJlY3QgeD0iMTkiIHk9IjYiIHdpZHRoPSI4MiIgaGVpZ2h0PSI4MCIgcng9IjE1IiBmaWxsPSJ1cmwoI3RnKSIvPgo8cmVjdCB4PSIxOS42IiB5PSI2LjYiIHdpZHRoPSI4MC44IiBoZWlnaHQ9Ijc4LjgiIHJ4PSIxNC40IiBmaWxsPSJub25lIiBzdHJva2U9IiM3ZmYwYmQiIHN0cm9rZS1vcGFjaXR5PSIuMjIiIHN0cm9rZS13aWR0aD0iMS4yIi8+CjwvZz4KPHBhdGggZD0iTTM3LjUgMjFIODAuNVYzNEg2NS41VjY5SDUyLjVWMzRIMzcuNVoiIGZpbGw9IiMxZDIwMjUiIGZpbHRlcj0idXJsKCNpbikiLz4KPC9zdmc+Cg==">
+<style>:root{
+  --bg:oklch(97% .015 80);--card:oklch(100% 0 0);--fg:oklch(22% .03 265);--muted:oklch(52% .04 257);
+  --primary:oklch(55% .15 45);--on-primary:oklch(98% .01 80);--secondary:oklch(94% .02 75);--accent:oklch(92% .05 60);
+  --border:oklch(90% .015 255);--danger:oklch(55% .22 27);--success:oklch(48% .13 150);--warn:oklch(70% .15 75);
+  --c-tarif:oklch(62% .16 45);--c-zk:oklch(55% .14 255);--c-fza:oklch(58% .13 300);--c-tzug:oklch(60% .13 175);--c-sonder:oklch(62% .15 350);--c-krank:oklch(55% .03 260);
+  --radius:14px;--shadow:0 1px 2px rgb(0 0 0/.05),0 6px 20px -8px rgb(0 0 0/.12);
+  --font-d:'Bebas Neue',Impact,'Arial Narrow',sans-serif;--font-b:'Barlow',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+body[data-theme=sw]{--bg:oklch(100% 0 0);--fg:oklch(15% 0 0);--primary:oklch(15% 0 0);--on-primary:#fff;--secondary:oklch(95% 0 0);--accent:oklch(90% 0 0);--muted:oklch(45% 0 0);--border:oklch(85% 0 0)}
+body[data-theme=blau]{--bg:oklch(98% .01 250);--fg:oklch(25% .08 260);--primary:oklch(50% .18 255);--on-primary:#fff;--secondary:oklch(94% .03 250);--accent:oklch(90% .06 250);--border:oklch(88% .03 250);--muted:oklch(48% .06 255)}
+body[data-theme=gruen]{--bg:oklch(98% .015 150);--fg:oklch(25% .06 155);--primary:oklch(52% .14 150);--on-primary:#fff;--secondary:oklch(94% .04 150);--accent:oklch(90% .08 150);--border:oklch(88% .04 150);--muted:oklch(46% .05 155)}
+body[data-theme=dark]{color-scheme:dark;--bg:#17181c;--card:#222328;--fg:#ececf1;--muted:#9a9ca6;--primary:#2fae78;--on-primary:#fff;--secondary:#2c2e34;--accent:#23392f;--border:#34363d;--success:#6fd39b;--danger:#ff6b6b;--warn:#f0b75a;--shadow:0 1px 2px rgb(0 0 0/.4),0 8px 24px -10px rgb(0 0 0/.6)}
+body[data-theme=neon]{color-scheme:dark;--onbg:#fff;--bg:#12062b;--card:rgb(28 12 54/.86);--fg:#f6eaff;--muted:#c3a6e0;--primary:#ff4fd8;--on-primary:#fff;--secondary:rgb(255 255 255/.08);--accent:rgb(65 232 255/.18);--border:rgb(255 79 216/.35);--success:#41e8ff;--danger:#ff5577;--warn:#ffd25a;--c-zk:#41e8ff;--shadow:0 0 0 1px rgb(255 79 216/.15),0 10px 30px -10px rgb(255 79 216/.45)}
+body[data-theme=neon] .card,body[data-theme=neon] .amp,body[data-theme=neon] details.fold,body[data-theme=neon] .bal .b{backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+body[data-theme=neon] h1{text-shadow:0 0 12px #ff4fd8,0 0 2px #fff}
+body[data-theme=dorf]{--onbg:#13254f;--bg:#bfe6ff;--card:rgb(255 255 255/.95);--fg:#13254f;--primary:#d0202e;--on-primary:#fff;--secondary:#eef2fa;--accent:#ffe3e5;--border:#cfd8ea;--muted:#4f6290}
+body[data-theme=dorf] .card,body[data-theme=dorf] details.fold{border-top:4px solid #1f3f8f;box-shadow:inset 0 3px 0 #fff,0 1px 2px rgb(0 0 0/.05),0 6px 20px -8px rgb(0 0 0/.12)}
+body[data-theme=dorf] .card::after{content:'';position:absolute;left:0;right:0;top:-4px;height:4px;background:linear-gradient(90deg,#d0202e 0 33.3%,#fff 33.3% 66.6%,#1f3f8f 66.6%);border-radius:var(--radius) var(--radius) 0 0}
+body[data-theme=arena]{--onbg:#fff;--bg:oklch(20% .06 260);--card:oklch(99% .003 250/.96);--fg:oklch(24% .07 258);--primary:oklch(52% .21 25);--on-primary:#fff;--secondary:oklch(94% .03 250);--accent:oklch(92% .04 25);--border:oklch(85% .05 250);--muted:oklch(45% .06 255)}
+body[data-theme=xmas]{--onbg:#fff;--bg:oklch(28% .07 255);--card:oklch(99% .008 150/.96);--fg:oklch(27% .06 155);--primary:oklch(48% .18 25);--on-primary:#fff;--secondary:oklch(94% .04 150);--accent:oklch(92% .08 85);--border:oklch(84% .07 85);--muted:oklch(44% .05 155)}
+body[data-theme=fryer]{--bg:oklch(93% .06 80);--card:oklch(99.5% .012 85/.95);--fg:oklch(28% .06 50);--primary:oklch(56% .17 40);--on-primary:#fff;--secondary:oklch(94% .05 85);--accent:oklch(90% .1 90);--border:oklch(84% .08 70);--muted:oklch(48% .06 55)}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100dvh;background:var(--bg);color:var(--fg);font-family:var(--font-b);font-size:16px;line-height:1.4;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+#fx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+#app{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 14px) 14px calc(96px + env(safe-area-inset-bottom))}
+@media (min-width:900px){#app{max-width:560px;padding-top:28px}}
+
+/* Kopf */
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.brand{display:flex;align-items:center;gap:8px;font-family:var(--font-d);font-size:15px;letter-spacing:.18em;color:var(--muted)}
+
+.brand{color:var(--onbg,var(--fg))}.brand img{width:34px;height:34px;border-radius:10px;box-shadow:0 2px 8px rgb(0 0 0/.25)}
+.brand span{font-family:var(--font-d);font-size:24px;letter-spacing:.14em}
+h1{font-family:var(--font-d);font-weight:400;font-size:44px;line-height:.95;margin:0 0 14px;letter-spacing:.01em}
+h1{color:var(--onbg,var(--fg))}body[data-theme=arena] h1,body[data-theme=xmas] h1{text-shadow:0 2px 12px rgb(0 0 0/.35)}
+.onbg{color:var(--onbg,var(--fg))!important;opacity:.85}
+.iconbtn{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:999px;border:1.5px solid var(--border);background:var(--card);cursor:pointer;color:var(--fg)}
+.iconbtn svg{width:20px;height:20px}
+
+/* Karten */
+.card{position:relative;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);margin-bottom:14px}
+.card h2{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.card h3{font-family:var(--font-d);font-weight:400;font-size:28px;margin:0;line-height:1}
+.label{display:block;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.row{display:flex;align-items:center;gap:10px}
+.between{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.muted{color:var(--muted)}.small{font-size:13px}.xs{font-size:11.5px}
+.mt{margin-top:12px}.mt-s{margin-top:6px}
+.num{font-variant-numeric:tabular-nums}
+
+/* Eingaben */
+.field{width:100%;height:46px;border:1.5px solid var(--border);border-radius:10px;background:var(--card);padding:0 12px;font-size:17px;outline:none;-webkit-appearance:none;appearance:none}
+.field:focus{border-color:var(--primary);box-shadow:0 0 0 3px color-mix(in oklch,var(--primary) 20%,transparent)}
+.field.big{height:64px;font-family:var(--font-d);font-size:clamp(30px,9vw,40px);padding:0 6px;text-align:center;letter-spacing:.03em}
+select.field{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 18px) 20px,calc(100% - 13px) 20px;background-size:5px 5px;background-repeat:no-repeat;padding-right:32px}
+input[type=time].field,input[type=date].field{min-width:0;max-width:100%}
+input[type=time]::-webkit-calendar-picker-indicator{opacity:.45;margin-left:2px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:46px;padding:0 18px;border-radius:10px;border:0;background:var(--primary);color:var(--on-primary);font-weight:600;cursor:pointer;width:100%;font-size:16px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--fg);border:1.5px solid var(--border)}
+.btn.soft{background:var(--secondary);color:var(--fg)}
+.btn.danger{background:transparent;color:var(--danger);border:1.5px solid color-mix(in oklch,var(--danger) 50%,transparent)}
+.btn.sm{height:34px;font-size:14px;padding:0 12px;width:auto}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;padding:4px;border-radius:12px;background:var(--secondary)}
+.seg button{border:0;background:transparent;border-radius:9px;height:38px;font-weight:600;cursor:pointer;color:var(--muted)}
+.seg button[aria-pressed=true]{background:var(--card);color:var(--fg);box-shadow:var(--shadow)}
+body[data-theme=arena] .seg,body[data-theme=xmas] .seg{background:rgb(255 255 255/.18)}
+body[data-theme=arena] .seg button,body[data-theme=xmas] .seg button{color:#fff}
+body[data-theme=arena] .seg button[aria-pressed=true],body[data-theme=xmas] .seg button[aria-pressed=true]{color:var(--fg)}
+body[data-theme=neon] .seg{background:rgb(28 12 54/.8)}
+.switch{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;cursor:pointer}
+.switch input{appearance:none;-webkit-appearance:none;width:46px;height:28px;border-radius:99px;background:var(--border);position:relative;flex:none;cursor:pointer;transition:.2s}
+.switch input::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgb(0 0 0/.3);transition:.2s}
+.switch input:checked{background:var(--primary)}
+.switch input:checked::after{left:21px}
+.chip{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 11px;border-radius:99px;border:1.5px solid var(--border);background:var(--card);font-size:13.5px;font-weight:600;cursor:pointer}
+.chip[aria-pressed=true]{border-color:var(--primary);background:var(--accent)}
+
+/* Ampel */
+.ampel{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.amp{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:8px 10px;box-shadow:var(--shadow);min-width:0;cursor:pointer;text-align:left}
+.amp .k{display:flex;align-items:center;gap:5px;font-size:9.5px;letter-spacing:.03em!important;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.amp .v{font-family:var(--font-d);font-size:25px;line-height:1.05;white-space:nowrap}
+.dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--success)}
+.dot.y{background:var(--warn)}.dot.r{background:var(--danger)}.dot.n{background:var(--border)}
+
+/* Feierabend */
+.datebtn{position:relative;display:flex;align-items:center;justify-content:space-between;height:46px;border:1.5px solid var(--border);border-radius:10px;padding:0 12px;font-weight:600;background:var(--card)}
+.datebtn input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+.worked{display:flex;align-items:center;justify-content:space-between;border-radius:12px;background:var(--primary);color:var(--on-primary);padding:8px 14px;margin-top:12px}
+.worked .v{font-family:var(--font-d);font-size:34px;line-height:1}
+.notice{border-radius:10px;padding:9px 12px;font-size:14px;font-weight:500;margin-top:10px;display:flex;gap:8px;align-items:flex-start}
+.notice.danger{border:2px solid var(--danger);color:var(--danger);background:color-mix(in oklch,var(--danger) 6%,var(--card))}
+.notice.info{background:var(--secondary)}
+.notice.warn{border:2px solid var(--warn);background:color-mix(in oklch,var(--warn) 12%,var(--card))}
+.notice.ok{background:color-mix(in oklch,var(--success) 12%,var(--card));color:var(--success)}
+.tiles{display:grid;gap:8px;grid-template-columns:repeat(4,1fr)}
+.tile{border-radius:12px;background:var(--secondary);padding:9px 4px;text-align:center;position:relative}
+.tile .k{font-size:12px;color:var(--muted);font-weight:600}
+.tile .v{font-family:var(--font-d);font-size:28px;color:var(--primary);line-height:1.05}
+.tile.max{outline:2px dashed color-mix(in oklch,var(--danger) 45%,transparent)}
+.tile.single{grid-column:1/-1}
+details.fold{background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);margin-bottom:14px}
+details.fold summary{list-style:none;display:flex;align-items:center;justify-content:space-between;padding:11px 14px;cursor:pointer;font-size:14px;font-weight:600}
+details.fold summary::-webkit-details-marker{display:none}
+details.fold summary .chev{transition:.2s;color:var(--muted)}
+details.fold[open] summary .chev{transform:rotate(180deg)}
+details.fold .body{padding:0 14px 12px}
+.minirow{display:flex;gap:8px;flex-wrap:wrap}
+
+/* Wochen */
+.wk-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;cursor:pointer}
+.wk-sub{font-size:12.5px;color:var(--muted);margin-top:2px}
+.big-r{font-family:var(--font-d);font-size:28px;color:var(--primary);line-height:1;white-space:nowrap}
+.days{margin-top:12px;display:grid;gap:6px}
+.day{display:grid;grid-template-columns:40px 1fr 62px;gap:8px;align-items:center;font-size:13.5px;height:32px}
+.day[data-act]{cursor:pointer}
+.day .wd{font-weight:700;line-height:1.05}.day .wd small{display:block;font-weight:500;color:var(--muted);font-size:11px}
+.bar{position:relative;height:26px;box-sizing:border-box;border-radius:7px;background:var(--secondary);overflow:hidden}
+.bar .f{position:absolute;inset:0 auto 0 0;background:color-mix(in oklch,var(--primary) 55%,var(--card));border-radius:7px}
+.bar .o{position:absolute;top:0;bottom:0;background:var(--success);border-radius:0 7px 7px 0}
+.bar .u{position:absolute;top:0;bottom:0;background:repeating-linear-gradient(135deg,color-mix(in oklch,var(--danger) 30%,transparent) 0 4px,transparent 4px 8px)}
+.bar .s{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--fg);opacity:.5}
+.bar .t{position:absolute;inset:0;display:flex;align-items:center;padding:0 8px;font-size:12px;font-weight:600;white-space:nowrap}
+.bar.abs{display:flex;align-items:center;padding:0 8px;font-size:12px;font-weight:700;color:#fff}
+.bar.hol{background:repeating-linear-gradient(135deg,var(--secondary) 0 6px,var(--accent) 6px 12px);display:flex;align-items:center;padding:0 8px;font-size:12px;font-weight:600}
+.bar.empty{background:transparent;height:26px}.bar.empty::after{content:'';position:absolute;left:0;right:0;top:12px;border-top:2px dashed var(--border)}
+.dv{font-weight:700;min-width:58px;text-align:right;font-variant-numeric:tabular-nums}
+.pos{color:var(--success)}.neg{color:var(--danger)}
+.del{border:0;background:transparent;color:var(--muted);cursor:pointer;padding:0 2px;font-size:15px}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}
+.kpi{background:var(--secondary);border-radius:10px;padding:7px 9px}
+.kpi .k{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.kpi .v{font-family:var(--font-d);font-size:23px;line-height:1.05}
+.kpi.hl{background:color-mix(in oklch,var(--success) 16%,var(--card))}
+.kpi.nach{background:color-mix(in oklch,var(--warn) 25%,var(--card))}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--secondary);white-space:nowrap}
+.badge.nach{background:var(--warn);color:oklch(25% .05 70)}
+dl.money{margin:12px 0 0;padding:10px 12px;border-radius:10px;background:var(--secondary);font-size:14px}
+dl.money div{display:flex;justify-content:space-between;gap:8px;padding:2px 0}
+dl.money dt{color:var(--muted)} dl.money dd{margin:0;font-variant-numeric:tabular-nums;font-weight:600}
+dl.money .sum{border-top:1px solid var(--border);margin-top:4px;padding-top:6px}
+dl.money .sum dt,dl.money .sum dd{color:var(--fg);font-weight:700}
+.progress{height:10px;border-radius:99px;background:var(--secondary);overflow:hidden;position:relative}
+.progress i{position:absolute;inset:0 auto 0 0;background:var(--primary);border-radius:99px}
+.progress i.n{background:var(--warn)}
+.chart{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;align-items:end;height:130px;margin-top:10px}
+.chart .c{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:3px}
+.chart .c b{display:block;width:100%;border-radius:5px 5px 2px 2px;background:var(--primary);min-height:2px}
+.chart .c b.zk{background:var(--c-zk)}
+.chart .c span{font-size:10px;color:var(--muted);font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--muted);margin-top:8px}
+.legend span{display:inline-flex;align-items:center;white-space:nowrap}
+.legend i{flex:none;display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+
+/* Kalender */
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal .wh{text-align:center;font-size:11px;font-weight:700;color:var(--muted);padding:2px 0}
+.cd{position:relative;aspect-ratio:1/1.05;border-radius:10px;border:1.5px solid transparent;background:var(--secondary);display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:600;font-size:15px;cursor:pointer;padding:0;user-select:none}
+.cd.out{opacity:.28}
+.cd.we{background:transparent;color:var(--muted)}
+.cd.hol{background:repeating-linear-gradient(135deg,var(--secondary) 0 5px,var(--accent) 5px 10px);color:var(--muted)}
+.cd.today{border-color:var(--fg)}
+.cd.sel{outline:3px solid var(--primary);outline-offset:-1px}
+.cd.inr{background:color-mix(in oklch,var(--primary) 22%,var(--card))}
+.cd .m{font-size:9px;font-weight:700;line-height:1;margin-top:2px}
+.cd.t-tarif{background:var(--c-tarif);color:#fff}.cd.t-zk{background:var(--c-zk);color:#fff}.cd.t-fza{background:var(--c-fza);color:#fff}.cd.t-tzug{background:var(--c-tzug);color:#fff}.cd.t-sonder{background:var(--c-sonder);color:#fff}
+.cd.half{background-image:linear-gradient(135deg,transparent 50%,rgb(255 255 255/.55) 50%)}
+.cd .w{position:absolute;bottom:4px;width:5px;height:5px;border-radius:50%;background:var(--primary)}
+.tdot{display:inline-block;width:10px;height:10px;border-radius:3px;flex:none}
+.tdot.tarif{background:var(--c-tarif)}.tdot.zk{background:var(--c-zk)}.tdot.fza{background:var(--c-fza)}.tdot.tzug{background:var(--c-tzug)}.tdot.sonder{background:var(--c-sonder)}
+.bal{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.bal .b{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 12px;box-shadow:var(--shadow);border-left:5px solid var(--border)}
+.bal .b.tarif{border-left-color:var(--c-tarif)}.bal .b.zk{border-left-color:var(--c-zk)}.bal .b.fza{border-left-color:var(--c-fza)}.bal .b.tzug{border-left-color:var(--c-tzug)}.bal .b.sonder{border-left-color:var(--c-sonder)}
+.bal .b.wide{grid-column:1/-1}
+.bal .k{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.bal .v{font-family:var(--font-d);font-size:30px;line-height:1.05}
+.bal .s{font-size:12px;color:var(--muted)}
+.typepick{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.typepick button{display:flex;align-items:center;gap:8px;text-align:left;border:1.5px solid var(--border);background:var(--card);border-radius:10px;padding:8px 10px;cursor:pointer;font-weight:600;font-size:14px}
+.typepick button small{display:block;font-weight:500;color:var(--muted);font-size:11.5px}
+.typepick button[aria-pressed=true]{border-color:var(--primary);background:var(--accent)}
+.list{display:grid;gap:2px}
+.li{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:14px}
+.li:last-child{border-bottom:0}
+.li .grow{flex:1;min-width:0}
+
+/* Netto */
+.hero{text-align:center;padding:20px 16px}
+.hero .v{font-family:var(--font-d);font-size:62px;line-height:.95;color:var(--primary)}
+.hero .s{color:var(--muted);font-size:14px}
+.blur{filter:blur(9px);user-select:none}
+.split{display:flex;height:14px;border-radius:99px;overflow:hidden;margin-top:12px}
+.split i{display:block;height:100%}
+
+/* Einstellungen */
+.set-sec summary h2{margin:0}
+.themes{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.th{border:2px solid var(--border);border-radius:12px;padding:0;overflow:hidden;cursor:pointer;background:var(--card);text-align:left}
+.th[aria-pressed=true]{border-color:var(--primary);box-shadow:0 0 0 3px color-mix(in oklch,var(--primary) 25%,transparent)}
+.th .pv{height:58px;position:relative;overflow:hidden}
+.th .nm{padding:6px 10px;font-weight:600;font-size:13.5px}
+.sonderbox{border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:8px;display:grid;gap:8px}
+.hint{font-size:12.5px;color:var(--muted);margin-top:4px}
+
+/* Navigation */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:center;padding:0 10px calc(8px + env(safe-area-inset-bottom));pointer-events:none}
+nav.tabs .in{pointer-events:auto;display:grid;grid-template-columns:repeat(5,1fr);gap:2px;width:100%;max-width:480px;background:color-mix(in oklch,var(--card) 92%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:20px;padding:6px;box-shadow:0 10px 30px -10px rgb(0 0 0/.3)}
+nav.tabs button{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;border-radius:14px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer}
+nav.tabs button svg{width:22px;height:22px}
+nav.tabs button[aria-current=page]{background:var(--accent);color:var(--fg)}
+
+/* Dialog */
+.scrim{position:fixed;inset:0;z-index:50;background:rgb(10 10 20/.45);display:flex;align-items:flex-end;justify-content:center;animation:fade .15s}
+.sheet{width:100%;max-width:480px;max-height:88dvh;overflow:auto;background:var(--card);color:var(--fg);border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));animation:up .2s ease-out}
+@media (min-width:600px){.scrim{align-items:center}.sheet{border-radius:20px}}
+.sheet h3{font-family:var(--font-d);font-weight:400;font-size:30px;margin:0 0 10px}
+@keyframes fade{from{opacity:0}}@keyframes up{from{transform:translateY(30px);opacity:.5}}
+.toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:99px;font-weight:600;font-size:14px;box-shadow:var(--shadow);animation:up .2s}
+.empty{text-align:center;padding:26px 10px;color:var(--muted)}
+body[data-theme=arena] .empty,body[data-theme=xmas] .empty,body[data-theme=neon] .empty{color:rgb(255 255 255/.8)}
+
+/* Themen-Deko */
+body[data-theme=arena] .card,body[data-theme=arena] .amp,body[data-theme=arena] details.fold,body[data-theme=arena] .bal .b{border-top:4px solid var(--primary)}
+body[data-theme=xmas] .card,body[data-theme=xmas] details.fold{margin-top:8px}
+body[data-theme=xmas] .card::before,body[data-theme=xmas] details.fold::before{content:'';position:absolute;left:-2px;right:-2px;top:-9px;height:16px;border-radius:12px 12px 8px 8px;background:radial-gradient(14px 10px at 12% 100%,transparent 98%,#fff) ,#fff;
+  -webkit-mask:radial-gradient(9px 7px at 8% 100%,#0000 96%,#000) 0 0/42px 100% repeat-x;mask:radial-gradient(9px 7px at 8% 100%,#0000 96%,#000) 0 0/42px 100% repeat-x;filter:drop-shadow(0 1px 1px rgb(80 110 160/.25));pointer-events:none}
+body[data-theme=xmas] details.fold{position:relative}
+body[data-theme=fryer] .card{background-image:radial-gradient(circle at 100% 0,color-mix(in oklch,var(--accent) 60%,transparent) 0 60px,transparent 61px)}
+
+/* v1.1 */
+.ibtn{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;border:1.5px solid currentColor;background:transparent;color:var(--primary);font:700 11px/1 Georgia,serif;font-style:italic;cursor:pointer;vertical-align:1px;margin-left:4px;padding:0;text-transform:none}
+.infotext{font-size:14.5px}.infotext ul{padding-left:18px;margin:6px 0}.infotext li{margin:5px 0}
+.pill{position:fixed;top:calc(10px + env(safe-area-inset-top));left:50%;transform:translate(-50%,-70px);z-index:70;background:var(--success);color:#fff;font-weight:700;font-size:13.5px;padding:7px 14px;border-radius:99px;box-shadow:var(--shadow);transition:transform .25s}
+.pill.on{transform:translate(-50%,0)}
+.toast.ok{background:var(--success);color:#fff}
+.savebar{position:sticky;bottom:calc(84px + env(safe-area-inset-bottom));z-index:5;margin:6px 0 14px;box-shadow:0 8px 20px -6px rgb(0 0 0/.35)}
+.field.sm{height:40px;font-size:15px}
+select.field.sm{background-position:calc(100% - 18px) 17px,calc(100% - 13px) 17px}
+button.tile{border:0;cursor:pointer;font:inherit;color:inherit;width:100%}
+button.tile:active{transform:scale(.97)}
+.tile.on{background:var(--primary)}.tile.on .v,.tile.on .k{color:var(--on-primary)}
+label.datebtn{cursor:pointer}
+.zrows{display:grid;grid-template-columns:1fr;gap:5px;margin-top:8px}
+.zr{display:flex;align-items:center;gap:10px;border-radius:10px;padding:6px 10px;font-weight:700;font-size:15px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.zr .grow{flex:1}.zr b{font-size:13px}
+.zr .zb{font-size:11px;font-weight:800;padding:2px 7px;border-radius:99px;color:#fff}
+.zr.z25{background:color-mix(in oklch,var(--warn) 22%,var(--card))}.zr.z25 .zb{background:color-mix(in oklch,var(--warn) 80%,#000)}
+.zr.z50{background:color-mix(in oklch,var(--danger) 16%,var(--card))}.zr.z50 .zb{background:var(--danger)}
+.zr.off{opacity:.45}
+dl.money .hl25 dt,dl.money .hl25 dd{color:color-mix(in oklch,var(--warn) 55%,var(--fg));font-weight:700}
+dl.money .hl50 dt,dl.money .hl50 dd{color:var(--danger);font-weight:700}
+.morebtn{display:block;width:100%;margin-top:10px;border:1.5px dashed var(--border);background:transparent;border-radius:10px;padding:8px;font-weight:600;font-size:13.5px;color:var(--muted);cursor:pointer}
+.anal{margin-top:12px;padding:12px;border-radius:12px;background:var(--secondary)}
+.stats{margin-top:10px;gap:6px}.stats div{background:var(--card);border-radius:9px;padding:6px 8px}.stats span{display:block;font-size:10.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}.stats b{font-family:var(--font-d);font-size:20px;font-weight:400}
+.yearnav{gap:6px}.yearnav b{font-family:var(--font-d);font-size:26px;color:var(--onbg,var(--fg));min-width:56px;text-align:center}
+.bal{grid-template-columns:1fr 1fr}
+.bal .b{display:flex;flex-direction:column;min-height:112px}
+.bal .b.all{border-left-color:var(--fg)}
+.bal .tn{font-family:var(--font-d);font-size:22px;line-height:1;letter-spacing:.02em}
+.bal .v{font-size:32px;margin-top:4px}.bal .v small{font-size:16px;color:var(--muted)}
+.bal .s{display:flex;justify-content:space-between;gap:6px;margin-top:auto;padding-top:4px;align-items:flex-end}
+.bal .s .side{font-size:11px;color:var(--muted);text-align:right;white-space:nowrap}
+.cd.hd{background:linear-gradient(135deg,var(--secondary) 50%,var(--accent) 50%)}
+.sumchips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 4px}
+.sc{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:99px;background:color-mix(in oklch,var(--tc) 16%,var(--card));border:1.5px solid color-mix(in oklch,var(--tc) 45%,transparent);font-size:13px}
+.sc b{font-family:var(--font-d);font-size:18px;font-weight:400}
+.mhead{font-size:11.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:14px 0 6px}
+.vrow{display:flex;align-items:center;gap:12px;padding:8px 10px 8px 8px;border-radius:12px;background:color-mix(in oklch,var(--tc) 8%,var(--card));border-left:5px solid var(--tc);margin-bottom:6px}
+.vrow.past{opacity:.6}
+.dblock{flex:none;width:44px;text-align:center;border-radius:9px;background:var(--tc);color:#fff;padding:4px 0;line-height:1}
+.dblock b{display:block;font-family:var(--font-d);font-size:24px;font-weight:400}.dblock span{font-size:10px;font-weight:800;letter-spacing:.06em}
+.vt{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.tname{font-weight:700}.vn{font-family:var(--font-d);font-size:20px;white-space:nowrap}
+.vd{font-size:12.5px;color:var(--muted);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.vx{font-size:12px;color:var(--muted);margin-top:2px}
+.ybox{border:1.5px solid var(--border);border-radius:12px;padding:12px}
+.del{width:30px;height:30px;border-radius:50%}
+
+body[data-theme=dorf] #app{padding-bottom:calc(200px + env(safe-area-inset-bottom))}
+.grid2>div{display:flex;flex-direction:column;min-width:0}
+.grid2>div>.label{flex:1;display:flex;align-items:flex-end;gap:2px}
+
+/* v1.2 */
+.tdot.krank{background:var(--c-krank)}.cd.t-krank{background:var(--c-krank);color:#fff}.bal .b.krank{border-left-color:var(--c-krank)}
+.kwcal{grid-template-columns:26px repeat(7,1fr)}
+.kwc{display:grid;place-items:center;font-size:10.5px;font-weight:800;color:var(--muted);background:color-mix(in oklch,var(--secondary) 60%,transparent);border-radius:7px}
+button.datebtn{width:100%;font:inherit;font-weight:600;color:var(--fg);cursor:pointer;text-align:left}
+.field.big2{height:56px;font-size:24px;font-weight:800;font-variant-numeric:tabular-nums}
+.kwr{font-family:var(--font-b);font-size:15px;font-weight:800;color:var(--fg);letter-spacing:0;margin-left:4px;vertical-align:3px}
+.kpi.zkk{background:color-mix(in oklch,var(--c-zk) 14%,var(--card))}
+.kpi.hl.nach{background:color-mix(in oklch,var(--warn) 28%,var(--card))}
+.ygrid{display:grid;grid-template-columns:30px repeat(31,1fr);gap:2px;margin-top:10px;align-items:center}
+.yh{font-size:8.5px;color:var(--muted);text-align:center;font-weight:700}
+.ym{font-size:10px;font-weight:800;color:var(--muted);cursor:pointer;text-transform:uppercase}
+.yc{display:block;aspect-ratio:1/1.35;border-radius:2px;background:var(--secondary)}
+.yc.x{background:transparent}.yc.we{background:color-mix(in oklch,var(--secondary) 45%,transparent)}
+.yc.hol{background:var(--accent)}
+.yc.t-tarif{background:var(--c-tarif)}.yc.t-zk{background:var(--c-zk)}.yc.t-fza{background:var(--c-fza)}.yc.t-tzug{background:var(--c-tzug)}.yc.t-sonder{background:var(--c-sonder)}.yc.t-krank{background:var(--c-krank)}
+.yc.half{opacity:.55}.yc.td{outline:1.5px solid var(--fg);outline-offset:0}
+details.tgroup{border-radius:12px;border:1.5px solid color-mix(in oklch,var(--tc) 35%,var(--border));margin-top:10px;overflow:hidden}
+details.tgroup summary{list-style:none;display:flex;align-items:center;gap:8px;padding:9px 12px;background:color-mix(in oklch,var(--tc) 10%,var(--card));cursor:pointer}
+details.tgroup summary::-webkit-details-marker{display:none}
+details.tgroup[open] summary .chev{transform:rotate(180deg)}
+.tsum{font-family:var(--font-d);font-size:22px}
+.tl{display:flex;align-items:center;gap:8px;padding:6px 12px;border-top:1px solid var(--border);font-size:14px}
+.tl.past{opacity:.55}
+.tlr{flex:1;min-width:0;font-weight:600}.tlr small{display:block;font-weight:500;color:var(--muted);font-size:11.5px}
+.tln{font-family:var(--font-d);font-size:19px;font-weight:400;white-space:nowrap}
+.bal .s{font-size:11.5px}
+.grow{flex:1;min-width:0}
+div.field.big2{font-size:19px;white-space:nowrap;overflow:hidden}
+.kwr{white-space:nowrap}
+.wk-head h3{line-height:1.1}
+
+/* v1.3 */
+.nsplit{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.nsplit>div{background:var(--secondary);border-radius:12px;padding:9px 11px;display:flex;flex-direction:column}
+.nsplit>div.m{background:color-mix(in oklch,var(--success) 14%,var(--card))}
+.nsplit span{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.nsplit b{font-family:var(--font-d);font-size:26px;font-weight:400;line-height:1.1}
+.nsplit small{font-size:11px;color:var(--muted)}
+.mea-eur{color:var(--success);font-size:13px;text-transform:none;letter-spacing:0;font-weight:800}
+.dim{opacity:.4}
+.sumbox{margin-top:12px;padding:10px;border-radius:12px;border:1.5px dashed var(--border)}
+.sumbox.man{border-style:solid;border-color:var(--warn);background:color-mix(in oklch,var(--warn) 8%,var(--card))}
+.pvwrap{position:fixed;inset:0;z-index:80;background:rgb(10 10 20/.7);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:14px;opacity:0;transition:opacity .2s}
+.pvwrap.on{opacity:1}
+.pvbar{display:flex;justify-content:space-between;gap:10px;align-items:center;width:min(92vw,420px);background:var(--card);color:var(--fg);border-radius:12px;padding:8px 12px;font-size:14px;box-shadow:var(--shadow)}
+.pvframe{width:min(92vw,420px);height:min(72vh,640px);border-radius:24px;overflow:hidden;border:3px solid var(--card);box-shadow:0 20px 50px -10px rgb(0 0 0/.5);position:relative;background:var(--bg)}
+.pvfx{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.pvapp{position:relative}
+.pvapp{transform:scale(.86);transform-origin:top center;padding:14px;pointer-events:none}
+.pvfront{z-index:2}.pvfront>div{bottom:8px!important}
+</style>
+</head>
+<body data-theme="standard">
+<div id="fx"></div>
+<main id="app"></main>
+<nav class="tabs" id="nav" aria-label="Bereiche"></nav>
+<script>/* Toki – Rechenkern. Reine Funktionen, keine DOM-Zugriffe. */
+const Core = (() => {
+  'use strict';
+
+  // ---------- Zeit ----------
+  const toMin = (s) => {
+    const m = /^(\d{1,2}):(\d{2})$/.exec(s || '');
+    return m ? Number(m[1]) * 60 + Number(m[2]) : null;
+  };
+  const fmtClock = (min) => {
+    const t = ((Math.round(min) % 1440) + 1440) % 1440;
+    return `${String(Math.floor(t / 60)).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`;
+  };
+  const leaveAt = (start, pauseMin, hours) => {
+    const s = toMin(start);
+    return s === null ? null : fmtClock(s + hours * 60 + pauseMin);
+  };
+  const workedRaw = (start, end, pauseMin) => {
+    const s = toMin(start), e = toMin(end);
+    if (s === null || e === null) return null;
+    let d = e - s;
+    if (d < 0) d += 1440;
+    return Math.max(0, d - pauseMin) / 60;
+  };
+  const MAX_DAY = 10;
+  const capDay = (h) => (h > MAX_DAY ? { hours: MAX_DAY, capped: true } : { hours: h, capped: false });
+
+  // ---------- Datum (ISO yyyy-mm-dd, UTC-Mittag) ----------
+  const D = (iso) => new Date(iso + 'T12:00:00Z');
+  const iso = (d) => d.toISOString().slice(0, 10);
+  const addDays = (s, n) => { const d = D(s); d.setUTCDate(d.getUTCDate() + n); return iso(d); };
+  const dow = (s) => D(s).getUTCDay(); // 0 So … 6 Sa
+  const monday = (s) => addDays(s, -((dow(s) + 6) % 7));
+  const isoWeek = (s) => {
+    const t = D(s);
+    t.setUTCDate(t.getUTCDate() + 3 - ((t.getUTCDay() + 6) % 7));
+    const f = new Date(Date.UTC(t.getUTCFullYear(), 0, 4));
+    return 1 + Math.round(((t - f) / 864e5 - 3 + ((f.getUTCDay() + 6) % 7)) / 7);
+  };
+  const ym = (s) => s.slice(0, 7);
+  const todayIso = () => { const n = new Date(); return new Date(n.getTime() - n.getTimezoneOffset() * 6e4).toISOString().slice(0, 10); };
+  const range = (from, to) => { const out = []; for (let d = from; d <= to; d = addDays(d, 1)) out.push(d); return out; };
+
+  // ---------- Feiertage ----------
+  const LAENDER = {
+    BW: 'Baden-Württemberg', BY: 'Bayern', BE: 'Berlin', BB: 'Brandenburg', HB: 'Bremen', HH: 'Hamburg',
+    HE: 'Hessen', MV: 'Mecklenburg-Vorpommern', NI: 'Niedersachsen', NW: 'Nordrhein-Westfalen',
+    RP: 'Rheinland-Pfalz', SL: 'Saarland', SN: 'Sachsen', ST: 'Sachsen-Anhalt', SH: 'Schleswig-Holstein', TH: 'Thüringen',
+  };
+  const easter = (y) => {
+    const a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4;
+    const f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
+    const i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451);
+    const month = Math.floor((h + l - 7 * m + 114) / 31), day = ((h + l - 7 * m + 114) % 31) + 1;
+    return `${y}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  };
+  const hCache = new Map();
+  const holidays = (y, opt) => {
+    const land = opt.land || 'BY';
+    const key = `${y}|${land}|${opt.mariae}`;
+    if (hCache.has(key)) return hCache.get(key);
+    const map = new Map();
+    const add = (d, n, lands) => { if (!lands || lands.includes(land)) map.set(d, n); };
+    const o = easter(y);
+    add(`${y}-01-01`, 'Neujahr');
+    add(`${y}-01-06`, 'Heilige Drei Könige', ['BW', 'BY', 'ST']);
+    add(`${y}-03-08`, 'Frauentag', ['BE', 'MV']);
+    add(addDays(o, -2), 'Karfreitag');
+    add(addDays(o, 1), 'Ostermontag');
+    add(`${y}-05-01`, 'Tag der Arbeit');
+    add(addDays(o, 39), 'Christi Himmelfahrt');
+    add(addDays(o, 50), 'Pfingstmontag');
+    add(addDays(o, 60), 'Fronleichnam', ['BW', 'BY', 'HE', 'NW', 'RP', 'SL']);
+    if (land === 'SL' || (land === 'BY' && opt.mariae)) add(`${y}-08-15`, 'Mariä Himmelfahrt');
+    add(`${y}-09-20`, 'Weltkindertag', ['TH']);
+    add(`${y}-10-03`, 'Tag der Deutschen Einheit');
+    add(`${y}-10-31`, 'Reformationstag', ['BB', 'MV', 'SN', 'ST', 'TH', 'HB', 'HH', 'NI', 'SH']);
+    add(`${y}-11-01`, 'Allerheiligen', ['BW', 'BY', 'NW', 'RP', 'SL']);
+    if (land === 'SN') { // Mittwoch vor dem 23.11.
+      let d = `${y}-11-22`; while (dow(d) !== 3) d = addDays(d, -1); add(d, 'Buß- und Bettag');
+    }
+    add(`${y}-12-25`, '1. Weihnachtstag');
+    add(`${y}-12-26`, '2. Weihnachtstag');
+    hCache.set(key, map);
+    return map;
+  };
+  const holidayName = (s, opt) => holidays(Number(s.slice(0, 4)), opt).get(s) || null;
+  const isWorkday = (s, opt) => { const w = dow(s); return w >= 1 && w <= 5 && !holidayName(s, opt); };
+  const workdaysBetween = (from, to, opt, skip) => range(from, to).filter((d) => isWorkday(d, opt) && !(skip && skip(d)));
+
+  // ---------- Einstellungen ----------
+  const defaults = () => ({
+    theme: 'standard',
+    arbeit: { wochenstunden: 35, brotzeit: 15, mittag: 30, land: 'BY', mariae: true, halb24: false, halb31: false },
+    lohn: {
+      grundlohn: 0, stundenlohn: 0, zeigen: true, auszahlung: 'folgemonat', nettoAbzug: 0,
+      sonder: [{ id: 'weihnachtsgeld', name: 'Weihnachtsgeld', art: 'einmalig', monat: 11, modus: 'betrag', wert: 0 }],
+    },
+    zk: { stand: 0, datum: '', samstagBonus: true, max: 35, min: -35 },
+    urlaub: { tarifTage: 30, ugFaktor: 0.5, ugTeiler: 21.75, fzaStand: 0, fzaDatum: '', tzugTage: 8, jahre: {} },
+    steuer: { klasse: 1, kirche: true, kinderFB: 0, kinderPV: 0, geburtsjahr: 0, kvZusatz: 2.9, geprueft: false },
+  });
+  const merge = (base, over) => {
+    if (Array.isArray(base)) return Array.isArray(over) ? over : base;
+    if (base && typeof base === 'object') {
+      const out = { ...base };
+      if (over && typeof over === 'object') for (const k of Object.keys(over)) out[k] = k in base ? merge(base[k], over[k]) : over[k];
+      return out;
+    }
+    return over === undefined || over === null ? base : over;
+  };
+  const tagessoll = (S) => (Number(S.arbeit.wochenstunden) || 35) / 5;
+  const stundenlohn = (S) => {
+    const h = Number(S.lohn.stundenlohn);
+    if (h > 0) return h;
+    const g = Number(S.lohn.grundlohn) || 0;
+    return g > 0 ? g / ((Number(S.arbeit.wochenstunden) || 35) * 4.35) : 0;
+  };
+  const holOpt = (S) => ({ land: S.arbeit.land, mariae: S.arbeit.mariae, halb24: S.arbeit.halb24, halb31: S.arbeit.halb31 });
+  /** Halber Arbeitstag (Heiligabend/Silvester, falls eingestellt) */
+  const halfDay = (d, S) => { const md = d.slice(5); return (md === '12-24' && S.arbeit.halb24) || (md === '12-31' && S.arbeit.halb31); };
+  /** Wie viele Urlaubstage ein freier Arbeitstag kostet */
+  const dayNeed = (d, S) => (halfDay(d, S) ? 0.5 : 1);
+  const yearCfg = (S, y) => { const j = (S.urlaub.jahre || {})[y] || {}; return { tarif: j.tarif ?? S.urlaub.tarifTage, tzug: j.tzug ?? S.urlaub.tzugTage, rest: j.rest, restDatum: j.restDatum || '', tzugRest: j.tzugRest } };
+
+  // ---------- Abwesenheiten ----------
+  const TYPES = {
+    tarif: { label: 'Tarifurlaub', short: 'TU' },
+    zk: { label: 'Zeitkonto', short: 'ZK' },
+    fza: { label: 'FZA-Konto', short: 'FZA' },
+    tzug: { label: 'T-Zug', short: 'TZ' },
+    sonder: { label: 'Sonderurlaub', short: 'SU' },
+    krank: { label: 'Krank', short: 'K' },
+  };
+  /** Samstag/Sonn-/Feiertag: keine Brotzeit, ab 6 Std. Anwesenheit 30 min Mittag (nie unter 6 Std.) */
+  const specialPause = (presenceMin) => (presenceMin > 360 ? Math.min(30, presenceMin - 360) : 0);
+  const presence = (start, end) => { const a = toMin(start), b = toMin(end); if (a === null || b === null) return null; let d = b - a; if (d < 0) d += 1440; return d; };
+  /** Liefert Map iso -> {type, units, id, note} für alle Arbeitstage unter Abwesenheiten (+ halbe Urlaubstage aus Einträgen). */
+  const absenceDays = (st) => {
+    const opt = holOpt(st.settings);
+    const map = new Map();
+    for (const a of st.absences || []) {
+      const days = workdaysBetween(a.from, a.to || a.from, opt);
+      for (const d of days) {
+        const need = dayNeed(d, st.settings);
+        const units = a.half && days.length === 1 ? Math.min(0.5, need) : need;
+        map.set(d, { type: a.type, units, full: units >= need, id: a.id, note: a.note || '' });
+      }
+    }
+    for (const [d, e] of Object.entries(st.entries || {})) {
+      if (e.half && !map.has(d)) map.set(d, { type: e.halfType || 'tarif', units: 0.5, full: false, fromEntry: true });
+    }
+    return map;
+  };
+
+  // ---------- Tagesauswertung ----------
+  const dayTarget = (d, e, S, absMap) => {
+    const opt = holOpt(S);
+    const w = dow(d);
+    if (w === 0 || w === 6 || holidayName(d, opt)) return 0;
+    const ab = absMap && absMap.get(d);
+    if (ab && ab.full) return 0;
+    if (halfDay(d, S)) return tagessoll(S) / 2;
+    if ((e && e.half) || (ab && !ab.full)) return tagessoll(S) / 2;
+    return tagessoll(S);
+  };
+
+  // ---------- Hauptberechnung: Wochen, Monate, Konten ----------
+  const zuschlag = (mehr, rate) => {
+    const h25 = Math.min(Math.max(mehr, 0), 6), h50 = Math.max(0, mehr - 6);
+    const base = mehr * rate, z25 = h25 * rate * 0.25, z50 = h50 * rate * 0.5;
+    return { h25, h50, base, z25, z50, total: base + z25 + z50 };
+  };
+
+  const compute = (st, today = todayIso()) => {
+    const S = st.settings;
+    const opt = holOpt(S);
+    const soll = tagessoll(S);
+    const rate = stundenlohn(S);
+    const absMap = absenceDays(st);
+    const entries = st.entries || {};
+    const kont = st.kontingent || {};
+    const nachByMonth = {};
+    for (const n of st.nach || []) nachByMonth[n.month] = (nachByMonth[n.month] || 0) + (Number(n.hours) || 0);
+
+    // Wochen sammeln
+    const dates = [...Object.keys(entries), ...absMap.keys()];
+    const weeks = [];
+    const weekMap = new Map();
+    if (dates.length) {
+      const first = monday(dates.reduce((a, b) => (a < b ? a : b)));
+      const lastDate = dates.reduce((a, b) => (a > b ? a : b));
+      const last = monday(lastDate > today ? lastDate : today);
+      for (let m = first; m <= last; m = addDays(m, 7)) {
+        const w = { monday: m, sunday: addDays(m, 6), kw: isoWeek(m), month: ym(addDays(m, 3)), days: [] };
+        weeks.push(w); weekMap.set(m, w);
+      }
+    }
+
+    const used = {}; // Kontingent je Monat verbraucht
+    let zk = Number(S.zk.stand) || 0;
+    let fza = Number(S.urlaub.fzaStand) || 0;
+    const zkStart = S.zk.datum || '';
+    const fzaStart = S.urlaub.fzaDatum || '';
+    let zkToday = null, fzaToday = null, zkTodaySum = 0, fzaTodaySum = 0, zkVerplant = 0, zkVerplantTage = 0;
+
+    for (const w of weeks) {
+      let wd = 0, sat = 0, satOnly = 0, worked = 0, zkUnits = 0, fzaUnits = 0, capped = 0;
+      for (let i = 0; i < 7; i++) {
+        const d = addDays(w.monday, i);
+        const e = entries[d];
+        const ab = absMap.get(d) || null;
+        const hol = holidayName(d, opt);
+        const day = { date: d, entry: e || null, absence: ab, holiday: hol, target: 0, delta: 0 };
+        if (ab && ab.type === 'zk') zkUnits += ab.units;
+        if (ab && ab.type === 'fza' && (!fzaStart || d > fzaStart)) fzaUnits += ab.units;
+        if (e && !(ab && ab.full)) {
+          const t = dayTarget(d, e, S, absMap);
+          day.target = t;
+          day.delta = e.hours - t;
+          worked += e.hours;
+          if (e.capped) capped++;
+          if (t > 0) wd += e.hours - t;
+          else { sat += e.hours; if (dow(d) === 6) satOnly += e.hours; }
+        }
+        w.days.push(day);
+      }
+      const zkDebit = zkUnits * soll;
+      let T = wd + sat;
+      let offset = 0;
+      if (zkDebit > 0 && T > 0) { offset = Math.min(T, zkDebit); T -= offset; }
+      let zkChange = -zkDebit + offset;
+      let mehr = 0, mehrNach = 0, toZK = 0, bonus = 0, under = 0;
+      if (T < 0) { under = -T; zkChange += T; }
+      else if (T > 0) {
+        const u = used[w.month] || 0;
+        const baseK = Number(kont[w.month]) || 0;
+        const totalK = baseK + (nachByMonth[w.month] || 0);
+        const avail = Math.max(0, totalK - u);
+        // Samstag zuerst in Mehrarbeit, dann Wochentage
+        const satEff = Math.min(satOnly, T);
+        const satToMehr = Math.min(satEff, avail);
+        const restAvail = avail - satToMehr;
+        const wdToMehr = Math.min(T - satEff, restAvail);
+        mehr = satToMehr + wdToMehr;
+        const baseAvail = Math.max(0, baseK - u);
+        mehrNach = Math.max(0, mehr - baseAvail);
+        used[w.month] = u + mehr;
+        toZK = T - mehr;
+        const satToZK = satEff - satToMehr;
+        if (S.zk.samstagBonus) bonus = satToZK * 0.25;
+        zkChange += toZK + bonus;
+      }
+      const pay = zuschlag(mehr, rate);
+      const Tfull = T + offset;
+      /** Zeitkonto-Wirkung nur der Tage lo < d <= hi (Mehrarbeit wird zuerst aus den frühen Tagen bedient) */
+      const zkPart = (lo, hi) => {
+        if ((!lo || w.monday > lo) && (!hi || w.sunday <= hi)) return zkChange;
+        if ((lo && w.sunday <= lo) || (hi && w.monday > hi)) return 0;
+        let tp = 0, satP = 0, debitP = 0, beforeT = 0;
+        for (const day of w.days) {
+          const c = day.entry && !(day.absence && day.absence.full) ? day.entry.hours - day.target : 0;
+          if (lo && day.date <= lo) { beforeT += c; continue; }
+          if (hi && day.date > hi) continue;
+          if (day.absence && day.absence.type === 'zk') debitP += day.absence.units * soll;
+          tp += c; if (c && dow(day.date) === 6) satP += day.entry.hours;
+        }
+        const offP = debitP > 0 && tp > 0 ? Math.min(tp, debitP) : 0;
+        let restP = tp - offP;
+        if (restP > 0) { const mehrP = Math.max(0, mehr - Math.max(0, beforeT)); restP = Math.max(0, restP - mehrP); }
+        const bonusP = restP > 0 && S.zk.samstagBonus ? Math.min(restP, satP) * 0.25 : 0;
+        return -debitP + offP + restP + bonusP;
+      };
+      void Tfull;
+      const zkEff = zkPart(zkStart, null);
+      zkTodaySum += zkPart(zkStart, today);
+      zk += zkEff;
+      let fzaNow = 0;
+      for (const day of w.days) if (day.absence && day.absence.type === 'fza' && (!fzaStart || day.date > fzaStart) && day.date <= today) fzaNow += day.absence.units * soll;
+      fzaTodaySum += fzaNow;
+      fza -= fzaUnits * soll;
+      for (const day of w.days) if (day.absence && day.absence.type === 'zk' && day.date > today) { zkVerplant += day.absence.units * soll; zkVerplantTage += day.absence.units; }
+      Object.assign(w, { worked, wd, sat, satOnly, zkUnits, zkDebit, offset, mehr, mehrNach, toZK, bonus, under, zkChange: zkEff, zkAfter: zk, fzaAfter: fza, pay, capped });
+    }
+    // Nachträglich eingetragene ZK-/FZA-Tage, die vor dem Stichtag liegen, trotzdem abziehen
+    let late = 0, lateF = 0;
+    for (const a of st.absences || []) {
+      if (!a.created) continue;
+      if (a.type === 'zk' && a.created > (Number(S.zk.setAt) || 0) && zkStart) for (const [d, x] of absMap) if (x.id === a.id && d <= zkStart) late += x.units * soll;
+      if (a.type === 'fza' && a.created > (Number(S.urlaub.fzaSetAt) || 0) && fzaStart) for (const [d, x] of absMap) if (x.id === a.id && d <= fzaStart) lateF += x.units * soll;
+    }
+    zk -= late; fza -= lateF;
+    zkToday = (Number(S.zk.stand) || 0) + zkTodaySum - late;
+    fzaToday = (Number(S.urlaub.fzaStand) || 0) - fzaTodaySum - lateF;
+
+    // Monate
+    const months = new Map();
+    const mget = (m) => {
+      if (!months.has(m)) months.set(m, { month: m, worked: 0, mehr: 0, mehrNach: 0, toZK: 0, bonus: 0, zkChange: 0, under: 0, weeks: [], pay: { h25: 0, h50: 0, base: 0, z25: 0, z50: 0, total: 0 }, days: 0 });
+      return months.get(m);
+    };
+    for (const [d, e] of Object.entries(entries)) { const m = mget(ym(d)); m.worked += e.hours; m.days++; }
+    for (const w of weeks) {
+      const m = mget(w.month);
+      m.weeks.push(w);
+      for (const k of ['mehr', 'mehrNach', 'toZK', 'bonus', 'zkChange', 'under']) m[k] += w[k];
+      for (const k of Object.keys(m.pay)) m.pay[k] += w.pay[k];
+    }
+    for (const [m, k] of Object.entries(kont)) { const o = mget(m); o.kontingent = Number(k) || 0; }
+    for (const m of months.values()) { m.kontingent = Number(kont[m.month]) || 0; m.nach = nachByMonth[m.month] || 0; m.used = used[m.month] || 0; }
+
+    return { weeks, weekMap, months, zk: zkToday, zkPlanned: zk, zkVerplant, zkVerplantTage, fza: fzaToday, fzaPlanned: fza, absMap, rate, soll };
+  };
+
+  // ---------- Urlaubskonten (pro Kalenderjahr) ----------
+  const vacation = (st, today = todayIso()) => {
+    const S = st.settings;
+    const absMap = absenceDays(st);
+    const byYear = {};
+    const yr = (y) => (byYear[y] ||= { tarif: [], tzug: [], sonder: 0, zk: 0, fza: 0, krank: 0 });
+    for (const [d, a] of [...absMap.entries()].sort((x, y) => (x[0] < y[0] ? -1 : 1))) {
+      const y = Number(d.slice(0, 4));
+      if (a.type === 'tarif' || a.type === 'tzug') yr(y)[a.type].push([d, a.units]);
+      else yr(y)[a.type] += a.units;
+    }
+    const cfgYears = Object.keys(S.urlaub.jahre || {}).map(Number);
+    const curY = Number(today.slice(0, 4));
+    const startY = Math.min(curY, ...cfgYears, ...Object.keys(byYear).map(Number));
+    const endY = Math.max(curY + 1, ...cfgYears, ...Object.keys(byYear).map(Number));
+    const res = {};
+    let carryIn = 0;
+    for (let y = startY; y <= endY; y++) {
+      const c = yearCfg(S, y), o = yr(y);
+      const hasStand = c.rest !== undefined && c.rest !== null && c.rest !== '';
+      const anspruch = Number(c.tarif) || 0;
+      let carry = hasStand ? 0 : carryIn;
+      let pool = hasStand ? Number(c.rest) : anspruch;
+      let fromCarry = 0, fromPool = 0, taken = 0, takenUntilToday = 0, vorStand = 0;
+      for (const [d, u] of o.tarif) {
+        taken += u;
+        if (d <= today) takenUntilToday += u;
+        if (hasStand && c.restDatum && d <= c.restDatum) { vorStand += u; continue; }
+        if (d <= `${y}-03-31` && carry > 0) { const t = Math.min(carry, u); carry -= t; fromCarry += t; fromPool += u - t; }
+        else fromPool += u;
+      }
+      const rest = pool - fromPool;
+      const tzugTaken = o.tzug.reduce((s2, x) => s2 + x[1], 0);
+      const tzugHasStand = c.tzugRest !== undefined && c.tzugRest !== null && c.tzugRest !== '';
+      const tzugAfter = tzugHasStand && c.restDatum ? o.tzug.filter(([d]) => d > c.restDatum).reduce((s2, x) => s2 + x[1], 0) : tzugTaken;
+      res[y] = {
+        year: y, anspruch, hasStand, stand: hasStand ? Number(c.rest) : null, standDatum: c.restDatum,
+        carryIn: hasStand ? 0 : carryIn, fromCarry, carryLeft: carry, verfallen: carry, // Rest nach 31.03. verfällt
+        taken, takenUntilToday, vorStand, rest,
+        tzug: tzugTaken, tzugMax: Number(c.tzug) || 0, tzugRest: (tzugHasStand ? Number(c.tzugRest) : Number(c.tzug) || 0) - tzugAfter,
+        sonder: o.sonder, krank: o.krank, zkDays: o.zk, fzaDays: o.fza,
+      };
+      carryIn = Math.max(0, rest);
+    }
+    return res;
+  };
+
+  // ---------- Steuer & Sozialversicherung 2026 (Näherung) ----------
+  const P = {
+    gfb: 12348, bbgKV: 5812.5, bbgRV: 8450, rv: 0.093, av: 0.013, kv: 0.073, pv: 0.018, pvKinderlos: 0.006,
+    anPausch: 1230, saPausch: 36, entlastung2: 4260, kfb: 9756, soliFrei: 20350,
+  };
+  const est = (zve) => {
+    const x = Math.floor(Math.max(0, zve));
+    let t;
+    if (x <= 12348) t = 0;
+    else if (x <= 17799) { const y = (x - 12348) / 1e4; t = (914.51 * y + 1400) * y; }
+    else if (x <= 69878) { const z = (x - 17799) / 1e4; t = (173.1 * z + 2397) * z + 1034.87; }
+    else if (x <= 277825) t = 0.42 * x - 11135.63;
+    else t = 0.45 * x - 19470.38;
+    return Math.floor(t);
+  };
+  const tarifFor = (zve, klasse) => {
+    if (klasse === 3) return 2 * est(zve / 2);
+    if (klasse === 5 || klasse === 6) {
+      const diff = (est(zve * 1.25) - est(zve * 0.75)) * 2;
+      return Math.max(diff, Math.floor(zve * 0.14));
+    }
+    return est(zve);
+  };
+  const svRates = (T, land) => {
+    const kv = P.kv + (Number(T.kvZusatz) || 0) / 200;
+    let pv = P.pv + (land === 'SN' ? 0.005 : 0);
+    const kids = Number(T.kinderPV) || 0;
+    const age = Number(T.geburtsjahr) ? new Date().getFullYear() - Number(T.geburtsjahr) : 99;
+    if (kids === 0 && age >= 23) pv += P.pvKinderlos;
+    if (kids >= 2) pv -= Math.min(4, kids - 1) * 0.0025;
+    return { kv, pv, rv: P.rv, av: P.av };
+  };
+  /** Lohnsteuer + Soli + KiSt auf Jahresbasis */
+  const steuerJahr = (brutto, S) => {
+    const T = S.steuer, k = Number(T.klasse) || 1;
+    const r = svRates(T, S.arbeit.land);
+    // Vorsorgepauschale wie im PAP: KV mit ermäßigtem Satz (7,0 % + halber Zusatzbeitrag)
+    const vors = Math.min(brutto, P.bbgRV * 12) * r.rv + Math.min(brutto, P.bbgKV * 12) * (r.kv - 0.003 + r.pv);
+    let zve = brutto - vors;
+    if (k !== 6) zve -= P.anPausch + P.saPausch;
+    if (k === 2) zve -= P.entlastung2;
+    zve = Math.max(0, zve);
+    const lst = tarifFor(zve, k);
+    const kids = Number(T.kinderFB) || 0;
+    const lstKfb = kids ? tarifFor(Math.max(0, zve - kids * P.kfb * (k === 4 ? 0.5 : 1)), k) : lst;
+    const frei = k === 3 ? P.soliFrei * 2 : P.soliFrei;
+    const soli = lstKfb > frei ? Math.min(lstKfb * 0.055, (lstKfb - frei) * 0.119) : 0;
+    const kist = T.kirche ? lstKfb * (['BY', 'BW'].includes(S.arbeit.land) ? 0.08 : 0.09) : 0;
+    return { lst, soli, kist, zve };
+  };
+  /** Monatsabrechnung: laufend = regelmäßiger Lohn dieses Monats, einmal = sonstige Bezüge */
+  const netto = (laufend, einmal, S, mo = 12, extraAbzug = 0) => {
+    const r = svRates(S.steuer, S.arbeit.land);
+    const gross = laufend + einmal;
+    // Einmalzahlungen: anteilige Jahres-BBG bis zum Auszahlungsmonat (bei gleichbleibendem laufendem Lohn)
+    const capE = (bbg) => Math.min(einmal, Math.max(0, (bbg - Math.min(laufend, bbg)) * mo));
+    const kvBase = Math.min(laufend, P.bbgKV) + capE(P.bbgKV), rvBase = Math.min(laufend, P.bbgRV) + capE(P.bbgRV);
+    const sv = { kv: kvBase * r.kv, pv: kvBase * r.pv, rv: rvBase * r.rv, av: rvBase * r.av };
+    const yL = steuerJahr(laufend * 12, S);
+    let lst = yL.lst / 12, soli = yL.soli / 12, kist = yL.kist / 12;
+    if (einmal > 0) {
+      const yE = steuerJahr(laufend * 12 + einmal, S);
+      lst += yE.lst - yL.lst; soli += yE.soli - yL.soli; kist += yE.kist - yL.kist;
+    }
+    const svSum = sv.kv + sv.pv + sv.rv + sv.av;
+    const taxSum = lst + soli + kist;
+    const abzug = Number(extraAbzug) || 0;
+    return { gross, laufend, einmal, sv, svSum, lst, soli, kist, taxSum, abzug, net: gross - svSum - taxSum - abzug, zveJahr: yL.zve };
+  };
+
+  /** Brutto-Bestandteile eines Monats */
+  const monthPay = (st, calc, m) => {
+    const S = st.settings;
+    const g = Number(S.lohn.grundlohn) || 0;
+    const [y, mo] = m.split('-').map(Number);
+    const lines = [{ k: 'Grundlohn', v: g, laufend: true }];
+    for (const s of S.lohn.sonder || []) {
+      const val = s.modus === 'faktor' ? g * (Number(s.wert) || 0) : Number(s.wert) || 0;
+      if (!val) continue;
+      if (s.art === 'monatlich') lines.push({ k: s.name || 'Sonderzahlung', v: val, laufend: true });
+      else if (Number(s.monat) === mo) lines.push({ k: s.name || 'Sonderzahlung', v: val, laufend: false });
+    }
+    // Mehrarbeit
+    const src = S.lohn.auszahlung === 'folgemonat' ? (mo === 1 ? `${y - 1}-12` : `${y}-${String(mo - 1).padStart(2, '0')}`) : m;
+    const mm = calc.months.get(src);
+    if (mm && mm.pay.total) lines.push({ k: `Mehrarbeit ${S.lohn.auszahlung === 'folgemonat' ? '(aus Vormonat)' : ''}`.trim(), v: mm.pay.total, laufend: true, mehr: mm });
+    // Urlaubsgeld
+    let tu = 0;
+    for (const [d, a] of calc.absMap) if (a.type === 'tarif' && ym(d) === m) tu += a.units;
+    const ugTag = (g / (Number(S.urlaub.ugTeiler) || 21.75)) * (Number(S.urlaub.ugFaktor) || 0);
+    if (tu && ugTag) lines.push({ k: `Urlaubsgeld (${String(tu).replace('.', ',')} Tage)`, v: tu * ugTag, laufend: false });
+    const laufend = lines.filter((l) => l.laufend).reduce((a, b) => a + b.v, 0);
+    const einmal = lines.filter((l) => !l.laufend).reduce((a, b) => a + b.v, 0);
+    return { lines, laufend, einmal, src, tu, ugTag };
+  };
+
+  return {
+    toMin, fmtClock, leaveAt, workedRaw, capDay, MAX_DAY, D, iso, addDays, dow, monday, isoWeek, ym, todayIso, range,
+    LAENDER, easter, holidays, holidayName, isWorkday, workdaysBetween, defaults, merge, tagessoll, stundenlohn, holOpt,
+    TYPES, specialPause, presence, absenceDays, halfDay, dayNeed, yearCfg, dayTarget, zuschlag, compute, vacation, est, steuerJahr, netto, monthPay, P,
+  };
+})();
+if (typeof module !== 'undefined') module.exports = Core;
+</script>
+<script>/* Toki – animierte Design-Hintergründe */
+const FX = (() => {
+  'use strict';
+  const reduce = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let raf = 0, cleanup = [];
+  const rnd = (a, b) => a + Math.random() * (b - a);
+
+  const BALL = `<svg viewBox="0 0 64 64"><defs><radialGradient id="bg" cx="38%" cy="32%" r="70%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#cfd6e4"/></radialGradient></defs><circle cx="32" cy="32" r="30" fill="url(#bg)" stroke="#1d2433" stroke-width="2"/><path d="M32 21l10.5 7.6-4 12.4h-13l-4-12.4z" fill="#1d2433"/><path d="M32 2.5V21M42.5 28.6l17.6-5.3M38.5 41l10.8 15.3M25.5 41L14.7 56.3M21.5 28.6L3.9 23.3" stroke="#1d2433" stroke-width="2.2" fill="none"/><path d="M26 3.2l6 4 6-4M58 19l-1 7 4 5M53 52l-7 1-3 6M11 52l7 1 3 6M6 19l1 7-4 5" fill="#1d2433"/></svg>`;
+
+  const STADIUM = `<svg viewBox="0 0 1200 420" preserveAspectRatio="xMidYMax slice" style="position:absolute;left:0;right:0;bottom:0;width:100%;height:46vh">
+    <defs>
+      <linearGradient id="st1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e2233a"/><stop offset="1" stop-color="#6d0b1a"/></linearGradient>
+      <radialGradient id="glow" cx="50%" cy="70%" r="60%"><stop offset="0" stop-color="#ff3b4f" stop-opacity=".55"/><stop offset="1" stop-color="#ff3b4f" stop-opacity="0"/></radialGradient>
+      <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+      <pattern id="rows" width="12" height="9" patternUnits="userSpaceOnUse"><rect width="12" height="9" fill="none"/><path d="M0 8h12" stroke="#ffffff" stroke-opacity=".18"/></pattern>
+    </defs>
+    <ellipse cx="600" cy="330" rx="640" ry="190" fill="url(#glow)"/>
+    <g opacity=".9"><path d="M150 60 L330 300" stroke="url(#beam)" stroke-width="60" opacity=".25"/><path d="M1050 60 L870 300" stroke="url(#beam)" stroke-width="60" opacity=".25"/></g>
+    <g fill="#1b2236"><rect x="142" y="60" width="8" height="250"/><rect x="1050" y="60" width="8" height="250"/></g>
+    <g fill="#fffbe6"><rect x="120" y="40" width="52" height="24" rx="3"/><rect x="1028" y="40" width="52" height="24" rx="3"/></g>
+    <g fill="#fff" opacity=".9"><circle cx="130" cy="47" r="3"/><circle cx="142" cy="47" r="3"/><circle cx="154" cy="47" r="3"/><circle cx="130" cy="57" r="3"/><circle cx="142" cy="57" r="3"/><circle cx="154" cy="57" r="3"/><circle cx="1038" cy="47" r="3"/><circle cx="1050" cy="47" r="3"/><circle cx="1062" cy="47" r="3"/><circle cx="1038" cy="57" r="3"/><circle cx="1050" cy="57" r="3"/><circle cx="1062" cy="57" r="3"/></g>
+    <path d="M60 420 C60 250 300 190 600 190 C900 190 1140 250 1140 420Z" fill="url(#st1)"/>
+    <path d="M60 420 C60 250 300 190 600 190 C900 190 1140 250 1140 420Z" fill="url(#rows)"/>
+    <path d="M60 300 C200 245 400 228 600 228 C800 228 1000 245 1140 300" stroke="#fff" stroke-opacity=".7" stroke-width="5" fill="none"/>
+    <ellipse cx="600" cy="370" rx="420" ry="80" fill="#0d3d22"/>
+    <g opacity=".35" stroke="#fff" fill="none" stroke-width="2"><ellipse cx="600" cy="370" rx="400" ry="70"/><path d="M600 300v140"/><ellipse cx="600" cy="370" rx="60" ry="14"/></g>
+    <g fill="#fff" font-family="Bebas Neue,Impact,sans-serif" font-size="34" text-anchor="middle" opacity=".92"><text x="600" y="268" letter-spacing="10">ROT · WEISS · ARENA</text></g>
+  </svg>`;
+
+  const SANTA = `<svg viewBox="0 0 260 90" width="230"><g fill="#6b4226"><path d="M10 40c6-6 14-8 22-6l10-10 4 3-8 9c4 3 6 8 4 13l-6 1-2 14h-4l-1-12-8-2-3 13h-4l1-15c-4-2-6-5-5-8z"/><path d="M62 40c6-6 14-8 22-6l10-10 4 3-8 9c4 3 6 8 4 13l-6 1-2 14h-4l-1-12-8-2-3 13h-4l1-15c-4-2-6-5-5-8z"/></g><path d="M24 22l-4-8M27 21l2-9M76 22l-4-8M79 21l2-9" stroke="#6b4226" stroke-width="2.5"/><circle cx="12" cy="40" r="3" fill="#e0242f"/><path d="M40 46 Q100 52 130 50" stroke="#c9a227" stroke-width="2" fill="none"/><path d="M125 34h70c10 0 14 10 10 20l-6 12h-74c-8 0-10-6-8-12z" fill="#c4122f"/><path d="M118 70h92" stroke="#c9a227" stroke-width="4" stroke-linecap="round"/><path d="M210 70c8 0 10-8 6-12" stroke="#c9a227" stroke-width="4" fill="none" stroke-linecap="round"/><rect x="180" y="20" width="22" height="20" rx="3" fill="#2f8f4e"/><path d="M191 20v20M180 30h22" stroke="#f2d16b" stroke-width="3"/><circle cx="160" cy="22" r="13" fill="#c4122f"/><circle cx="158" cy="12" r="7" fill="#f6d3b8"/><path d="M151 14c0 8 4 12 7 12s7-4 7-12c-2 3-12 3-14 0z" fill="#fff"/><path d="M150 8c2-9 14-11 18-2l7 4-3 3z" fill="#c4122f"/><circle cx="176" cy="12" r="3" fill="#fff"/><path d="M150 8h17" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>`;
+  const ELF = (c, d) => `<svg viewBox="0 0 50 70" width="34" style="animation-delay:${d}s"><path d="M10 26 L30 0 L40 26z" fill="${c}"/><circle cx="30" cy="1" r="3.5" fill="#f2d16b"/><rect x="8" y="24" width="34" height="6" rx="3" fill="#fff"/><ellipse cx="25" cy="38" rx="13" ry="12" fill="#f6d3b8"/><path d="M11 37l-6-5 2 8zM39 37l6-5-2 8z" fill="#f6d3b8"/><circle cx="20" cy="37" r="1.8" fill="#222"/><circle cx="30" cy="37" r="1.8" fill="#222"/><path d="M20 43q5 4 10 0" stroke="#a5452f" stroke-width="1.8" fill="none" stroke-linecap="round"/><circle cx="16" cy="42" r="2.5" fill="#f2a0a0" opacity=".7"/><circle cx="34" cy="42" r="2.5" fill="#f2a0a0" opacity=".7"/><path d="M12 50h26l3 20H9z" fill="${c}"/><path d="M12 56h26" stroke="#c9a227" stroke-width="3"/></svg>`;
+  const TREE = `<svg viewBox="0 0 120 160" width="110"><path d="M60 8 20 70h18L12 110h22L4 150h112L86 110h22L82 70h18z" fill="#1f6b3a"/><rect x="52" y="148" width="16" height="12" fill="#6b4226"/><path d="M60 0l4 8 9 1-7 6 2 9-8-5-8 5 2-9-7-6 9-1z" fill="#f2d16b"/><g><circle cx="45" cy="62" r="4" fill="#e0242f"/><circle cx="72" cy="80" r="4" fill="#f2d16b"/><circle cx="40" cy="100" r="4" fill="#4da3ff"/><circle cx="80" cy="118" r="4" fill="#e0242f"/><circle cx="55" cy="130" r="4" fill="#f2d16b"/><circle cx="66" cy="45" r="3.5" fill="#4da3ff"/></g><path d="M30 92q30 12 58-6M22 132q40 14 78-8" stroke="#f2d16b" stroke-width="2" fill="none" opacity=".8"/></svg>`;
+
+  const FRYER = (accent = '#ff8a2a') => `<svg viewBox="0 0 80 96" width="100%"><rect x="6" y="6" width="68" height="84" rx="20" fill="#26272c"/><rect x="6" y="6" width="68" height="84" rx="20" fill="url(#fg)" opacity=".5"/><defs><linearGradient id="fg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".25"/><stop offset=".4" stop-color="#fff" stop-opacity="0"/></linearGradient></defs><rect x="20" y="14" width="40" height="18" rx="6" fill="#0d0e10"/><text x="40" y="28" font-family="monospace" font-size="11" fill="${accent}" text-anchor="middle" font-weight="700">200°</text><circle cx="26" cy="38" r="2" fill="${accent}"/><circle cx="54" cy="38" r="2" fill="#5fd38d"/><rect x="12" y="44" width="56" height="38" rx="10" fill="#34363c"/><rect x="28" y="56" width="24" height="9" rx="4.5" fill="#15161a"/><path d="M14 92h10M56 92h10" stroke="#111" stroke-width="4" stroke-linecap="round"/></svg>`;
+  const FRIES = `<svg viewBox="0 0 70 90" width="100%"><g stroke="#c98a14" stroke-width="1"><rect x="14" y="8" width="8" height="44" rx="2" fill="#ffd34d" transform="rotate(-12 18 30)"/><rect x="24" y="2" width="8" height="48" rx="2" fill="#ffcb3a" transform="rotate(-4 28 26)"/><rect x="34" y="4" width="8" height="46" rx="2" fill="#ffd34d" transform="rotate(5 38 26)"/><rect x="44" y="10" width="8" height="42" rx="2" fill="#ffc52e" transform="rotate(14 48 30)"/><rect x="29" y="12" width="8" height="40" rx="2" fill="#ffe07a"/></g><path d="M8 36h54l-7 50H15z" fill="#e3262f"/><path d="M8 36h54l-2 12H10z" fill="#c21a24"/><circle cx="35" cy="64" r="11" fill="#fff"/><path d="M31 58v12M35 58v12M39 58v12" stroke="#e3262f" stroke-width="2.4"/></svg>`;
+  const HENDL = `<svg viewBox="0 0 110 80" width="100%"><ellipse cx="55" cy="72" rx="48" ry="7" fill="#e9e2d0"/><path d="M14 46c0-20 20-34 42-34s40 12 40 30c0 14-14 26-40 26S14 62 14 46z" fill="#c8741f"/><path d="M22 40c4-14 18-22 34-22" stroke="#e8a64a" stroke-width="5" fill="none" stroke-linecap="round" opacity=".8"/><path d="M80 30c10-8 20-6 22 0 2 5-4 10-12 8z" fill="#b5651a"/><circle cx="101" cy="28" r="5" fill="#fff6e8"/><circle cx="104" cy="33" r="4.5" fill="#fff6e8"/><path d="M76 52c12 4 20 10 20 14 0 4-6 4-10 1z" fill="#b5651a"/><circle cx="94" cy="68" r="4.5" fill="#fff6e8"/><path d="M30 60c6 2 12 2 18 0" stroke="#8f4a10" stroke-width="2" fill="none" opacity=".6"/><g fill="#4caf50"><path d="M10 66c4-6 10-6 12 0-4 3-8 3-12 0z"/><path d="M86 70c4-6 10-6 12 0-4 3-8 3-12 0z"/></g><g fill="#fff" opacity=".7"><circle cx="40" cy="30" r="1.5"/><circle cx="58" cy="26" r="1.5"/><circle cx="48" cy="40" r="1.5"/></g></svg>`;
+  const STEAM = `<svg viewBox="0 0 30 50" width="100%"><path d="M10 48c-8-10 8-14 0-24S8 6 14 2M20 48c-8-10 8-14 0-24" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" opacity=".8"/></svg>`;
+
+  const css = `
+  .fx-ball{position:absolute;width:var(--s);height:var(--s);left:-80px;top:var(--y);animation:fx-fly var(--d) linear var(--dl) infinite;filter:drop-shadow(0 6px 6px rgb(0 0 0/.35))}
+  .fx-ball svg{width:100%;height:100%;animation:fx-spin calc(var(--d)/3) linear infinite}
+  @keyframes fx-fly{0%{transform:translate(0,0)}25%{transform:translate(28vw,-14vh)}50%{transform:translate(56vw,-4vh)}75%{transform:translate(84vw,-16vh)}100%{transform:translate(calc(100vw + 160px),2vh)}}
+  @keyframes fx-spin{to{transform:rotate(360deg)}}
+  .fx-star{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;animation:fx-tw 3s ease-in-out infinite}
+  @keyframes fx-tw{50%{opacity:.2}}
+  .fx-santa{position:absolute;top:9vh;left:-260px;animation:fx-santa 26s linear 2s infinite;filter:drop-shadow(0 4px 8px rgb(0 0 0/.3))}
+  @keyframes fx-santa{0%{transform:translate(0,0) rotate(-3deg)}50%{transform:translate(60vw,-4vh) rotate(2deg)}100%{transform:translate(calc(100vw + 520px),2vh) rotate(-3deg)}}
+  .fx-elf{position:absolute;bottom:0}
+  .fx-elf svg{display:block;animation:fx-hop 2.4s ease-in-out infinite;transform-origin:bottom center}
+  @keyframes fx-hop{0%,60%,100%{transform:translateY(0)}70%{transform:translateY(-12px) rotate(-4deg)}80%{transform:translateY(0)}}
+  .fx-float{position:absolute;width:var(--s);top:110vh;left:var(--x);animation:fx-up var(--d) linear var(--dl) infinite;opacity:.95;filter:drop-shadow(0 8px 10px rgb(90 40 0/.22))}
+  .fx-float>div{animation:fx-wob 4s ease-in-out infinite alternate}
+  @keyframes fx-up{to{transform:translateY(-135vh) rotate(var(--r))}}
+  @keyframes fx-wob{from{transform:translateX(-12px) rotate(-6deg)}to{transform:translateX(12px) rotate(6deg)}}
+
+  .fx-floor{position:absolute;left:-50%;right:-50%;bottom:0;height:30vh;background:linear-gradient(#2a0a46,#12062b);overflow:hidden}
+  .fx-floor::before{content:'';position:absolute;inset:-100% 0 0;background-image:linear-gradient(#ff4fd8 2px,transparent 2px),linear-gradient(90deg,#ff4fd8 2px,transparent 2px);background-size:60px 40px;transform:perspective(260px) rotateX(62deg);transform-origin:50% 100%;animation:fx-grid 1.6s linear infinite;opacity:.75;filter:drop-shadow(0 0 3px #ff4fd8)}
+  @keyframes fx-grid{to{background-position:0 40px}}
+  .fx-sun{position:absolute;left:50%;bottom:calc(30vh - 60px);width:min(70vw,420px);aspect-ratio:1;transform:translateX(-50%);border-radius:50%;background:linear-gradient(#ffe36a,#ff9a3d 45%,#ff3d9a 80%);-webkit-mask:linear-gradient(#000 52%,transparent 52% 55%,#000 55% 63%,transparent 63% 67%,#000 67% 74%,transparent 74% 79%,#000 79% 85%,transparent 85% 91%,#000 91%);mask:linear-gradient(#000 52%,transparent 52% 55%,#000 55% 63%,transparent 63% 67%,#000 67% 74%,transparent 74% 79%,#000 79% 85%,transparent 85% 91%,#000 91%);filter:drop-shadow(0 0 40px #ff5ab4)}
+  .fx-streak{position:absolute;height:3px;width:90px;border-radius:3px;bottom:calc(30vh + 2px);left:-120px;animation:fx-drive var(--d) linear var(--dl) infinite}
+  @keyframes fx-drive{to{transform:translateX(calc(100vw + 240px))}}
+  .fx-cloud{position:absolute;width:var(--s);top:var(--y);left:-160px;animation:fx-drift var(--d) linear var(--dl) infinite}
+  @keyframes fx-drift{to{transform:translateX(calc(100vw + 320px))}}
+  .fx-head{transform-origin:110px 50px;animation:fx-nod 6s ease-in-out infinite}
+  @keyframes fx-nod{0%,100%{transform:rotate(4deg) translateY(2px)}50%{transform:rotate(-2deg) translateY(3px)}}
+  .fx-leaf{position:absolute;top:-30px;width:16px;height:10px;border-radius:0 10px;background:#c98a2a;animation:fx-fall var(--d) linear var(--dl) infinite}
+  @keyframes fx-fall{to{transform:translate(var(--x2),110vh) rotate(720deg)}}
+  @media (prefers-reduced-motion: reduce){#fx *,#fxf *{animation:none!important}}`;
+
+
+  const PALM = (flip) => `<svg viewBox="0 0 120 260" width="100%" style="${flip ? 'transform:scaleX(-1)' : ''}"><path d="M58 260 C62 200 66 150 60 90" stroke="#140726" stroke-width="9" fill="none" stroke-linecap="round"/><g fill="#140726"><path d="M60 92 C40 70 14 70 0 84 C20 76 40 80 60 92Z"/><path d="M60 92 C46 60 22 50 6 54 C28 56 46 70 60 92Z"/><path d="M60 92 C70 60 96 50 116 58 C94 58 76 70 60 92Z"/><path d="M60 92 C82 72 108 74 120 90 C102 82 82 82 60 92Z"/><path d="M60 92 C58 62 64 40 76 28 C68 46 64 66 60 92Z"/></g></svg>`;
+  const SKYLINE = () => {
+    let r = '', x = 0;
+    const cols = ['#ff4fd8', '#41e8ff', '#ffd25a'];
+    while (x < 1200) {
+      const w = 30 + Math.random() * 60, h = 60 + Math.random() * 170;
+      r += `<rect x="${x}" y="${260 - h}" width="${w}" height="${h}" fill="#1a0833"/>`;
+      for (let wy = 260 - h + 10; wy < 250; wy += 14) for (let wx = x + 6; wx < x + w - 8; wx += 12) if (Math.random() < 0.28) r += `<rect x="${wx}" y="${wy}" width="5" height="7" fill="${cols[(wx + wy) % 3 | 0]}" opacity="${0.5 + Math.random() * 0.5}"/>`;
+      x += w + 4;
+    }
+    return `<svg viewBox="0 0 1200 260" preserveAspectRatio="xMidYMax slice" style="position:absolute;left:0;right:0;bottom:30vh;width:100%;height:30vh">${r}<text x="600" y="70" text-anchor="middle" font-family="Bebas Neue,Impact,sans-serif" font-size="46" fill="#ff4fd8" style="filter:drop-shadow(0 0 6px #ff4fd8)" letter-spacing="8">NEON CITY</text></svg>`;
+  };
+  const BENCH = `<svg viewBox="0 0 220 150" width="100%">
+    <ellipse cx="110" cy="142" rx="105" ry="7" fill="#000" opacity=".15"/>
+    <g fill="#8a5a2b"><rect x="8" y="38" width="204" height="11" rx="3"/><rect x="8" y="54" width="204" height="11" rx="3"/><rect x="2" y="90" width="216" height="12" rx="3"/></g>
+    <g fill="#5d3b1a"><rect x="20" y="38" width="7" height="104"/><rect x="193" y="38" width="7" height="104"/><rect x="14" y="100" width="7" height="42"/><rect x="199" y="100" width="7" height="42"/></g>
+    <g class="fx-sad">
+      <path d="M91 34 C84 58 86 84 92 100 L128 100 C134 84 136 58 129 34 Z" fill="#e9c35a"/>
+      <rect x="93" y="55" width="34" height="38" rx="9" fill="#d0202e"/><rect x="93" y="70" width="34" height="6" fill="#fff"/><rect x="108" y="55" width="4" height="38" fill="#1f3f8f" opacity=".6"/>
+      <path d="M96 60 C86 72 92 92 100 104" stroke="#f3cfb3" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M124 60 C134 72 128 92 120 104" stroke="#f3cfb3" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <rect x="95" y="92" width="13" height="16" rx="3" fill="#1f3f8f"/><rect x="112" y="92" width="13" height="16" rx="3" fill="#1f3f8f"/>
+      <rect x="97" y="106" width="9" height="26" fill="#f3cfb3"/><rect x="114" y="106" width="9" height="26" fill="#f3cfb3"/>
+      <rect x="96" y="118" width="11" height="14" fill="#d0202e"/><rect x="113" y="118" width="11" height="14" fill="#d0202e"/>
+      <path d="M93 132h16v6H90z M111 132h16l3 6h-19z" fill="#222"/>
+      <g class="fx-head"><circle cx="110" cy="40" r="13" fill="#f3cfb3"/>
+      <path d="M97 40 C97 24 123 24 123 40 C119 31 101 31 97 40Z" fill="#f1cf6b"/>
+      <path d="M97 38 C93 50 94 62 96 70 M123 38 C127 50 126 62 124 70" stroke="#f1cf6b" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <path d="M104 43 q2 1.5 4 0 M112 43 q2 1.5 4 0" stroke="#6b4a2f" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <path d="M106 50 q4 -2.5 8 0" stroke="#a5452f" stroke-width="1.6" fill="none" stroke-linecap="round"/></g>
+    </g>
+    <g transform="translate(176 118)"><circle r="12" fill="#fff" stroke="#333" stroke-width="1.5"/><path d="M0 -5l5 3.5-2 6h-6l-2-6z" fill="#333"/></g>
+  </svg>`;
+  const CLOUD = `<svg viewBox="0 0 120 50" width="100%"><path d="M20 45h80c12 0 18-8 16-16s-10-12-18-10C96 8 86 2 74 6 66-2 48 0 44 12 36 6 24 10 22 20 10 20 4 28 6 36s8 9 14 9z" fill="#fff" opacity=".95"/></svg>`;
+
+  function ensureStyle() {
+    if (document.getElementById('fx-css')) return;
+    const s = document.createElement('style'); s.id = 'fx-css'; s.textContent = css; document.head.appendChild(s);
+  }
+  function layers() {
+    let back = document.getElementById('fx');
+    let front = document.getElementById('fxf');
+    if (!front) { front = document.createElement('div'); front.id = 'fxf'; front.style.cssText = 'position:fixed;inset:0;z-index:25;pointer-events:none;overflow:hidden'; document.body.appendChild(front); }
+    return { back, front };
+  }
+  function stop() { cancelAnimationFrame(raf); raf = 0; cleanup.forEach((f) => f()); cleanup = []; }
+
+  function arena(back, front) {
+    back.style.background = 'radial-gradient(120% 70% at 50% 0%, #2a3a72 0%, #121a3a 55%, #0a0f24 100%)';
+    let html = '';
+    for (let i = 0; i < 40; i++) html += `<i class="fx-star" style="left:${rnd(0, 100)}%;top:${rnd(0, 45)}%;animation-delay:${rnd(0, 3)}s;opacity:${rnd(.3, 1)}"></i>`;
+    html += STADIUM;
+    for (let i = 0; i < 7; i++) html += `<div class="fx-ball" style="--s:${rnd(26, 58)}px;--y:${rnd(8, 70)}vh;--d:${rnd(9, 17)}s;--dl:${-rnd(0, 17)}s">${BALL}</div>`;
+    back.innerHTML = html;
+    front.innerHTML = `<div class="fx-ball" style="--s:46px;--y:30vh;--d:13s;--dl:4s;opacity:.95">${BALL}</div>`;
+  }
+
+  function fryer(back) {
+    back.style.background = 'radial-gradient(circle at 20% 10%, #fff3d6 0, transparent 40%), radial-gradient(circle at 90% 80%, #ffe2b8 0, transparent 45%), repeating-linear-gradient(0deg, #f8e2b5 0 38px, #f1d49c 38px 40px), repeating-linear-gradient(90deg, transparent 0 38px, #f1d49c 38px 40px)';
+    const items = [];
+    for (let i = 0; i < 18; i++) {
+      const k = i % 6;
+      const svg = k === 0 || k === 3 ? FRYER(['#ff8a2a', '#5fd38d', '#4da3ff'][i % 3]) : k === 1 || k === 4 ? FRIES : k === 2 ? HENDL : STEAM;
+      const s = k === 2 ? rnd(80, 120) : k === 5 ? 28 : rnd(52, 86);
+      items.push(`<div class="fx-float" style="--s:${s}px;--x:${(i * 37) % 96}vw;--d:${rnd(16, 30)}s;--dl:${-rnd(0, 30)}s;--r:${rnd(-40, 40)}deg"><div style="animation-delay:${-rnd(0, 4)}s">${svg}</div></div>`);
+    }
+    back.innerHTML = items.join('');
+  }
+
+  function xmas(back, front) {
+    back.style.background = 'linear-gradient(#0e1a3d 0%, #1d3263 55%, #3c5a8f 100%)';
+    let html = '';
+    for (let i = 0; i < 50; i++) html += `<i class="fx-star" style="left:${rnd(0, 100)}%;top:${rnd(0, 50)}%;animation-delay:${rnd(0, 3)}s;opacity:${rnd(.3, 1)}"></i>`;
+    html += `<div style="position:absolute;right:8vw;top:6vh;width:70px;height:70px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fffbe6,#f3e3a6);box-shadow:0 0 60px 10px rgb(255 244 200/.35)"></div>`;
+    html += `<svg viewBox="0 0 1200 300" preserveAspectRatio="none" style="position:absolute;left:0;bottom:0;width:100%;height:28vh"><path d="M0 120 Q200 40 420 110 T820 90 T1200 110 V300 H0Z" fill="#e8f0fb"/><path d="M0 190 Q260 120 560 180 T1200 170 V300 H0Z" fill="#fff"/></svg>`;
+    html += `<div style="position:absolute;left:2vw;bottom:10vh">${TREE}</div><div style="position:absolute;right:3vw;bottom:12vh;transform:scale(.75);transform-origin:bottom right">${TREE}</div>`;
+    back.innerHTML = html;
+    front.innerHTML = `<canvas id="snow" style="position:absolute;inset:0;width:100%;height:100%"></canvas><div class="fx-santa">${SANTA}</div><div id="elves"></div>`;
+    const cv = front.querySelector('#snow'), ctx = cv.getContext('2d');
+    const elves = front.querySelector('#elves');
+    let W, H, dpr, ground, cols, base, flakes;
+    const STEP = 3, MAXH = 16;
+    function size() {
+      dpr = Math.min(2, window.devicePixelRatio || 1);
+      W = window.innerWidth; H = window.innerHeight;
+      cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const nav = document.querySelector('nav.tabs .in');
+      const r = nav ? nav.getBoundingClientRect() : null;
+      base = { y: r ? r.top + 1 : H, x0: r ? r.left + 8 : 0, x1: r ? r.right - 8 : W };
+      cols = Math.ceil(W / STEP);
+      const old = ground; ground = new Float32Array(cols); if (old) ground.set(old.subarray(0, Math.min(old.length, cols)));
+      const n = Math.min(170, Math.round((W * H) / 7000));
+      flakes = Array.from({ length: n }, () => mk(true));
+      elves.innerHTML = r ? `<div class="fx-elf" style="left:${r.left + 4}px;top:${r.top - 47}px">${ELF("#2f8f4e", 0)}</div><div class="fx-elf" style="left:${r.right - 40}px;top:${r.top - 47}px">${ELF('#c4122f', 1.1)}</div>` : '';
+    }
+    const mk = (any) => ({ x: rnd(0, W), y: any ? rnd(-H, H) : rnd(-40, -5), r: rnd(1, 3.4), vy: rnd(.5, 1.5), ph: rnd(0, 6.28), sw: rnd(.3, 1) });
+    function frame() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = '#fff';
+      for (const f of flakes) {
+        f.y += f.vy * (0.6 + f.r / 3); f.ph += 0.02; f.x += Math.sin(f.ph) * f.sw * 0.6;
+        const c = Math.floor(f.x / STEP);
+        const onNav = f.x > base.x0 && f.x < base.x1;
+        const gy = onNav ? base.y - (ground[c] || 0) : H + 10;
+        if (f.y + f.r >= gy) {
+          if (onNav) for (let k = -2; k <= 2; k++) { const i = c + k; if (i >= 0 && i < cols) ground[i] = Math.min(MAXH, ground[i] + f.r * (0.22 - Math.abs(k) * 0.05)); }
+          Object.assign(f, mk(false));
+          continue;
+        }
+        ctx.globalAlpha = 0.55 + f.r / 8;
+        ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, 6.283); ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      // Schneedecke auf der Navigationsleiste
+      if (Math.random() < 0.05) for (let i = 1; i < cols - 1; i++) ground[i] = (ground[i - 1] + ground[i] * 2 + ground[i + 1]) / 4;
+      ctx.beginPath(); ctx.moveTo(base.x0, base.y + 2);
+      for (let x = base.x0; x <= base.x1; x += STEP) ctx.lineTo(x, base.y - (ground[Math.floor(x / STEP)] || 0));
+      ctx.lineTo(base.x1, base.y + 2); ctx.closePath();
+      ctx.shadowColor = 'rgba(80,110,160,.35)'; ctx.shadowBlur = 4; ctx.fill(); ctx.shadowBlur = 0;
+      raf = requestAnimationFrame(frame);
+    }
+    size();
+    const onR = () => size();
+    window.addEventListener('resize', onR);
+    cleanup.push(() => window.removeEventListener('resize', onR));
+    if (!reduce()) raf = requestAnimationFrame(frame);
+  }
+
+
+  function neon(back) {
+    back.style.background = 'linear-gradient(#0d0322 0%, #2a0b52 35%, #8a1f7a 62%, #ff7a3d 70%, #2a0a46 70.2%)';
+    let html = '';
+    for (let i = 0; i < 40; i++) html += `<i class="fx-star" style="left:${rnd(0, 100)}%;top:${rnd(0, 35)}%;animation-delay:${rnd(0, 3)}s;opacity:${rnd(.3, 1)}"></i>`;
+    html += '<div class="fx-sun"></div>' + SKYLINE() + '<div class="fx-floor"></div>';
+    html += `<div style="position:absolute;left:-2vw;bottom:22vh;width:min(28vw,170px)">${PALM(false)}</div><div style="position:absolute;right:-3vw;bottom:20vh;width:min(32vw,200px)">${PALM(true)}</div>`;
+    for (let i = 0; i < 5; i++) html += `<div class="fx-streak" style="--d:${rnd(2.5, 5)}s;--dl:${-rnd(0, 5)}s;background:linear-gradient(90deg,transparent,${i % 2 ? '#ff3355' : '#fff6d0'});box-shadow:0 0 10px ${i % 2 ? '#ff3355' : '#fff6d0'}"></div>`;
+    back.innerHTML = html;
+  }
+  function dorf(back) {
+    back.style.background = 'linear-gradient(#7fc8ff 0%, #bfe6ff 52%, #6db35f 52.2%, #3f9b4b 100%)';
+    let html = `<div style="position:absolute;right:10vw;top:7vh;width:64px;height:64px;border-radius:50%;background:#ffe27a;box-shadow:0 0 50px 12px rgb(255 226 122/.6)"></div>`;
+    for (let i = 0; i < 5; i++) html += `<div class="fx-cloud" style="--s:${rnd(90, 170)}px;--y:${rnd(3, 30)}vh;--d:${rnd(50, 90)}s;--dl:${-rnd(0, 90)}s">${CLOUD}</div>`;
+    html += `<svg viewBox="0 0 1200 120" preserveAspectRatio="none" style="position:absolute;left:0;right:0;top:44vh;width:100%;height:9vh"><path d="M0 120 C200 40 360 60 520 90 S880 30 1200 80 V120Z" fill="#8cc779"/></svg>`;
+    html += `<div style="position:absolute;inset:52vh 0 0;background:repeating-linear-gradient(90deg,transparent 0 60px,rgb(255 255 255/.07) 60px 120px)"></div>`;
+    html += `<svg viewBox="0 0 1200 300" preserveAspectRatio="none" style="position:absolute;left:0;right:0;bottom:0;width:100%;height:48vh"><g fill="none" stroke="#fff" stroke-opacity=".75" stroke-width="3"><path d="M40 20 H1160 L1200 300 H0Z"/><path d="M600 20 V300"/><ellipse cx="600" cy="150" rx="110" ry="50"/><path d="M40 90 h140 l-10 120 H30"/></g></svg>`;
+    html += `<svg viewBox="0 0 160 70" style="position:absolute;left:4vw;top:47vh;width:min(34vw,200px)"><path d="M10 68 V8 H150 V68" stroke="#fff" stroke-width="5" fill="none"/><path d="M10 8 L30 20 H130 L150 8 M30 20 V68 M130 20 V68" stroke="#fff" stroke-opacity=".5" fill="none"/><g stroke="#fff" stroke-opacity=".35"><path d="M30 30 H130 M30 40 H130 M30 50 H130 M30 60 H130 M50 20 V68 M70 20 V68 M90 20 V68 M110 20 V68"/></g></svg>`;
+    let flags = '';
+    for (let i = 0; i < 24; i++) flags += `<path d="M${i * 50 + 5} ${16 + Math.sin(i) * 2} l20 0 l-10 22z" fill="${['#d0202e', '#ffffff', '#1f3f8f'][i % 3]}"/>`;
+    html += `<svg viewBox="0 0 1200 50" preserveAspectRatio="none" style="position:absolute;left:0;right:0;top:0;width:100%;height:6vh"><path d="M0 14 Q300 26 600 14 T1200 14" stroke="#555" fill="none"/>${flags}</svg>`;
+
+    for (let i = 0; i < 4; i++) html += `<i class="fx-leaf" style="left:${rnd(5, 95)}vw;--d:${rnd(12, 20)}s;--dl:${-rnd(0, 20)}s;--x2:${rnd(-80, 80)}px"></i>`;
+    back.innerHTML = html;
+  }
+  function set(theme) {
+    ensureStyle();
+    stop();
+    const { back, front } = layers();
+    back.innerHTML = ''; back.style.background = ''; front.innerHTML = '';
+    if (theme === 'arena') arena(back, front);
+    else if (theme === 'xmas') xmas(back, front);
+    else if (theme === 'fryer') fryer(back);
+    else if (theme === 'neon') neon(back);
+    else if (theme === 'dorf') { dorf(back); front.innerHTML = `<div style="position:absolute;right:max(14px,calc(50vw - 230px));bottom:calc(env(safe-area-inset-bottom) + 70px);width:150px">${BENCH}</div>`; }
+  }
+  const preview = (id) => ({
+    arena: `<div style="position:absolute;right:8px;top:8px;width:26px">${BALL}</div>`,
+    xmas: `<div style="position:absolute;right:6px;bottom:-4px;width:34px">${TREE}</div><div style="position:absolute;inset:0;background:radial-gradient(2px 2px at 20% 30%,#fff 50%,transparent 51%),radial-gradient(2px 2px at 50% 60%,#fff 50%,transparent 51%),radial-gradient(2px 2px at 35% 80%,#fff 50%,transparent 51%),radial-gradient(2px 2px at 70% 20%,#fff 50%,transparent 51%)"></div>`,
+    fryer: `<div style="position:absolute;left:8px;top:6px;width:34px">${FRYER()}</div><div style="position:absolute;right:8px;top:8px;width:34px">${FRIES}</div>`,
+    neon: `<div style="position:absolute;left:4px;bottom:0;width:22px">${PALM(false)}</div><div style="position:absolute;right:4px;bottom:0;width:22px">${PALM(true)}</div>`,
+    dorf: `<div style="position:absolute;right:6px;bottom:2px;width:64px">${BENCH}</div>`,
+    dark: '<div style="position:absolute;left:10px;top:12px;right:40%;height:8px;border-radius:4px;background:#3a3c42"></div><div style="position:absolute;left:10px;top:26px;right:55%;height:8px;border-radius:4px;background:#8fd1c1"></div>',
+  }[id] || '');
+  return { set, preview };
+})();
+</script>
+<script>/* Toki – Oberfläche */
+(() => {
+  'use strict';
+  const C = Core;
+  const KEY = 'takt-v1';
+  const LOGO = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjE1IDMgOTAgODgiPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJ0ZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzM2Yjk4MiIvPjxzdG9wIG9mZnNldD0iLjU1IiBzdG9wLWNvbG9yPSIjMmE5YzZiIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWQ3NjUwIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJ0eCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzJjOWY2YyIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzFlN2E1MSIvPjwvbGluZWFyR3JhZGllbnQ+CjxmaWx0ZXIgaWQ9InNoIiB4PSItMjAlIiB5PSItMjAlIiB3aWR0aD0iMTQwJSIgaGVpZ2h0PSIxNDAlIj48ZmVEcm9wU2hhZG93IGR4PSIwIiBkeT0iMS41IiBzdGREZXZpYXRpb249IjEuNiIgZmxvb2QtY29sb3I9IiMwMDAiIGZsb29kLW9wYWNpdHk9Ii4zNSIvPjwvZmlsdGVyPgo8ZmlsdGVyIGlkPSJpbiI+PGZlT2Zmc2V0IGR5PSIxLjIiLz48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIxIi8+PGZlQ29tcG9zaXRlIG9wZXJhdG9yPSJvdXQiIGluPSJTb3VyY2VHcmFwaGljIi8+PGZlQ29tcG9uZW50VHJhbnNmZXI+PGZlRnVuY0EgdHlwZT0ibGluZWFyIiBzbG9wZT0iLjciLz48L2ZlQ29tcG9uZW50VHJhbnNmZXI+PGZlQmxlbmQgaW4yPSJTb3VyY2VHcmFwaGljIiBtb2RlPSJub3JtYWwiLz48L2ZpbHRlcj4KPC9kZWZzPgo8ZyBmaWx0ZXI9InVybCgjc2gpIj4KPHJlY3QgeD0iMTkiIHk9IjYiIHdpZHRoPSI4MiIgaGVpZ2h0PSI4MCIgcng9IjE1IiBmaWxsPSJ1cmwoI3RnKSIvPgo8cmVjdCB4PSIxOS42IiB5PSI2LjYiIHdpZHRoPSI4MC44IiBoZWlnaHQ9Ijc4LjgiIHJ4PSIxNC40IiBmaWxsPSJub25lIiBzdHJva2U9IiM3ZmYwYmQiIHN0cm9rZS1vcGFjaXR5PSIuMjIiIHN0cm9rZS13aWR0aD0iMS4yIi8+CjwvZz4KPHBhdGggZD0iTTM3LjUgMjFIODAuNVYzNEg2NS41VjY5SDUyLjVWMzRIMzcuNVoiIGZpbGw9IiMxZDIwMjUiIGZpbHRlcj0idXJsKCNpbikiLz4KPC9zdmc+Cg==';
+  let storageOk = true;
+
+  // ---------- Speicher ----------
+  const norm = (d) => {
+    const settings = C.merge(C.defaults(), d.settings || {});
+    if (!THEME_IDS.includes(settings.theme)) settings.theme = 'standard';
+    const absences = (d.absences || []).map((a) => (a.created ? a : { ...a, created: Date.now() }));
+    return { settings, entries: d.entries || {}, absences, kontingent: d.kontingent || {}, nach: d.nach || [], pref: d.pref || {} };
+  };
+  const THEMES = [
+    ['dark', 'Dark', 'linear-gradient(135deg,#2a2c31 0 50%,#1b1c20 50%)'],
+    ['standard', 'Standard', 'linear-gradient(135deg,oklch(55% .15 45) 0 50%,oklch(97% .015 80) 50%)'],
+    ['sw', 'Schwarz/Weiß', 'linear-gradient(135deg,#111 0 50%,#fff 50%)'],
+    ['blau', 'Blau', 'linear-gradient(135deg,oklch(50% .18 255) 0 50%,oklch(98% .01 250) 50%)'],
+    ['gruen', 'Grün', 'linear-gradient(135deg,oklch(52% .14 150) 0 50%,oklch(98% .015 150) 50%)'],
+    ['arena', 'Rot-Weiß Arena', 'radial-gradient(120% 90% at 50% 120%,#e2233a 0 45%,transparent 46%),linear-gradient(#2a3a72,#0a0f24)'],
+    ['neon', 'Neon City', 'radial-gradient(circle at 50% 75%,#ffcf5a 0 14%,transparent 15%),linear-gradient(#1a0b3a,#7a1d7a 60%,#ff6a3d)'],
+    ['dorf', 'Auswechselspieler', 'linear-gradient(#8fd0ff 0 55%,#3f9b4b 55%)'],
+    ['xmas', 'Weihnachten', 'linear-gradient(#0e1a3d,#3c5a8f)'],
+    ['fryer', 'Airfryer', 'repeating-linear-gradient(0deg,#f8e2b5 0 14px,#f1d49c 14px 16px)'],
+  ];
+  const THEME_IDS = THEMES.map((t) => t[0]);
+  function load() {
+    try { const raw = localStorage.getItem(KEY); return norm(raw ? JSON.parse(raw) : {}); }
+    catch { storageOk = false; return norm({}); }
+  }
+  let st = load();
+  const S = () => st.settings;
+  function save() {
+    st.pref = { ...st.pref, start: ui.start, bz: ui.bz, mi: ui.mi };
+    try { localStorage.setItem(KEY, JSON.stringify(st)); storageOk = true; } catch { storageOk = false; }
+  }
+
+  const today = C.todayIso();
+  const curY = Number(today.slice(0, 4));
+  const ui = {
+    tab: 'feierabend', date: today, start: st.pref.start || '07:00', end: '', bz: st.pref.bz !== false, mi: st.pref.mi !== false, half: false,
+    view: 'woche', kmonth: C.ym(today), cal: C.ym(today), sel: null, vyear: curY,
+    nmonth: C.ym(today), year: curY, open: {}, setYear: curY, nmode: 'ist',
+  };
+
+  // ---------- Format ----------
+  const nf = (n, d = 2) => (Number(n) || 0).toLocaleString('de-DE', { minimumFractionDigits: d, maximumFractionDigits: d });
+  const H = (n, d = 2) => `${nf(n, d)} h`;
+  const sH = (n) => `${n > 0.0001 ? '+' : n < -0.0001 ? '−' : '±'}${nf(Math.abs(n))} h`;
+  const D1 = (n) => nf(n, Number.isInteger(Math.round(Number(n) * 1000) / 1000) ? 0 : 1);
+  const EUR = (n) => (S().lohn.zeigen ? `${nf(n)} €` : '•••,•• €');
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const WD = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+  const MON = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+  const dShort = (d) => `${d.slice(8, 10)}.${d.slice(5, 7)}.`;
+  const dLong = (d) => `${WD[C.dow(d)]}. ${dShort(d)}${d.slice(0, 4)}`;
+  const monthName = (m) => `${MON[Number(m.slice(5, 7)) - 1]} ${m.slice(0, 4)}`;
+  const shiftMonth = (m, n) => { let [y, mo] = m.split('-').map(Number); mo += n; while (mo > 12) { mo -= 12; y++; } while (mo < 1) { mo += 12; y--; } return `${y}-${String(mo).padStart(2, '0')}`; };
+  const uid = () => (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2));
+  const num = (v) => {
+    let t = String(v ?? '').trim().replace(/\s|€/g, '');
+    if (/^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(t)) t = t.replace(/\./g, '');
+    const n = parseFloat(t.replace(',', '.'));
+    return Number.isFinite(n) ? n : 0;
+  };
+  const deNum = (v) => (v === '' || v === null || v === undefined ? '' : String(v).replace('.', ','));
+  const minToClock = (m) => C.fmtClock(m);
+
+  const I = {
+    clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 17l5-5 4 4 8-8"/><path d="M14 8h6v6"/></svg>',
+    cal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 15h3"/></svg>',
+    euro: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6.5A7 7 0 1 0 18 17.5"/><path d="M4 10h10M4 14h10"/></svg>',
+    gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+    eye: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+    eyeoff: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3l18 18M10.6 10.6a2 2 0 0 0 2.8 2.8M9.9 5.1A10 10 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 4M6.1 6.1C3.5 7.9 2 12 2 12s3.5 7 10 7c1.6 0 3-.4 4.3-1"/></svg>',
+    left: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>',
+    right: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>',
+    chev: '<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>',
+  };
+  const TABS = [['feierabend', 'Feierabend', I.clock], ['mehrarbeit', 'Mehrarbeit', I.plus], ['urlaub', 'Urlaub', I.cal], ['netto', 'Netto', I.euro], ['einstellungen', 'Mehr', I.gear]];
+  const info = (k) => `<button class="ibtn" data-act="info" data-k="${k}" aria-label="Info">i</button>`;
+  const INFO = {
+    kv: ['KV-Zusatzbeitrag', `<p><b>Was bedeutet das?</b> Deine Krankenversicherung kostet 14,6 % vom Brutto (Hälfte zahlst du, Hälfte die Firma) <b>plus</b> einen Zusatzbeitrag, den jede Kasse selbst festlegt. Auch der wird halbiert.</p><p><b>Was eintragen?</b> Den vollen Zusatzbeitrag deiner Kasse in Prozent, z. B. <b>2,69</b> bei der TK. Weißt du ihn nicht, lass 2,9 stehen (Durchschnitt 2026).</p><p>Jede gesetzliche Krankenkasse verlangt zusätzlich zum allgemeinen Satz von 14,6 % einen eigenen <b>Zusatzbeitrag</b>. 2026 liegt er im Schnitt bei 2,9 %.</p>
+      <p><b>So findest du ihn:</b></p><ul><li><b>Lohnabrechnung:</b> Steht bei der Krankenversicherung ein Gesamtsatz (z. B. 17,29 %), ist der Zusatzbeitrag dieser Satz minus 14,6 (hier: 2,69 %). Steht dort dein Arbeitnehmeranteil (z. B. 8,65 %), rechne: Anteil × 2 − 14,6.</li><li><b>Webseite deiner Krankenkasse:</b> Suche nach „Beitragssatz“ oder „Zusatzbeitrag 2026“.</li><li><b>Mitgliedschreiben:</b> Die Kasse informiert dich bei jeder Änderung per Brief.</li></ul><p class="small muted">Eintragen bitte den vollen Satz (z. B. 2,69), die App rechnet die Hälfte für dich.</p>`],
+    stkl: ['Welche Steuerklasse habe ich?', `<ul><li><b>I</b> – ledig, geschieden oder dauernd getrennt lebend.</li><li><b>II</b> – alleinerziehend mit mindestens einem Kind im Haushalt (Entlastungsbetrag).</li><li><b>III</b> – verheiratet, du verdienst deutlich mehr als dein Partner (der hat dann V).</li><li><b>IV</b> – verheiratet, beide verdienen ähnlich viel (auch IV mit Faktor möglich).</li><li><b>V</b> – verheiratet, Partner von jemandem in III.</li><li><b>VI</b> – für einen Zweit- oder Nebenjob.</li></ul><p class="small muted">Deine Steuerklasse steht oben auf jeder Lohnabrechnung (meist als „StKl“) und in deinem ELStAM-Ausdruck vom Finanzamt.</p>`],
+    zk: ['Zeitkonto-Stand', '<p>Trag einmal den Stand von deiner Abrechnung oder dem Zeiterfassungs-Terminal ein. Ab dem Tag danach rechnet Toki jede gespeicherte Arbeitszeit und jeden Zeitkonto-Urlaub selbst dazu. Den Stand musst du nur ändern, wenn du ihn mit der Firma abgleichen willst.</p>'],
+    alter: ['Warum das Alter?', '<p>Wer <b>kinderlos und mindestens 23</b> ist, zahlt in der Pflegeversicherung 0,6 % mehr. Dafür braucht der Rechner dein Geburtsjahr. Leer lassen = über 23.</p>'],
+    urlaubsjahr: ['Urlaub pro Jahr', '<p>Für jedes Jahr kannst du Anspruch und T-Zug-Tage festlegen. Für das <b>aktuelle Jahr</b> trägst du am besten deinen <b>Stand heute</b> ein (z. B. 11 Tage frei, inkl. Rest aus dem Vorjahr). Alles, was du danach im Urlaubskalender planst, wird davon abgezogen.</p><p>Was am Jahresende übrig bleibt, nimmt Toki automatisch ins nächste Jahr mit – nutzbar <b>bis 31. März</b>, danach verfällt es.</p>'],
+  };
+
+  // ---------- Berechnung ----------
+  let calc, vac;
+  const recompute = () => { calc = C.compute(st, today); vac = C.vacation(st, today); };
+  const opt = () => C.holOpt(S());
+  const absAt = (d) => { const a = calc.absMap.get(d); return a && !a.fromEntry ? a : null; };
+
+  // ---------- Toast, Dialog ----------
+  function toast(msg, ms = 2200, cls = '') {
+    document.querySelectorAll('.toast').forEach((t) => t.remove());
+    const t = document.createElement('div'); t.className = `toast ${cls}`; t.textContent = msg; document.body.appendChild(t);
+    setTimeout(() => t.remove(), ms);
+  }
+  let pillT;
+  function savedPill() {
+    let p = document.getElementById('pill');
+    if (!p) { p = document.createElement('div'); p.id = 'pill'; p.className = 'pill'; document.body.appendChild(p); }
+    p.textContent = '✓ Gespeichert'; p.classList.add('on');
+    clearTimeout(pillT); pillT = setTimeout(() => p.classList.remove('on'), 1400);
+  }
+  let sheetOnClose = null;
+  function sheet(html, onMount) {
+    const old = document.getElementById('scrim'); if (old) old.remove();
+    const s = document.createElement('div'); s.className = 'scrim'; s.id = 'scrim';
+    s.innerHTML = `<div class="sheet" role="dialog" aria-modal="true">${html}</div>`;
+    s.addEventListener('click', (e) => { if (e.target === s) closeSheet(); });
+    document.body.appendChild(s);
+    onMount && onMount(s.firstElementChild);
+  }
+  function closeSheet() { const s = document.getElementById('scrim'); if (s) s.remove(); if (sheetOnClose) { const f = sheetOnClose; sheetOnClose = null; f(); } }
+  function confirmBox(title, text, okLabel, onOk, danger = true) {
+    sheet(`<h3>${esc(title)}</h3><p class="muted">${text}</p><div class="grid2 mt"><button class="btn ghost" data-act="close">Abbrechen</button><button class="btn ${danger ? 'danger' : ''}" id="okb">${esc(okLabel)}</button></div>`,
+      (el) => el.querySelector('#okb').addEventListener('click', () => { closeSheet(); onOk(); }));
+  }
+
+  // ---------- Hilfen ----------
+  function kontInfo(m = C.ym(today)) {
+    const mm = calc.months.get(m);
+    const nach = st.nach.filter((n) => n.month === m).reduce((a, b) => a + num(b.hours), 0);
+    const k = (Number(st.kontingent[m]) || 0) + nach;
+    const used = mm ? mm.used : 0;
+    return { k, used, open: k - used, has: k > 0 };
+  }
+  function tarifFrei(y, at = today) {
+    const v = vac[y];
+    if (!v) return { frei: Number(C.yearCfg(S(), y).tarif) || 0, carry: 0 };
+    const carry = at <= `${y}-03-31` ? v.carryLeft : 0;
+    return { frei: v.rest + carry, carry, rest: v.rest };
+  }
+
+  // ---------- Konto-Ampel ----------
+  function ampel() {
+    const z = calc.zk, Z = S().zk;
+    const zd = z > Z.max || z < Z.min ? 'r' : z > Z.max - 5 || z < Z.min + 5 ? 'y' : '';
+    const k = kontInfo();
+    const kd = !k.has ? 'n' : k.open <= 0 ? 'r' : k.open < 3 ? 'y' : '';
+    const ut = tarifFrei(curY).frei;
+    const ud = ut <= 0 ? 'r' : ut <= 3 ? 'y' : '';
+    return `<div class="ampel">
+      <button class="amp" data-act="tab" data-tab="urlaub"><div class="k"><span class="dot ${zd}"></span>Zeitkonto</div><div class="v num">${sH(z)}</div></button>
+      <button class="amp" data-act="tab" data-tab="mehrarbeit"><div class="k"><span class="dot ${kd}"></span>offene MEA</div><div class="v num">${k.has ? H(Math.max(0, k.open), 1) : '–'}</div></button>
+      <button class="amp" data-act="tab" data-tab="urlaub"><div class="k"><span class="dot ${ud}"></span>Resturlaub</div><div class="v num">${D1(ut)} T</div></button>
+    </div>`;
+  }
+
+  // ---------- Seite: Feierabend ----------
+  function dayPause(d) {
+    const s = S(), w = C.dow(d);
+    const special = w === 0 || w === 6 || !!C.holidayName(d, opt());
+    if (special) { const pr = C.presence(ui.start, ui.end); return { pause: pr === null ? 0 : C.specialPause(pr), special }; }
+    if (ui.half || C.halfDay(d, s)) return { pause: s.arbeit.brotzeit, special };
+    return { pause: (ui.bz ? s.arbeit.brotzeit : 0) + (ui.mi ? s.arbeit.mittag : 0), special };
+  }
+  function pageFeierabend() {
+    const s = S();
+    const d = ui.date, w = C.dow(d);
+    const hol = C.holidayName(d, opt());
+    const ab = absAt(d);
+    const halfD = C.halfDay(d, s);
+    const { pause, special } = dayPause(d);
+    const raw = C.workedRaw(ui.start, ui.end, pause);
+    const res = raw === null ? null : C.capDay(raw);
+    const soll = C.tagessoll(s);
+    const half = ui.half || halfD || (ab && !ab.full);
+    const targets = special ? [4, 6, 8, 10] : half ? [soll / 2] : [...new Set([soll, 8, 9, 10].filter((x) => x >= soll && x <= 10))];
+    const pauseFor = (t) => (special ? (t > 6 ? 30 : 0) : pause);
+    const entry = st.entries[d];
+    const blocked = !!(ab && ab.full);
+    let notes = '';
+    if (blocked) notes += `<div class="notice warn">🌴 <div>Hier ist <b>${C.TYPES[ab.type].label}</b> eingetragen – Arbeitszeit für diesen Tag ist gesperrt.<br><button class="btn sm soft mt-s" data-act="tab" data-tab="urlaub">Im Urlaubskalender ansehen</button></div></div>`;
+    else if (hol) notes += `<div class="notice info">🎉 <div><b>${esc(hol)}</b> – Feiertag. Arbeit zählt komplett als Mehrarbeit, ohne Pausenabzug.</div></div>`;
+    else if (w === 6) notes += `<div class="notice info">Samstag: keine Brotzeit – erst ab 6 Std. werden 30 min Mittag abgezogen. Alles zählt als Mehrarbeit${s.zk.samstagBonus ? ' (läuft es ins Zeitkonto: +25 % Zeitzuschlag)' : ''}.</div>`;
+    else if (w === 0) notes += '<div class="notice info">Sonntag: keine Brotzeit, ab 6 Std. 30 min Mittag. Alles zählt als Mehrarbeit.</div>';
+    else if (halfD) notes += `<div class="notice info">${d.slice(5) === '12-24' ? 'Heiligabend' : 'Silvester'}: halber Arbeitstag (${D1(soll / 2)} Std.).</div>`;
+    else if (ab && !ab.full) notes += `<div class="notice info">½ Tag ${C.TYPES[ab.type].label} eingetragen – Soll heute ${D1(soll / 2)} Std.</div>`;
+    if (res && res.capped) notes += `<div class="notice danger">⚠ <div><b>Zeitverstoß:</b> mehr als 10 Std. gearbeitet (${nf(raw)} h). Gezählt werden nur 10 Std.</div></div>`;
+    const pauseLbl = special ? `Wochenende: ${pause ? '30 min Mittag' : 'keine Pause'}` : `Pausen ${pause} min`;
+    const modeLbl = ui.half ? '½ Urlaubstag' : 'normaler Tag';
+    return `${ampel()}
+    <section class="card">
+      <label class="label" for="work-date">Arbeitstag</label>
+      <button class="datebtn" id="work-date" data-act="pickDate"><span>${d === today ? `Heute · ${WD[w]}. ${dShort(d)}` : dLong(d)}</span>${I.cal.replace('<svg', '<svg width="20" height="20"')}</button>
+      <div class="grid2 mt">
+        <div><label class="label" for="work-start">Beginn</label><input id="work-start" class="field big" type="time" value="${esc(ui.start)}" data-bind="start"></div>
+        <div><label class="label" for="work-end">Ende (Wunsch)</label><input id="work-end" class="field big" type="time" value="${esc(ui.end)}" data-bind="end"></div>
+      </div>
+      <div class="worked"><span class="small" style="opacity:.85">Gearbeitet (Industriestd.)</span><span class="v num">${res ? H(res.hours) : '– h'}</span></div>
+      ${notes}
+      <button class="btn mt" data-act="saveEntry" ${!res || blocked ? 'disabled' : ''}>${entry ? 'Eintrag aktualisieren' : 'Zeit speichern'}</button>
+    </section>
+    <section class="card">
+      <h2>Gehen um … <span class="xs muted" style="text-transform:none;letter-spacing:0;font-weight:500">· antippen übernimmt die Zeit</span></h2>
+      <div class="tiles">${targets.map((t) => { const at = C.leaveAt(ui.start, pauseFor(t), t); return `<button class="tile ${targets.length === 1 ? 'single' : ''} ${t === 10 ? 'max' : ''} ${at && at === ui.end ? 'on' : ''}" data-act="setEnd" data-t="${at || ''}" ${at ? '' : 'disabled'}><div class="k">${D1(t)} Std.${t === 10 ? ' · max' : ''}</div><div class="v num">${at ?? '–'}</div></button>`; }).join('')}</div>
+    </section>
+    <details class="fold" ${ui.foldOpen ? 'open' : ''} data-fold="foldOpen">
+      <summary><span>${pauseLbl} · ${modeLbl}</span>${I.chev}</summary>
+      <div class="body">
+        <div class="minirow">
+          <button class="chip" aria-pressed="${ui.bz && !ui.half}" data-act="toggle" data-k="bz" ${special || ui.half ? 'disabled' : ''}>Brotzeit ${s.arbeit.brotzeit}</button>
+          <button class="chip" aria-pressed="${ui.mi && !ui.half}" data-act="toggle" data-k="mi" ${special || ui.half ? 'disabled' : ''}>Mittag ${s.arbeit.mittag}</button>
+        </div>
+        <label class="switch mt-s"><span><b>Halbtags Urlaub</b><br><span class="xs muted">${D1(soll / 2)} Std. arbeiten + Brotzeit, ½ Tag Tarifurlaub wird abgezogen</span></span><input type="checkbox" data-act="half" ${ui.half ? 'checked' : ''} ${special ? 'disabled' : ''}></label>
+      </div>
+    </details>`;
+  }
+
+  // ---------- Seite: Mehrarbeit ----------
+  function weekStats(w) {
+    const es = w.days.filter((x) => x.entry && !(x.absence && x.absence.full));
+    if (!es.length) return null;
+    const st0 = es.map((x) => C.toMin(x.entry.start)), en = es.map((x) => { let e = C.toMin(x.entry.end); const s0 = C.toMin(x.entry.start); if (e < s0) e += 1440; return e; });
+    const avg = (a) => a.reduce((p, c) => p + c, 0) / a.length;
+    const longest = es.reduce((a, b) => (b.entry.hours > a.entry.hours ? b : a));
+    return { es, st0, en, avgStart: avg(st0), avgEnd: avg(en), avgDur: avg(es.map((x) => x.entry.hours)), longest };
+  }
+  function weekChart(w, ws) {
+    const s = S();
+    const lo = Math.floor(Math.min(...ws.st0) / 60) * 60 - 30, hi = Math.ceil(Math.max(...ws.en) / 60) * 60 + 30;
+    const W = 320, rowH = 22, top = 18, left = 34;
+    const x = (m) => left + ((m - lo) / (hi - lo)) * (W - left - 6);
+    const h = top + ws.es.length * rowH + 6;
+    let grid = '';
+    for (let m = Math.ceil(lo / 60) * 60; m <= hi; m += 60) grid += `<line x1="${x(m)}" x2="${x(m)}" y1="${top - 4}" y2="${h - 4}" stroke="currentColor" stroke-opacity=".12"/><text x="${x(m)}" y="11" font-size="9" text-anchor="middle" fill="currentColor" fill-opacity=".55">${String((m / 60) % 24).padStart(2, '0')}</text>`;
+    const soll = C.tagessoll(s);
+    const rows = ws.es.map((d, i) => {
+      const y = top + i * rowH;
+      const a = ws.st0[i], b = ws.en[i];
+      const sollEnd = d.target > 0 ? a + d.target * 60 + (d.entry.pause || 0) : null;
+      return `<text x="2" y="${y + 13}" font-size="10" font-weight="700" fill="currentColor">${WD[C.dow(d.date)]}</text>
+        <rect x="${x(a)}" y="${y + 3}" width="${Math.max(2, x(Math.min(b, sollEnd ?? a)) - x(a))}" height="14" rx="4" fill="var(--primary)" opacity=".55"/>
+        ${sollEnd !== null && b > sollEnd ? `<rect x="${x(sollEnd)}" y="${y + 3}" width="${x(b) - x(sollEnd)}" height="14" rx="4" fill="var(--success)"/>` : ''}
+        ${sollEnd === null ? `<rect x="${x(a)}" y="${y + 3}" width="${x(b) - x(a)}" height="14" rx="4" fill="var(--success)"/>` : ''}
+        <circle cx="${x(a)}" cy="${y + 10}" r="3.5" fill="var(--c-zk)"/><circle cx="${x(b)}" cy="${y + 10}" r="3.5" fill="var(--danger)"/>`;
+    }).join('');
+    const avgLine = `<line x1="${x(ws.avgStart)}" x2="${x(ws.avgStart)}" y1="${top}" y2="${h - 6}" stroke="var(--c-zk)" stroke-dasharray="3 3"/><line x1="${x(ws.avgEnd)}" x2="${x(ws.avgEnd)}" y1="${top}" y2="${h - 6}" stroke="var(--danger)" stroke-dasharray="3 3"/>`;
+    // Dauer-Balken
+    const maxD = Math.max(10, ...ws.es.map((d) => d.entry.hours));
+    const bw = 300, bh = 90;
+    const colW = bw / Math.max(5, ws.es.length);
+    const by = (v) => bh - 14 - (v / maxD) * (bh - 24);
+    const bars = ws.es.map((d, i) => { const v = d.entry.hours; const cx = i * colW + colW / 2; return `<rect x="${cx - colW * 0.3}" y="${by(v)}" width="${colW * 0.6}" height="${bh - 14 - by(v)}" rx="4" fill="${v > (d.target || 0) ? 'var(--success)' : 'var(--primary)'}" opacity="${d.target === 0 ? 1 : 0.85}"/><text x="${cx}" y="${by(v) - 3}" font-size="9.5" text-anchor="middle" font-weight="700" fill="currentColor">${nf(v, 1)}</text><text x="${cx}" y="${bh - 2}" font-size="9.5" text-anchor="middle" fill="currentColor" fill-opacity=".6">${WD[C.dow(d.date)]}</text>`; }).join('');
+    return `<div class="anal">
+      <div class="label">Kommen &amp; Gehen</div>
+      <svg viewBox="0 0 ${W} ${h}" width="100%" style="color:var(--fg)">${grid}${avgLine}${rows}</svg>
+      <div class="legend"><span><i style="background:var(--c-zk);border-radius:50%"></i>Kommen</span><span><i style="background:var(--danger);border-radius:50%"></i>Gehen</span><span><i style="background:var(--success)"></i>über Soll</span><span>– – Ø</span></div>
+      <div class="label mt">Stunden pro Tag</div>
+      <svg viewBox="0 0 ${bw} ${bh}" width="100%" style="color:var(--fg)"><line x1="0" x2="${bw}" y1="${by(soll)}" y2="${by(soll)}" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="4 3"/><text x="${bw}" y="${by(soll) - 3}" font-size="9" text-anchor="end" fill="currentColor" fill-opacity=".55">Soll ${D1(soll)} h</text>${bars}</svg>
+      <div class="grid4 stats">
+        <div><span>Ø Kommen</span><b>${minToClock(ws.avgStart)}</b></div><div><span>Ø Gehen</span><b>${minToClock(ws.avgEnd)}</b></div>
+        <div><span>Ø Dauer</span><b>${nf(ws.avgDur, 1)} h</b></div><div><span>Längster</span><b>${WD[C.dow(ws.longest.date)]} ${nf(ws.longest.entry.hours, 1)}</b></div>
+      </div>
+    </div>`;
+  }
+  function weekCard(w, prev) {
+    const s = S(), show = s.lohn.zeigen;
+    const open = !!ui.open[w.monday];
+    const maxH = 11;
+    const pct = (h) => `${Math.max(0, Math.min(100, (h / maxH) * 100))}%`;
+    if (!w.days.some((x) => x.entry)) {
+      const ab = w.days.filter((x) => x.absence && !x.absence.fromEntry);
+      const types = [...new Set(ab.map((x) => x.absence.type))];
+      return `<section class="card" style="padding:12px 16px"><div class="between"><div><h3 style="font-size:24px">KW ${w.kw} <span class="kwr">${dShort(w.monday)}–${dShort(w.sunday)}</span></h3></div><div class="row" style="gap:6px;flex-wrap:wrap;justify-content:flex-end">${types.map((t) => `<span class="badge"><span class="tdot ${t}"></span>${C.TYPES[t].label} · ${D1(ab.filter((x) => x.absence.type === t).reduce((a, x) => a + x.absence.units, 0))} T</span>`).join('')}${w.zkChange ? `<span class="badge">${sH(w.zkChange)} ZK</span>` : ''}</div></div></section>`;
+    }
+    const days = w.days.map((day) => {
+      const d = day.date, wd = C.dow(d), e = day.entry, ab = day.absence;
+      if ((wd === 0 || wd === 6) && !e) return '';
+      let bar, dv = '<span class="dv"></span>';
+      if (ab && ab.full && !ab.fromEntry) bar = `<div class="bar abs" style="background:var(--c-${ab.type})">${C.TYPES[ab.type].label}${ab.type === 'zk' ? ` · −${H(ab.units * C.tagessoll(s), 1)}` : ''}</div>`;
+      else if (e) {
+        const t = day.target, over = e.hours - t;
+        bar = `<div class="bar"><div class="f" style="width:${pct(Math.min(e.hours, t || e.hours))}"></div>${t > 0 && over > 0 ? `<div class="o" style="left:${pct(t)};width:${pct(over)}"></div>` : ''}${t === 0 ? `<div class="o" style="left:0;width:${pct(e.hours)};border-radius:7px"></div>` : ''}${t > 0 && over < 0 ? `<div class="u" style="left:${pct(e.hours)};width:${pct(-over)}"></div>` : ''}${t > 0 ? `<div class="s" style="left:${pct(t)}"></div>` : ''}<div class="t">${esc(e.start)}–${esc(e.end)}${e.half ? ' · ½U' : ''}${e.capped ? ' · ⚠' : ''}</div></div>`;
+        dv = `<span class="dv ${day.delta > 0 ? 'pos' : day.delta < 0 ? 'neg' : ''}">${sH(day.delta)}</span>`;
+      } else if (day.holiday) bar = `<div class="bar hol">🎉 ${esc(day.holiday)}</div>`;
+      else if (ab && !ab.full) bar = `<div class="bar abs" style="background:var(--c-${ab.type});opacity:.7">½ ${C.TYPES[ab.type].label}</div>`;
+      else bar = '<div class="bar empty"></div>';
+      return `<div class="day" ${e ? `data-act="dayMenu" data-date="${d}"` : ''}><div class="wd">${WD[wd]}<small>${dShort(d)}</small></div>${bar}${dv}</div>`;
+    }).join('');
+    const p = w.pay;
+    const right = w.mehr > 0 ? (show ? EUR(p.total) : sH(w.mehr)) : w.zkChange ? `<span style="color:var(--c-zk)">${sH(w.zkChange)} ZK</span>` : '';
+    const ws = open ? weekStats(w) : null;
+    const diff = prev ? w.mehr - prev.mehr : null;
+    return `<section class="card">
+      <div class="wk-head" data-act="openWeek" data-w="${w.monday}">
+        <div><h3>KW ${w.kw} <span class="kwr">${dShort(w.monday)}–${dShort(w.sunday)}</span></h3></div>
+        <span class="big-r num">${right}</span>
+      </div>
+      <div class="kpis">
+        <div class="kpi"><div class="k">Gearbeitet</div><div class="v num">${H(w.worked)}</div></div>
+        <div class="kpi hl ${w.mehrNach > 0 ? 'nach' : ''}"><div class="k">Mehrarbeit</div><div class="v num">${H(w.mehr)}</div>${w.mehrNach > 0 ? `<div class="xs"><b>davon ${H(w.mehrNach, 1)} nachbeantr.</b></div>` : ''}</div>
+        <div class="kpi zkk"><div class="k">Zeitkonto</div><div class="v num">${sH(w.zkChange)}</div></div>
+      </div>
+      ${w.mehr > 0 ? `<div class="zrows">
+        <div class="zr z25"><span class="zb">+25 %</span><span class="grow">${H(w.pay.h25)}</span>${show ? `<b>${EUR(p.z25)}</b>` : ''}</div>
+        <div class="zr z50 ${p.h50 ? '' : 'off'}"><span class="zb">+50 %</span><span class="grow">${H(p.h50)}</span>${show ? `<b>${EUR(p.z50)}</b>` : ''}</div>
+      </div>` : ''}
+      <div class="days">${days}</div>
+      <button class="morebtn" data-act="openWeek" data-w="${w.monday}">${open ? 'Auswertung ausblenden ▲' : 'Auswertung & Diagramme ▼'}</button>
+      ${open && ws ? `${weekChart(w, ws)}
+        ${diff !== null ? `<p class="xs muted mt-s">Mehrarbeit ggü. Vorwoche (KW ${prev.kw}): <b class="${diff > 0 ? 'pos' : diff < 0 ? 'neg' : ''}">${sH(diff)}</b></p>` : ''}
+        ${w.offset > 0 ? `<p class="xs muted mt-s">${H(w.offset)} Plus dieser Woche wurden mit dem Zeitkonto-Tag verrechnet (zählen nicht als Mehrarbeit).</p>` : ''}
+        ${w.bonus > 0 ? `<p class="xs muted mt-s">Samstag ins Zeitkonto: +${H(w.bonus)} Zeitzuschlag (25 %).</p>` : ''}
+        ${w.mehr > 0 && show ? `<dl class="money">
+          <div><dt>Grundvergütung (${H(w.mehr)} × ${EUR(calc.rate)})</dt><dd>${EUR(p.base)}</dd></div>
+          <div class="hl25"><dt>Zuschlag 25 % auf ${H(p.h25)}</dt><dd>${EUR(p.z25)}</dd></div>
+          <div class="hl50"><dt>Zuschlag 50 % auf ${H(p.h50)}</dt><dd>${EUR(p.z50)}</dd></div>
+          <div class="sum"><dt>Gesamt brutto</dt><dd>${EUR(p.total)}</dd></div></dl>` : ''}` : ''}
+    </section>`;
+  }
+  function monthCard(m) {
+    const show = S().lohn.zeigen, p = m.pay;
+    const K = m.kontingent + m.nach;
+    const usedPct = K ? Math.min(100, (m.used / K) * 100) : 0;
+    return `<section class="card">
+      <div class="between"><h3>${monthName(m.month)}</h3><span class="big-r num">${show ? EUR(p.total) : H(m.mehr)}</span></div>
+      <div class="kpis">
+        <div class="kpi hl"><div class="k">Mehrarbeit</div><div class="v num">${H(m.mehr)}</div></div>
+        <div class="kpi"><div class="k">Zeitkonto</div><div class="v num">${sH(m.zkChange)}</div></div>
+        <div class="kpi"><div class="k">Gearbeitet</div><div class="v num">${H(m.worked, 1)}</div></div>
+      </div>
+      ${m.mehr > 0 ? `<div class="zrows"><div class="zr z25"><span class="zb">+25 %</span><span class="grow">${H(p.h25)}</span>${show ? `<b>${EUR(p.z25)}</b>` : ''}</div><div class="zr z50 ${p.h50 ? '' : 'off'}"><span class="zb">+50 %</span><span class="grow">${H(p.h50)}</span>${show ? `<b>${EUR(p.z50)}</b>` : ''}</div></div>` : ''}
+      ${K ? `<div class="mt"><div class="xs muted">MEA-Kontingent ${H(m.used, 1)} von ${H(K, 1)}${m.nach ? ` · inkl. <span class="badge nach">${H(m.nach, 1)} nachbeantragt</span>` : ''}</div><div class="progress mt-s"><i style="width:${usedPct}%"></i></div></div>` : ''}
+      ${m.mehr > 0 && show ? `<dl class="money"><div><dt>Grundvergütung</dt><dd>${EUR(p.base)}</dd></div><div class="hl25"><dt>Zuschlag 25 %</dt><dd>${EUR(p.z25)}</dd></div><div class="hl50"><dt>Zuschlag 50 %</dt><dd>${EUR(p.z50)}</dd></div><div class="sum"><dt>Gesamt brutto</dt><dd>${EUR(p.total)}</dd></div></dl>` : ''}
+      <p class="xs muted mt-s">${m.days} Tage erfasst · Zuschläge werden je Woche berechnet</p>
+    </section>`;
+  }
+  function yearView() {
+    const y = ui.year;
+    const ms = Array.from({ length: 12 }, (_, i) => calc.months.get(`${y}-${String(i + 1).padStart(2, '0')}`) || null);
+    const tot = ms.reduce((a, m) => { if (m) { a.worked += m.worked; a.mehr += m.mehr; a.zk += m.zkChange; a.pay += m.pay.total; a.h25 += m.pay.h25; a.h50 += m.pay.h50; a.z25 += m.pay.z25; a.z50 += m.pay.z50; a.days += m.days; a.nach += m.nach; } return a; }, { worked: 0, mehr: 0, zk: 0, pay: 0, h25: 0, h50: 0, z25: 0, z50: 0, days: 0, nach: 0 });
+    const max = Math.max(1, ...ms.map((m) => (m ? Math.max(m.mehr, Math.max(0, m.zkChange)) : 0)));
+    return `<section class="card">
+      <div class="between"><button class="iconbtn" data-act="year" data-d="-1">${I.left}</button><h3>Jahr ${y}</h3><button class="iconbtn" data-act="year" data-d="1">${I.right}</button></div>
+      <div class="kpis">
+        <div class="kpi"><div class="k">Gearbeitet</div><div class="v num">${H(tot.worked, 0)}</div></div>
+        <div class="kpi hl"><div class="k">Mehrarbeit</div><div class="v num">${H(tot.mehr, 1)}</div></div>
+        <div class="kpi"><div class="k">Ins Zeitkonto</div><div class="v num">${sH(tot.zk)}</div></div>
+      </div>
+      <div class="chart">${ms.map((m, i) => `<div class="c" title="${MON[i]}"><b style="height:${m ? (m.mehr / max) * 100 : 0}%"></b><b class="zk" style="height:${m && m.zkChange > 0 ? (m.zkChange / max) * 100 : 0}%;opacity:.7"></b><span>${MON[i].slice(0, 1)}</span></div>`).join('')}</div>
+      <div class="legend"><span><i style="background:var(--primary)"></i>Mehrarbeit</span><span><i style="background:var(--c-zk)"></i>ins Zeitkonto</span></div>
+      <div class="zrows"><div class="zr z25"><span class="zb">+25 %</span><span class="grow">${H(tot.h25, 1)}</span>${S().lohn.zeigen ? `<b>${EUR(tot.z25)}</b>` : ''}</div><div class="zr z50 ${tot.h50 ? '' : 'off'}"><span class="zb">+50 %</span><span class="grow">${H(tot.h50, 1)}</span>${S().lohn.zeigen ? `<b>${EUR(tot.z50)}</b>` : ''}</div></div>
+      <dl class="money"><div><dt>Erfasste Arbeitstage</dt><dd>${tot.days}</dd></div><div><dt>davon nachbeantragt</dt><dd>${H(tot.nach, 1)}</dd></div><div class="sum"><dt>Mehrarbeit brutto gesamt</dt><dd>${EUR(tot.pay)}</dd></div></dl>
+    </section>`;
+  }
+  function pageMehrarbeit() {
+    const s = S();
+    const m = ui.kmonth;
+    const k = kontInfo(m);
+    const mm = calc.months.get(m);
+    const isCur = m === C.ym(today);
+    let avg = '';
+    if (isCur && k.has) {
+      const end = `${m}-${String(new Date(Number(m.slice(0, 4)), Number(m.slice(5, 7)), 0).getDate()).padStart(2, '0')}`;
+      const rest = C.workdaysBetween(today, end, opt(), (d) => !!absAt(d)).length;
+      avg = k.open <= 0 ? '<p class="small mt-s pos"><b>Kontingent erreicht.</b></p>' : rest ? `<p class="small mt-s"><b class="pos">Noch Ø ${nf(k.open / rest)} Std. Mehrarbeit pro Arbeitstag</b><br><span class="xs muted">${rest} verbleibende Arbeitstage im ${MON[Number(m.slice(5, 7)) - 1]} (ohne Feiertage & Urlaub, inkl. heute)</span></p>` : '<p class="small mt-s muted">Keine Arbeitstage mehr in diesem Monat.</p>';
+    }
+    const z = calc.zk;
+    const curK = kontInfo();
+    const showNach = z > s.zk.max && curK.open <= 0;
+    const nachList = st.nach.slice().sort((a, b) => (a.month < b.month ? 1 : -1));
+    let body = '';
+    if (ui.view === 'woche') {
+      const all = calc.weeks.filter((w) => w.days.some((d) => d.entry || (d.absence && !d.absence.fromEntry)));
+      body = all.length ? all.map((w, i) => weekCard(w, all[i - 1] && all[i - 1].days.some((x) => x.entry) ? all[i - 1] : null)).reverse().join('') : '<p class="empty">Noch keine Tage gespeichert.</p>';
+    } else if (ui.view === 'monat') {
+      const ms = [...calc.months.values()].filter((x) => x.days || x.weeks.some((w) => w.mehr || w.zkChange)).sort((a, b) => (a.month < b.month ? 1 : -1));
+      body = ms.length ? ms.map(monthCard).join('') : '<p class="empty">Noch keine Monate mit Einträgen.</p>';
+    } else body = yearView();
+    const fehlt = [];
+    if (!k.has && !st.nach.some((n) => n.month === m)) fehlt.push(`MEA-Kontingent für ${MON[Number(m.slice(5, 7)) - 1]} (Feld hier drunter)`);
+    if (!Number(s.lohn.grundlohn) && !Number(s.lohn.stundenlohn)) fehlt.push('Grundlohn bzw. Stundenlohn (für die €-Beträge)');
+    if (!s.zk.datum) fehlt.push('Zeitkonto-Stand');
+    const fehltNote = fehlt.length ? `<div class="notice warn" style="margin:0 0 14px"><div><b>Damit alles stimmt, fehlen noch:</b><ul style="margin:4px 0 0;padding-left:18px">${fehlt.map((x) => `<li>${x}</li>`).join('')}</ul>${fehlt.some((x) => !x.startsWith('MEA')) ? `<button class="btn sm soft mt-s" data-act="goSet" data-sec="${!s.zk.datum && Number(s.lohn.grundlohn) ? 'mehrarbeit' : 'verdienst'}">Zu den Einstellungen</button>` : ''}</div></div>` : '';
+    return `<div class="between"><h1>Mehrarbeit</h1><button class="iconbtn" data-act="eye" title="Lohn ein-/ausblenden">${s.lohn.zeigen ? I.eye : I.eyeoff}</button></div>
+    ${fehltNote}
+    <section class="card">
+      <div class="between"><button class="iconbtn" data-act="kmonth" data-d="-1">${I.left}</button><h3>${monthName(m)}</h3><button class="iconbtn" data-act="kmonth" data-d="1">${I.right}</button></div>
+      <div class="grid2 mt">
+        <div><label class="label" for="kont">MEA-Kontingent (h)</label><input id="kont" class="field big2" inputmode="decimal" placeholder="z. B. 20" value="${deNum(st.kontingent[m] ?? '')}" data-kont="${m}"></div>
+        <div><span class="label">Geleistet / offen</span><div class="field big2 num" style="display:flex;align-items:center;background:var(--secondary)">${H(mm ? mm.mehr : 0, 1)} / ${k.has ? H(Math.max(0, k.open), 1) : '–'}</div></div>
+      </div>
+      ${k.has ? `<div class="progress mt"><i style="width:${Math.min(100, (k.used / k.k) * 100)}%"></i></div>` : '<p class="hint">Ohne Kontingent laufen alle Überstunden ins Zeitkonto.</p>'}
+      ${avg}
+      ${z > s.zk.max ? `<div class="notice danger">⚠ <div><b>Vorsicht, Stundenkonto voll!</b> Zeitkonto ${sH(z)} – es wird weiter mitgezählt.</div></div>` : ''}
+    </section>
+    ${showNach ? `<section class="card" style="border:2px solid var(--warn)">
+      <h2>Mehrarbeit nachbeantragen</h2>
+      <p class="small">MEA-Kontingent für ${monthName(C.ym(today))} ist ${curK.has ? 'erschöpft' : 'nicht vorhanden'} und das Zeitkonto ist über ${s.zk.max} h. Trag die genehmigten Stunden ein – sie fließen ins Kontingent und zählen als Mehrarbeit (hervorgehoben).</p>
+      <div class="grid2 mt"><input class="field" id="nachH" inputmode="decimal" placeholder="Stunden"><button class="btn" data-act="addNach">Eintragen</button></div>
+    </section>` : ''}
+    ${nachList.length ? `<section class="card"><h2>Nachbeantragt</h2><div class="list">${nachList.map((n) => `<div class="li"><span class="badge nach">${H(num(n.hours), 1)}</span><span class="grow">${monthName(n.month)}<br><span class="xs muted">eingetragen ${dShort(n.date)}${n.date.slice(0, 4)}</span></span><button class="btn sm danger" data-act="delNach" data-id="${n.id}">Löschen</button></div>`).join('')}</div></section>` : ''}
+    <div class="seg" style="margin-bottom:14px">${[['woche', 'Wochen'], ['monat', 'Monate'], ['jahr', 'Jahr']].map(([kk, l]) => `<button aria-pressed="${ui.view === kk}" data-act="view" data-v="${kk}">${l}</button>`).join('')}</div>
+    ${body}
+    <p class="xs muted onbg" style="text-align:center">Mehrarbeit ab ${D1(C.tagessoll(s))} Std./Tag · Samstag komplett · Zuschläge je Woche: erste 6 h +25 %, danach +50 % · Tag antippen zum Löschen</p>`;
+  }
+
+  // ---------- Seite: Urlaub ----------
+  function typeAvail(type, y) {
+    const v = vac[y] || {};
+    if (type === 'tarif') return `${D1(tarifFrei(y).frei)} Tage frei`;
+    if (type === 'zk') return `${sH(calc.zkPlanned)} ≈ ${Math.floor(calc.zkPlanned / calc.soll)} Tage`;
+    if (type === 'fza') return `${H(calc.fzaPlanned, 1)} ≈ ${Math.floor(calc.fzaPlanned / calc.soll)} Tage`;
+    if (type === 'tzug') return `${D1(v.tzugRest ?? C.yearCfg(S(), y).tzug)} Tage frei`;
+    if (type === 'krank') return `${D1(v.krank || 0)} Tage in ${y}`;
+    return `${D1(v.sonder || 0)} Tage genommen`;
+  }
+  /** Monatskalender (mit KW-Spalte) – für Urlaub und Datumsauswahl */
+  function monthGrid(m, cellFn) {
+    const start = C.monday(`${m}-01`);
+    let html = `<div class="cal kwcal"><div class="wh">KW</div>${['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].map((x) => `<div class="wh">${x}</div>`).join('')}`;
+    for (let r = 0; r < 6; r++) {
+      const mon = C.addDays(start, r * 7);
+      if (r > 3 && mon.slice(0, 7) !== m) break;
+      html += `<div class="kwc">${C.isoWeek(mon)}</div>`;
+      for (let i = 0; i < 7; i++) html += cellFn(C.addDays(mon, i));
+    }
+    return html + '</div>';
+  }
+  function dayCell(d, m, act) {
+    const s = S();
+    const a = calc.absMap.get(d);
+    const hol = C.holidayName(d, opt());
+    const wd = C.dow(d);
+    const cls = ['cd'];
+    if (d.slice(0, 7) !== m) cls.push('out');
+    if (wd === 0 || wd === 6) cls.push('we');
+    if (hol) cls.push('hol');
+    if (a) { cls.push(`t-${a.type}`); if (!a.full) cls.push('half'); }
+    else if (C.halfDay(d, s) && wd > 0 && wd < 6) cls.push('hd');
+    if (d === today) cls.push('today');
+    if (act === 'day') {
+      const sel = ui.sel;
+      if (sel && (d === sel.from || d === sel.to)) cls.push('sel');
+      if (sel && sel.to && d > sel.from && d < sel.to) cls.push('inr');
+    } else if (d === ui.date) cls.push('sel');
+    const mark = a ? C.TYPES[a.type].short : hol ? 'FT' : '';
+    return `<button class="${cls.join(' ')}" data-act="${act}" data-d="${d}" title="${esc(hol || (a ? C.TYPES[a.type].label : ''))}">${Number(d.slice(8))}${mark ? `<span class="m">${mark}</span>` : ''}${st.entries[d] && !(a && a.full) ? '<span class="w"></span>' : ''}</button>`;
+  }
+  function pageUrlaub() {
+    const s = S(), y = ui.vyear, v = vac[y] || {};
+    const cfg = C.yearCfg(s, y);
+    const tf = tarifFrei(y, y === curY ? today : `${y}-01-01`);
+    const tarifBasis = v.hasStand ? v.stand : (v.anspruch ?? cfg.tarif) + (v.carryIn || 0);
+    const tarifGen = v.hasStand ? (v.taken || 0) - (v.vorStand || 0) : v.taken || 0;
+    const zkDays = v.zkDays || 0, fzaDays = v.fzaDays || 0;
+    const tile = (cls, name, val, sub, side = '') => `<div class="b ${cls}"><div class="tn">${name}</div><div class="v num">${val}</div><div class="s"><span>${sub}</span>${side ? `<span class="side">${side}</span>` : ''}</div></div>`;
+    const m = ui.cal;
+    // Einträge des Jahres
+    const items = [];
+    for (const a of st.absences) {
+      if (a.to.slice(0, 4) < String(y) || a.from.slice(0, 4) > String(y)) continue;
+      const days = C.workdaysBetween(a.from, a.to, opt());
+      const n = days.reduce((acc, d) => acc + (calc.absMap.get(d) && calc.absMap.get(d).id === a.id ? calc.absMap.get(d).units : 0), 0);
+      items.push({ ...a, n });
+    }
+    for (const [d, e] of Object.entries(st.entries)) if (e.half && d.slice(0, 4) === String(y) && !absAt(d)) items.push({ id: null, from: d, to: d, type: 'tarif', n: 0.5, note: '½ Tag (aus Arbeitszeit)' });
+    items.sort((a, b) => (a.from < b.from ? -1 : 1));
+    const sums = {};
+    for (const it of items) sums[it.type] = (sums[it.type] || 0) + it.n;
+    const ugTag = ((Number(s.lohn.grundlohn) || 0) / (Number(s.urlaub.ugTeiler) || 21.75)) * (Number(s.urlaub.ugFaktor) || 0);
+    // Jahresraster: 12 Monate × 31 Tage
+    let grid = '<div class="ygrid"><div></div>';
+    for (let d = 1; d <= 31; d++) grid += `<div class="yh">${d % 5 === 0 || d === 1 ? d : ''}</div>`;
+    for (let mo = 1; mo <= 12; mo++) {
+      grid += `<div class="ym" data-act="calTo" data-m="${y}-${String(mo).padStart(2, '0')}">${MON[mo - 1].slice(0, 3)}</div>`;
+      const dim = new Date(y, mo, 0).getDate();
+      for (let d = 1; d <= 31; d++) {
+        if (d > dim) { grid += '<i class="yc x"></i>'; continue; }
+        const iso = `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const a = calc.absMap.get(iso), wd = C.dow(iso), hol = C.holidayName(iso, opt());
+        const c = a ? `t-${a.type}${a.full ? '' : ' half'}` : hol ? 'hol' : wd === 0 || wd === 6 ? 'we' : '';
+        grid += `<i class="yc ${c} ${iso === today ? 'td' : ''}" title="${dShort(iso)}${a ? ' · ' + C.TYPES[a.type].label : hol ? ' · ' + esc(hol) : ''}"></i>`;
+      }
+    }
+    grid += '</div>';
+    // Liste nach Typ gruppiert
+    const groups = Object.keys(C.TYPES).filter((t) => items.some((it) => it.type === t)).map((t) => {
+      const list = items.filter((it) => it.type === t);
+      const open = ui.vopen && t in ui.vopen ? ui.vopen[t] : list.length <= 4;
+      return `<details class="tgroup" style="--tc:var(--c-${t})" ${open ? 'open' : ''} data-vt="${t}"><summary><span class="tdot ${t}"></span><b>${C.TYPES[t].label}</b><span class="grow"></span><span class="tsum">${D1(sums[t])} T</span><span class="xs muted">${list.length}×</span>${I.chev}</summary>
+        ${list.map((it) => {
+          const past = it.to < today, now = it.from <= today && it.to >= today;
+          const extra = [];
+          if (it.type === 'zk' || it.type === 'fza') extra.push(`−${H(it.n * calc.soll, 1)}`);
+          if (it.type === 'tarif' && s.lohn.zeigen && ugTag) extra.push(`UG ${EUR(it.n * ugTag)}`);
+          if (it.note) extra.push(esc(it.note));
+          return `<div class="tl ${past ? 'past' : ''}"><span class="tlr">${it.from === it.to ? `${WD[C.dow(it.from)]} ${dShort(it.from)}` : `${WD[C.dow(it.from)]} ${dShort(it.from)} – ${WD[C.dow(it.to)]} ${dShort(it.to)}`}${now ? ' <span class="badge" style="background:var(--success);color:#fff">läuft</span>' : ''}${extra.length ? `<small>${extra.join(' · ')}</small>` : ''}</span><b class="tln">${D1(it.n)} T</b>${it.id ? `<button class="del" data-act="delAbs" data-id="${it.id}" aria-label="Löschen">✕</button>` : '<span style="width:30px"></span>'}</div>`;
+        }).join('')}</details>`;
+    }).join('');
+    const verpl = calc.zkVerplant > 0 ? `<b class="neg">${H(calc.zkVerplant, 0)} verplant</b>` : '';
+    return `<div class="between"><h1>Urlaub</h1><div class="row yearnav"><button class="iconbtn" data-act="vyear" data-d="-1">${I.left}</button><b>${y}</b><button class="iconbtn" data-act="vyear" data-d="1">${I.right}</button></div></div>
+    <div class="bal">
+      ${tile('tarif', 'Tarifurlaub', `${D1(tf.frei)} <small>T frei</small>`, `${D1(tarifGen)} von ${D1(tarifBasis)} genommen`, tf.carry > 0 ? `inkl. ${D1(tf.carry)} T Vorjahr bis 31.03.` : v.verfallen > 0 && y <= curY ? `${D1(v.verfallen)} T verfallen` : '')}
+      ${tile('zk', 'Zeitkonto', sH(calc.zk), `${D1(zkDays)} ${zkDays === 1 ? 'Tag' : 'Tage'} genommen${calc.zkVerplant > 0 ? `<br>${verpl} (${D1(calc.zkVerplantTage)} T) → ${sH(calc.zkPlanned)}` : ''}`, `≈ ${Math.max(0, Math.floor(calc.zkPlanned / calc.soll))} T frei`)}
+      ${tile('fza', 'FZA-Konto', H(calc.fza, 1), `${D1(fzaDays)} ${fzaDays === 1 ? 'Tag' : 'Tage'} genommen`, `≈ ${Math.max(0, Math.floor(calc.fzaPlanned / calc.soll))} T frei`)}
+      ${tile('tzug', 'T-Zug', `${D1(v.tzugRest ?? cfg.tzug)} <small>T frei</small>`, `${D1(v.tzug || 0)} von ${D1(v.tzugMax ?? cfg.tzug)} genommen`, `nur ${y}`)}
+      ${tile('sonder', 'Sonderurlaub', `${D1(v.sonder || 0)} <small>T</small>`, 'genommen')}
+      ${tile('krank', 'Krank', `${D1(v.krank || 0)} <small>T</small>`, `in ${y} · bezahlt mit ${D1(calc.soll)} h/Tag`)}
+    </div>
+    <section class="card">
+      <div class="cal-head"><button class="iconbtn" data-act="cal" data-d="-1">${I.left}</button><h3>${monthName(m)}</h3><button class="iconbtn" data-act="cal" data-d="1">${I.right}</button></div>
+      ${monthGrid(m, (d) => dayCell(d, m, 'day'))}
+      <p class="hint" style="text-align:center">${ui.sel ? `Start: <b>${dShort(ui.sel.from)}</b> – jetzt Endtag tippen (gleicher Tag = 1 Tag) · <a href="#" data-act="selClear">abbrechen</a>` : 'Tippe Start- und Endtag, um Urlaub zu planen. Tippe auf einen Urlaubstag zum Bearbeiten.'}</p>
+      <div class="legend" style="justify-content:center">${Object.entries(C.TYPES).map(([kk, t]) => `<span><i class="tdot ${kk}"></i>${t.label}</span>`).join('')}<span><i style="background:repeating-linear-gradient(135deg,var(--secondary) 0 3px,var(--accent) 3px 6px)"></i>Feiertag</span></div>
+    </section>
+    <section class="card"><div class="between"><h2 style="margin:0">Jahresüberblick ${y}</h2><span class="xs muted">${D1(Object.values(sums).reduce((a2, b2) => a2 + b2, 0))} Tage frei</span></div>
+      ${grid}
+      <p class="xs muted" style="margin:4px 0 0">Monat antippen = Kalender springt dorthin</p>
+      ${groups || '<p class="empty" style="color:var(--muted)">Für dieses Jahr ist noch nichts eingetragen.</p>'}
+    </section>`;
+  }
+  function openAbsenceSheet(from, to) {
+    const s = S();
+    const days = C.workdaysBetween(from, to, opt());
+    const y = Number(from.slice(0, 4));
+    const clash = days.filter((d) => absAt(d));
+    const worked = days.filter((d) => st.entries[d]);
+    const f = { type: 'tarif', half: false, note: '' };
+    const ugTag = ((Number(s.lohn.grundlohn) || 0) / (Number(s.urlaub.ugTeiler) || 21.75)) * (Number(s.urlaub.ugFaktor) || 0);
+    const cost = () => days.reduce((a, d) => a + (f.half && days.length === 1 ? Math.min(0.5, C.dayNeed(d, s)) : C.dayNeed(d, s)), 0);
+    const draw = (el) => {
+      const n = cost();
+      const warn = [];
+      if (f.type === 'tarif') { const free = tarifFrei(y, from).frei; if (n > free + 1e-9) warn.push(`Nur noch ${D1(free)} Tage Tarifurlaub frei.`); }
+      if (f.type === 'tzug') { const free = (vac[y] || {}).tzugRest ?? C.yearCfg(s, y).tzug; if (from.slice(0, 4) !== to.slice(0, 4)) warn.push('T-Zug-Tage gelten nur innerhalb eines Kalenderjahres.'); if (n > free) warn.push(`Nur noch ${D1(free)} T-Zug-Tage in ${y}.`); }
+      if (f.type === 'zk' && calc.zkPlanned - n * calc.soll < s.zk.min) warn.push(`Zeitkonto ginge unter ${s.zk.min} h (${sH(calc.zkPlanned - n * calc.soll)}).`);
+      if (f.type === 'fza' && calc.fzaPlanned - n * calc.soll < 0) warn.push(`FZA-Konto reicht nicht (${H(calc.fzaPlanned - n * calc.soll, 1)}).`);
+      const hard = clash.length > 0 || !days.length || (f.type === 'tzug' && from.slice(0, 4) !== to.slice(0, 4));
+      el.innerHTML = `<h3>Urlaub eintragen</h3>
+        <p class="small"><b>${from === to ? dLong(from) : `${dLong(from)} – ${dLong(to)}`}</b><br><span class="muted">${D1(n)} Urlaubstag${n === 1 ? '' : 'e'} (ohne Wochenende & Feiertage${days.some((d) => C.halfDay(d, s)) ? ', Heiligabend/Silvester als ½ Tag' : ''})</span></p>
+        <div class="typepick mt">${Object.entries(C.TYPES).map(([k, t]) => `<button aria-pressed="${f.type === k}" data-t="${k}"><span class="tdot ${k}"></span><span>${t.label}<small>${typeAvail(k, y)}</small></span></button>`).join('')}</div>
+        ${days.length === 1 ? `<label class="switch mt-s"><span>Nur halber Tag</span><input type="checkbox" id="halfc" ${f.half ? 'checked' : ''}></label>` : ''}
+        <div id="halfErr"></div>
+        <input class="field mt-s" id="note" placeholder="Notiz (optional)" value="${esc(f.note)}">
+        ${f.type === 'tarif' && s.lohn.zeigen && ugTag ? `<p class="small mt-s">Urlaubsgeld: <b>${EUR(n * ugTag)}</b> (${D1(n)} × ${EUR(ugTag)})</p>` : ''}
+        ${f.type !== 'tarif' ? '<p class="xs muted mt-s">Bezahlt werden je Tag die Sollstunden ohne Zuschläge, kein Urlaubsgeld.</p>' : ''}
+        ${f.type === 'zk' ? `<p class="xs muted">${days[0] && days[0] < today ? 'Liegt in der Vergangenheit: wird direkt vom Zeitkonto abgezogen.' : `Die Wochen-Sollzeit sinkt um ${H(calc.soll, 0)} je Tag: Plus dieser Woche wird zuerst mit dem Zeitkonto verrechnet, erst über ${D1(s.arbeit.wochenstunden)} h zählt Mehrarbeit.`}</p>` : ''}
+        ${clash.length ? `<div class="notice danger">An ${clash.length} Tag(en) ist schon Urlaub eingetragen.</div>` : ''}
+        ${!days.length ? '<div class="notice danger">Im Zeitraum liegt kein Arbeitstag.</div>' : ''}
+        ${worked.length ? `<div class="notice warn">An ${worked.length} Tag(en) ist schon Arbeitszeit gespeichert – die wird für diese Tage nicht mehr gezählt.</div>` : ''}
+        ${warn.map((w) => `<div class="notice warn">${esc(w)}</div>`).join('')}
+        <div class="grid2 mt"><button class="btn ghost" data-act="close">Abbrechen</button><button class="btn" id="saveAbs" ${hard ? 'disabled' : ''}>Eintragen</button></div>`;
+      el.querySelectorAll('[data-t]').forEach((b) => b.addEventListener('click', () => { f.type = b.dataset.t; f.note = el.querySelector('#note').value; draw(el); }));
+      const hc = el.querySelector('#halfc'); if (hc) hc.addEventListener('change', () => { f.half = hc.checked; f.note = el.querySelector('#note').value; draw(el); });
+      el.querySelector('#saveAbs').addEventListener('click', () => {
+        if (f.half && days.length === 1 && !['tarif', 'zk'].includes(f.type)) {
+          el.querySelector('#halfErr').innerHTML = '<div class="notice danger">Ein halber Tag geht nur bei <b>Tarifurlaub</b> oder <b>Zeitkonto</b>.</div>';
+          return;
+        }
+        st.absences.push({ id: uid(), created: Date.now(), from, to, type: f.type, half: f.half && days.length === 1, note: el.querySelector('#note').value.trim() });
+        ui.sel = null; save(); sheetOnClose = null; closeSheet(); toast(`✓ ${C.TYPES[f.type].label} eingetragen`); render();
+      });
+    };
+    sheetOnClose = () => { ui.sel = null; render(); };
+    sheet('', draw);
+  }
+  function openAbsenceInfo(d) {
+    const a = calc.absMap.get(d);
+    const ab = st.absences.find((x) => x.id === a.id);
+    if (!ab) return;
+    const n = C.workdaysBetween(ab.from, ab.to, opt()).reduce((acc, x) => acc + ((calc.absMap.get(x) || {}).id === ab.id ? calc.absMap.get(x).units : 0), 0);
+    sheet(`<h3><span class="tdot ${ab.type}" style="width:16px;height:16px"></span> ${C.TYPES[ab.type].label}</h3>
+      <p>${ab.from === ab.to ? dLong(ab.from) : `${dLong(ab.from)} – ${dLong(ab.to)}`}<br><span class="muted">${D1(n)} Urlaubstag(e)${ab.note ? ` · ${esc(ab.note)}` : ''}</span></p>
+      <div class="grid2 mt"><button class="btn ghost" data-act="close">Schließen</button><button class="btn danger" data-act="delAbs" data-id="${ab.id}">Löschen</button></div>`);
+  }
+
+  // ---------- Seite: Netto Rechner ----------
+  function godDefaults() {
+    const s = S();
+    return { grundlohn: Number(s.lohn.grundlohn) || 3800, mea: 40, h25: 24, zulage: 0, einmal: 0, utage: 0, klasse: Number(s.steuer.klasse) || 1, kirche: !!s.steuer.kirche, kvZusatz: Number(s.steuer.kvZusatz) || 2.9, kinderPV: Number(s.steuer.kinderPV) || 0, kinderFB: Number(s.steuer.kinderFB) || 0, land: s.arbeit.land || 'BY', alter: Number(s.steuer.geburtsjahr) ? new Date().getFullYear() - Number(s.steuer.geburtsjahr) : '' };
+  }
+  function nettoResult(lines, laufend, einmal, S2, mo, abzug, rate, cls, note = '', mehrG = 0) {
+    const n = C.netto(laufend, einmal, S2, mo, abzug);
+    const nOhne = mehrG > 0 ? C.netto(laufend - mehrG, einmal, S2, mo, abzug) : n;
+    const netMehr = n.net - nOhne.net;
+    const n25 = C.netto(laufend + rate * 1.25, einmal, S2, mo, abzug), n50 = C.netto(laufend + rate * 1.5, einmal, S2, mo, abzug);
+    const net25 = n25.net - n.net, net50 = n50.net - n.net;
+    const grenz = rate ? 1 - net25 / (rate * 1.25) : 0;
+    const spitze = n.zveJahr >= 69879;
+    let tipp;
+    if (spitze) tipp = `Du liegst im <b>Spitzensteuersatz (42 %)</b>. Von jeder bezahlten Überstunde bleibt gut die Hälfte – Stunden ins <b>Zeitkonto oder FZA</b> zu schieben und später frei zu nehmen, ist oft attraktiver.`;
+    else if (grenz > 0.5) tipp = `Deine Grenzbelastung liegt bei <b>${nf(grenz * 100, 0)} %</b>: von 1 € Mehrarbeit bleiben nur ${nf((1 - grenz) * 100, 0)} Cent. Freizeitausgleich lohnt sich hier oft mehr als Auszahlung.`;
+    else if (grenz > 0.42) tipp = `Grenzbelastung <b>${nf(grenz * 100, 0)} %</b> – von 1 € Mehrarbeit bleiben ca. ${nf((1 - grenz) * 100, 0)} Cent. Die +50 %-Stunden (ab der 7. Überstunde der Woche) bringen netto am meisten.`;
+    else tipp = `Grenzbelastung <b>${nf(grenz * 100, 0)} %</b> – von 1 € Mehrarbeit bleiben ca. ${nf((1 - grenz) * 100, 0)} Cent. Bezahlte Mehrarbeit lohnt sich bei dir noch gut.`;
+    const parts = [[n.net, 'var(--success)', 'Netto'], [n.taxSum, 'var(--danger)', 'Steuern'], [n.svSum, 'var(--c-zk)', 'Sozialvers.']];
+    if (n.abzug) parts.push([n.abzug, 'var(--muted)', 'Sonstiges']);
+    return `<section class="card">
+      <div class="hero"><div class="s">Netto (ca.)</div><div class="v num ${cls}">${nf(n.net)} €</div><div class="s ${cls}">Brutto ${nf(n.gross)} €</div></div>
+      <div class="nsplit ${cls}"><div><span>Netto (Grundgehalt)</span><b class="num">${nf(nOhne.net)} €</b><small>aus ${nf(n.gross - mehrG)} € brutto</small></div><div class="m"><span>Netto (Mehrarbeit)</span><b class="num">${mehrG > 0 ? nf(netMehr) + ' €' : '–'}</b><small>${mehrG > 0 ? `aus ${nf(mehrG)} € brutto · ${nf((netMehr / mehrG) * 100, 0)} % bleiben` : 'keine Mehrarbeit'}</small></div></div>
+      <div class="split ${cls}">${parts.map(([v, c]) => `<i style="width:${n.gross ? (v / n.gross) * 100 : 0}%;background:${c}"></i>`).join('')}</div>
+      <div class="legend">${parts.map(([v, c, l]) => `<span><i style="background:${c}"></i>${l} ${nf(n.gross ? (v / n.gross) * 100 : 0, 0)} %</span>`).join('')}</div>
+      ${note}
+    </section>
+    <section class="card"><h2>Brutto</h2>
+      <dl class="money ${cls}" style="margin-top:0">${lines.map((l) => `<div class="${l.cls || ''}"><dt>${l.k}</dt><dd>${nf(l.v)} €</dd></div>`).join('')}<div class="sum"><dt>Brutto gesamt</dt><dd>${nf(n.gross)} €</dd></div></dl>
+      <h2 class="mt">Abzüge</h2>
+      <dl class="money ${cls}" style="margin-top:0">
+        <div><dt>Lohnsteuer</dt><dd>−${nf(n.lst)} €</dd></div>${n.soli > 0.005 ? `<div><dt>Solidaritätszuschlag</dt><dd>−${nf(n.soli)} €</dd></div>` : ''}${S2.steuer.kirche ? `<div><dt>Kirchensteuer</dt><dd>−${nf(n.kist)} €</dd></div>` : ''}
+        <div><dt>Krankenversicherung</dt><dd>−${nf(n.sv.kv)} €</dd></div><div><dt>Pflegeversicherung</dt><dd>−${nf(n.sv.pv)} €</dd></div>
+        <div><dt>Rentenversicherung</dt><dd>−${nf(n.sv.rv)} €</dd></div><div><dt>Arbeitslosenversicherung</dt><dd>−${nf(n.sv.av)} €</dd></div>
+        ${n.abzug ? `<div><dt>Sonstige Abzüge (netto)</dt><dd>−${nf(n.abzug)} €</dd></div>` : ''}
+        <div class="sum"><dt>Netto</dt><dd>${nf(n.net)} €</dd></div>
+      </dl>
+    </section>
+    <section class="card"><h2>Lohnt sich Mehrarbeit?</h2>
+      <div class="grid2 ${cls}">
+        <div class="kpi hl"><div class="k">1 Std. +25 %</div><div class="v num">${nf(net25)} €</div><div class="xs muted">netto von ${nf(rate * 1.25)} € brutto</div></div>
+        <div class="kpi hl"><div class="k">1 Std. +50 %</div><div class="v num">${nf(net50)} €</div><div class="xs muted">netto von ${nf(rate * 1.5)} € brutto</div></div>
+      </div>
+      <div class="notice ${spitze || grenz > 0.5 ? 'warn' : 'info'}"><div>${tipp}</div></div>
+    </section>`;
+  }
+  function pageNetto() {
+    const s = S(), show = s.lohn.zeigen;
+    const cls = show ? '' : 'blur';
+    const head = `<div class="between"><h1>Netto Rechner</h1><button class="iconbtn" data-act="eye" title="Lohn ein-/ausblenden">${show ? I.eye : I.eyeoff}</button></div>
+      <div class="seg" style="margin-bottom:14px"><button aria-pressed="${ui.nmode === 'ist'}" data-act="nmode" data-v="ist">Mein Monat</button><button aria-pressed="${ui.nmode === 'god'}" data-act="nmode" data-v="god">⚡ God Mode</button></div>`;
+    const foot = (S2) => `<p class="xs muted onbg" style="text-align:center;padding:0 10px">Näherung nach Lohnsteuer-Tarif und SV-Werten 2026 (StKl ${['I', 'II', 'III', 'IV', 'V', 'VI'][S2.steuer.klasse - 1]}, ${C.LAENDER[S2.arbeit.land]}${S2.steuer.kirche ? ', mit KiSt' : ''}). Keine Gewähr – maßgeblich ist deine Lohnabrechnung.${S2.steuer.klasse >= 5 ? ' StKl V/VI nur grob angenähert.' : ''}</p>`;
+    if (ui.nmode === 'god') {
+      const g = { ...godDefaults(), ...(st.pref.god || {}) };
+      const S2 = JSON.parse(JSON.stringify(s));
+      Object.assign(S2.steuer, { klasse: Number(g.klasse), kirche: !!g.kirche, kvZusatz: Number(g.kvZusatz), kinderPV: Number(g.kinderPV), kinderFB: Number(g.kinderFB), geburtsjahr: g.alter ? new Date().getFullYear() - Number(g.alter) : 0 });
+      S2.arbeit.land = g.land || 'BY';
+      const rate = (Number(g.grundlohn) || 0) / ((Number(s.arbeit.wochenstunden) || 35) * 4.35);
+      const tot = Math.max(0, Number(g.mea) || 0);
+      const h25 = Math.min(tot, Math.max(0, Number(g.h25) || 0));
+      const h50 = tot - h25;
+      const mea = h25 * rate * 1.25 + h50 * rate * 1.5;
+      const ug = Number(g.utage) * (Number(g.grundlohn) / (Number(s.urlaub.ugTeiler) || 21.75)) * (Number(s.urlaub.ugFaktor) || 0);
+      const lines = [{ k: 'Grundlohn', v: Number(g.grundlohn) }];
+      if (mea) lines.push({ k: `Mehrarbeit ${nf(h25, 1)} h à 125 % + ${nf(h50, 1)} h à 150 %`, v: mea, cls: 'hl25' });
+      if (Number(g.zulage)) lines.push({ k: 'Zulagen (monatlich)', v: Number(g.zulage) });
+      if (ug) lines.push({ k: `Urlaubsgeld (${D1(g.utage)} Tage)`, v: ug });
+      if (Number(g.einmal)) lines.push({ k: 'Einmalzahlung', v: Number(g.einmal) });
+      const manual = g.manuell !== undefined && g.manuell !== '' && g.manuell !== null && Number(g.manuell) > 0;
+      if (manual) { lines.length = 0; lines.push({ k: 'Grundlohn + Mehrarbeit (manuell)', v: Number(g.manuell) }); if (Number(g.zulage)) lines.push({ k: 'Zulagen (monatlich)', v: Number(g.zulage) }); if (ug) lines.push({ k: `Urlaubsgeld (${D1(g.utage)} Tage)`, v: ug }); if (Number(g.einmal)) lines.push({ k: 'Einmalzahlung', v: Number(g.einmal) }); }
+      const laufend = (manual ? Number(g.manuell) : Number(g.grundlohn) + mea) + Number(g.zulage), einmal = ug + Number(g.einmal);
+      const gf = (k, l, attrs = 'inputmode="decimal"', hint = '') => `<div class="${manual && ['grundlohn', 'mea', 'h25'].includes(k) ? 'dim' : ''}"><label class="label">${l}</label><input class="field" data-god="${k}" value="${esc(deNum(g[k]))}" ${attrs}>${hint ? `<div class="hint">${hint}</div>` : ''}</div>`;
+      return `${head}<section class="card"><h2>Spielwiese – alles frei eingeben</h2>
+        <div class="grid2">${gf('grundlohn', 'Grundlohn (€ brutto)')}<div><span class="label">Stundenlohn</span><div class="field num" style="display:flex;align-items:center;background:var(--secondary)">${nf(rate)} €</div></div></div>
+        <div class="hint">Stundenlohn = Grundlohn ÷ (${D1(s.arbeit.wochenstunden)} h × 4,35)</div>
+        <div class="label mt ${manual ? 'dim' : ''}">Mehrarbeit im Monat&nbsp;<b class="mea-eur">(${nf(mea)} €)</b></div>
+        <div class="grid3">${gf('mea', 'Gesamt (h)')}${gf('h25', 'davon 25 % (h)')}<div><span class="label">Rest 50 % (h)</span><div class="field num" style="display:flex;align-items:center;background:var(--secondary)">${nf(h50, 1)}</div></div></div>
+        ${Number(g.h25) > tot ? '<div class="hint neg">25 %-Stunden können nicht mehr sein als die Gesamtstunden – auf Gesamt begrenzt.</div>' : ''}
+        <div class="sumbox ${manual ? 'man' : ''}"><label class="label">Grundlohn + Mehrarbeit (€ brutto)</label>
+          <input class="field big2" data-god="manuell" inputmode="decimal" value="${manual ? esc(deNum(g.manuell)) : ''}" placeholder="${nf(Number(g.grundlohn) + mea)}">
+          ${manual ? `<div class="notice warn"><div>✋ <b>Manueller Wert aktiv:</b> Grundlohn und Mehrarbeit oben werden ignoriert, gerechnet wird mit ${nf(Number(g.manuell))} €.<br><button class="btn sm soft mt-s" data-act="godManualOff">Wieder automatisch rechnen</button></div></div>` : '<div class="hint">Automatisch = Grundlohn + Mehrarbeit. Eigenen Wert eintippen, um ihn direkt zu verwenden.</div>'}</div>
+        <div class="grid2 mt"><div><label class="label">Steuerklasse ${info('stkl')}</label><select class="field" data-god="klasse">${[1, 2, 3, 4, 5, 6].map((k) => `<option value="${k}" ${Number(g.klasse) === k ? 'selected' : ''}>${['I', 'II', 'III', 'IV', 'V', 'VI'][k - 1]}</option>`).join('')}</select></div>
+        ${gf('kvZusatz', `KV-Zusatz (%) ${info('kv')}`)}
+        <div><label class="label">Bundesland</label><select class="field" data-god="land" data-str="1">${Object.entries(C.LAENDER).map(([k, l]) => `<option value="${k}" ${(g.land || 'BY') === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+        ${gf('alter', `Alter ${info('alter')}`, 'inputmode="numeric" placeholder="z. B. 35"')}
+        ${gf('kinderPV', 'Kinder (PV)', 'inputmode="numeric"')}${gf('kinderFB', 'Kinderfreibeträge')}</div>
+        <label class="switch"><span>Kirchensteuer</span><input type="checkbox" data-god="kirche" ${g.kirche ? 'checked' : ''}></label>
+        <details class="fold" style="margin:6px 0 0;box-shadow:none" ${ui.godSZ ? 'open' : ''} data-fold="godSZ"><summary><span>Sonderzulagen ${Number(g.zulage) || Number(g.einmal) || Number(g.utage) ? '· aktiv' : ''}</span>${I.chev}</summary><div class="body"><div class="grid2">${gf('zulage', 'Zulagen monatl. (€)')}${gf('einmal', 'Einmalzahlung (€)', 'inputmode="decimal"', 'z. B. Weihnachtsgeld')}${gf('utage', 'Urlaubstage (Urlaubsgeld)')}</div></div></details>
+        <div class="grid2 mt"><button class="btn soft" data-act="godReset">Aus meinen Daten</button><button class="btn" data-act="godCalc">Berechnen</button></div>
+      </section>
+      ${nettoResult(lines, laufend, einmal, S2, 6, 0, rate, '', '', manual ? 0 : mea)}
+      ${foot(S2)}`;
+    }
+    const m = ui.nmonth;
+    const gl = Number(s.lohn.grundlohn) || 0;
+    if (!gl) return `${head}<section class="card"><p>Trag zuerst deinen <b>Grundlohn</b> und deine Steuerdaten ein – dann rechne ich dir jeden Monat dein Netto aus. Oder spiel im <b>God Mode</b> mit freien Werten.</p><button class="btn" data-act="goSet" data-sec="verdienst">Zu den Einstellungen</button></section>`;
+    const mp = C.monthPay(st, calc, m);
+    const mo = Number(m.slice(5, 7));
+    const lines = mp.lines.map((l) => ({ k: `${esc(l.k)}${l.mehr ? ` <span class="xs">(${H(l.mehr.mehr, 1)}: ${H(l.mehr.pay.h25, 1)} à 25 %, ${H(l.mehr.pay.h50, 1)} à 50 %)</span>` : ''}`, v: l.v, cls: l.mehr ? 'hl25' : '' }));
+    // fehlende Angaben
+    const miss = [];
+    if (!s.steuer.geprueft) miss.push(`Steuerdaten noch nicht geprüft – gerechnet wird mit StKl ${['I', 'II', 'III', 'IV', 'V', 'VI'][s.steuer.klasse - 1]}, KV-Zusatz ${nf(s.steuer.kvZusatz, 2)} %, ${s.steuer.kirche ? 'mit' : 'ohne'} Kirchensteuer.`);
+    if (!Number(s.lohn.stundenlohn)) miss.push(`Stundenlohn fehlt – geschätzt aus dem Grundlohn (${nf(calc.rate)} €).`);
+    for (const x of s.lohn.sonder) if (x.art === 'einmalig' && Number(x.monat) === mo && !Number(x.wert)) miss.push(`${esc(x.name || 'Sonderzahlung')} ist für ${MON[mo - 1]} angelegt, aber ohne Betrag.`);
+    const src = mp.src;
+    const srcHas = Object.keys(st.entries).some((d) => d.startsWith(src));
+    if (!srcHas) miss.push(`Für ${monthName(src)} sind keine Arbeitszeiten erfasst – Mehrarbeit ${s.lohn.auszahlung === 'folgemonat' ? 'aus dem Vormonat ' : ''}fehlt deshalb.`);
+    const note = miss.length ? `<div class="notice warn"><div><b>Dafür fehlen mir noch Infos:</b><ul style="margin:4px 0 0;padding-left:18px">${miss.map((x) => `<li>${x}</li>`).join('')}</ul><button class="btn sm soft mt-s" data-act="goSet" data-sec="steuer">Zu den Einstellungen</button></div></div>` : '';
+    // Jahr
+    const y = Number(m.slice(0, 4));
+    let yG = 0, yN = 0;
+    for (let i = 1; i <= 12; i++) {
+      const mm = `${y}-${String(i).padStart(2, '0')}`;
+      const p = C.monthPay(st, calc, mm);
+      const ml = p.lines.find((l) => l.mehr);
+      if (!ml) continue;
+      yG += ml.v; yN += C.netto(p.laufend, p.einmal, s, i).net - C.netto(p.laufend - ml.v, p.einmal, s, i).net;
+    }
+    return `${head}
+    <div class="between" style="margin-bottom:10px"><button class="iconbtn" data-act="nmonth" data-d="-1">${I.left}</button><b class="onbg" style="font-family:var(--font-d);font-size:26px">${monthName(m)}</b><button class="iconbtn" data-act="nmonth" data-d="1">${I.right}</button></div>
+    ${nettoResult(lines, mp.laufend, mp.einmal, s, mo, 0, calc.rate, cls, note, (mp.lines.find((l) => l.mehr) || { v: 0 }).v)}
+    ${yG > 0 ? `<section class="card"><h2>Mehrarbeit ${y}</h2><dl class="money ${cls}" style="margin-top:0"><div><dt>brutto ausgezahlt</dt><dd>${nf(yG)} €</dd></div><div class="sum"><dt>davon netto ca.</dt><dd>${nf(yN)} €</dd></div></dl></section>` : ''}
+    ${foot(s)}`;
+  }
+
+  // ---------- Seite: Einstellungen ----------
+  const fld = (label, path, val, attrs = '', hint = '') => `<div><label class="label">${label}</label><input class="field" data-set="${path}" value="${esc(val)}" ${attrs}>${hint ? `<div class="hint">${hint}</div>` : ''}</div>`;
+  const sw = (label, path, val, sub = '') => `<label class="switch"><span>${label}${sub ? `<br><span class="xs muted">${sub}</span>` : ''}</span><input type="checkbox" data-set="${path}" data-type="bool" ${val ? 'checked' : ''}></label>`;
+  const sec = (id, title, body) => `<details class="fold set-sec" ${ui.setOpen === id ? 'open' : ''} data-sec="${id}"><summary><h2>${title}</h2>${I.chev}</summary><div class="body">${body}</div></details>`;
+  function pageSettings() {
+    const s = S();
+    const auto = !Number(s.lohn.stundenlohn) && Number(s.lohn.grundlohn) > 0;
+    const sonder = s.lohn.sonder.map((x, i) => `<div class="sonderbox">
+      <div class="between"><input class="field" style="height:40px" data-sonder="${i}.name" value="${esc(x.name)}" placeholder="Bezeichnung"><button class="btn sm danger" data-act="delSonder" data-i="${i}">✕</button></div>
+      <div class="grid2"><select class="field sm" data-sonder="${i}.art" data-struct="1"><option value="einmalig" ${x.art === 'einmalig' ? 'selected' : ''}>Einmalig</option><option value="monatlich" ${x.art === 'monatlich' ? 'selected' : ''}>Monatlich</option></select>
+      ${x.art === 'einmalig' ? `<select class="field sm" data-sonder="${i}.monat">${MON.map((mm, j) => `<option value="${j + 1}" ${Number(x.monat) === j + 1 ? 'selected' : ''}>im ${mm}</option>`).join('')}</select>` : '<span></span>'}</div>
+      <div class="grid2"><select class="field sm" data-sonder="${i}.modus" data-struct="1"><option value="betrag" ${x.modus === 'betrag' ? 'selected' : ''}>Betrag in € (brutto)</option><option value="faktor" ${x.modus === 'faktor' ? 'selected' : ''}>Faktor × Grundlohn</option></select>
+      <input class="field sm" inputmode="decimal" data-sonder="${i}.wert" value="${esc(deNum(x.wert))}" placeholder="${x.modus === 'faktor' ? 'z. B. 0,55' : 'z. B. 2.300'}"></div>
+      <div class="hint">${x.modus === 'faktor' ? `Faktor × Grundlohn${s.lohn.grundlohn ? ` = ${EUR(num(x.wert) * s.lohn.grundlohn)} brutto` : ''}` : 'Bruttobetrag in Euro'}</div>
+    </div>`).join('');
+    const Y = ui.setYear;
+    const jc = (s.urlaub.jahre || {})[Y] || {};
+    const yv = vac[Y] || {};
+    const zkInfo = s.zk.datum ? `Stand am ${dShort(s.zk.datum)}${s.zk.datum.slice(0, 4)}: <b>${sH(Number(s.zk.stand) || 0)}</b> → heute: <b>${sH(calc.zk)}</b>` : 'Stand eintragen – das Datum wird automatisch auf heute gesetzt.';
+    return `<h1>Einstellungen</h1>
+    ${!storageOk ? '<div class="notice danger" style="margin-bottom:14px">Dein Browser erlaubt hier kein dauerhaftes Speichern. Sichere deine Daten unter „Datentransport“.</div>' : ''}
+    ${sec('design', 'Design', `<div class="themes">${THEMES.map(([id, l, bg]) => `<button class="th" aria-pressed="${s.theme === id}" data-act="theme" data-id="${id}"><div class="pv" style="background:${bg}">${FX.preview(id)}</div><div class="nm">${l}</div></button>`).join('')}</div>`)}
+    ${sec('arbeit', 'Arbeitszeit & Feiertage', `<div class="grid2">${fld('Wochenstunden', 'arbeit.wochenstunden', deNum(s.arbeit.wochenstunden), 'inputmode="decimal"', `= ${D1(C.tagessoll(s))} Std./Tag`)}<div></div>${fld('Brotzeit (min)', 'arbeit.brotzeit', s.arbeit.brotzeit, 'inputmode="numeric"')}${fld('Mittag (min)', 'arbeit.mittag', s.arbeit.mittag, 'inputmode="numeric"')}</div>
+      <div class="mt"><label class="label">Bundesland (Feiertage)</label><select class="field" data-set="arbeit.land" data-struct="1">${Object.entries(C.LAENDER).map(([k, l]) => `<option value="${k}" ${s.arbeit.land === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+      ${s.arbeit.land === 'BY' ? sw('Mariä Himmelfahrt (15.08.) frei', 'arbeit.mariae', s.arbeit.mariae, 'gilt in überwiegend katholischen Gemeinden') : ''}
+      ${sw('Heiligabend = halber Arbeitstag', 'arbeit.halb24', s.arbeit.halb24, 'für den freien Tag ist nur ½ Urlaubstag nötig')}${sw('Silvester = halber Arbeitstag', 'arbeit.halb31', s.arbeit.halb31, 'für den freien Tag ist nur ½ Urlaubstag nötig')}`)}
+    ${sec('verdienst', 'Verdienst', `<div class="grid2">${fld('Grundlohn / Monat (€ brutto)', 'lohn.grundlohn', deNum(s.lohn.grundlohn || ''), 'inputmode="decimal" placeholder="z. B. 4200"')}${fld('Stundenlohn (€)', 'lohn.stundenlohn', deNum(s.lohn.stundenlohn || ''), `inputmode="decimal" placeholder="${auto ? nf(C.stundenlohn(s)) + ' (auto)' : 'z. B. 27,50'}"`, auto ? 'leer = Grundlohn ÷ (Wochenstd. × 4,35)' : '')}</div>
+      ${sw('Lohn in der App anzeigen', 'lohn.zeigen', s.lohn.zeigen, 'aus = alle €-Beträge werden versteckt (z. B. wenn du Kollegen die App zeigst)')}
+      <div><label class="label">Mehrarbeit wird ausgezahlt</label><select class="field" data-set="lohn.auszahlung"><option value="folgemonat" ${s.lohn.auszahlung === 'folgemonat' ? 'selected' : ''}>im Folgemonat</option><option value="gleich" ${s.lohn.auszahlung === 'gleich' ? 'selected' : ''}>im selben Monat</option></select></div>
+      <div class="label mt">Sonderzahlungen</div>${sonder}<button class="btn soft sm" data-act="addSonder">+ Sonderzahlung</button>
+      <div class="label mt">Urlaubsgeld je Tarifurlaubstag</div><div class="grid2">${fld('Faktor', 'urlaub.ugFaktor', deNum(s.urlaub.ugFaktor), 'inputmode="decimal"')}${fld('Teiler', 'urlaub.ugTeiler', deNum(s.urlaub.ugTeiler), 'inputmode="decimal"')}</div>
+      <div class="hint">Grundlohn ÷ Teiler × Faktor${s.lohn.grundlohn ? ` = <b>${EUR((s.lohn.grundlohn / s.urlaub.ugTeiler) * s.urlaub.ugFaktor)}</b> pro Tag` : ''}</div>
+`)}
+    ${sec('mehrarbeit', 'Mehrarbeit & Zeitkonto', `<div class="grid2">${fld(`Zeitkonto-Stand (h) ${info('zk')}`, 'zk.stand', deNum(s.zk.stand), 'inputmode="decimal"')}<div><label class="label">Stand vom</label><input class="field" type="date" data-set="zk.datum" value="${esc(s.zk.datum)}"></div></div>
+      <div class="notice info">${zkInfo}</div>
+      <div class="grid2 mt">${fld('Maximum (h)', 'zk.max', deNum(s.zk.max), 'inputmode="decimal"')}${fld('Minimum (h)', 'zk.min', deNum(s.zk.min), 'inputmode="decimal"')}</div>
+      ${sw('Samstag-Zuschlag 25 % fürs Zeitkonto', 'zk.samstagBonus', s.zk.samstagBonus, 'Samstagsstunden, die ins Zeitkonto laufen, zählen ×1,25')}
+      <div class="grid2">${fld('FZA-Konto (h)', 'urlaub.fzaStand', deNum(s.urlaub.fzaStand), 'inputmode="decimal"')}<div><label class="label">FZA Stand vom</label><input class="field" type="date" data-set="urlaub.fzaDatum" value="${esc(s.urlaub.fzaDatum)}"></div></div>`)}
+    ${sec('urlaub', 'Urlaub & Konten', `<div class="between"><span class="label" style="margin:0">Jahr wählen ${info('urlaubsjahr')}</span></div>
+      <div class="minirow mt-s">${[curY - 1, curY, curY + 1, curY + 2].map((yy) => `<button class="chip" aria-pressed="${yy === Y}" data-act="setYear" data-y="${yy}">${yy}</button>`).join('')}</div>
+      <div class="ybox mt">
+        <div class="grid2">${fld(`Tarifurlaub ${Y} (Tage)`, `urlaub.jahre.${Y}.tarif`, deNum(jc.tarif ?? ''), `inputmode="decimal" placeholder="${s.urlaub.tarifTage}"`)}${fld(`T-Zug ${Y} (Tage)`, `urlaub.jahre.${Y}.tzug`, deNum(jc.tzug ?? ''), `inputmode="decimal" placeholder="${s.urlaub.tzugTage}"`)}</div>
+        <div class="label mt">Stand (optional – z. B. heute)</div>
+        <div class="grid2">${fld('Tarifurlaub noch frei', `urlaub.jahre.${Y}.rest`, deNum(jc.rest ?? ''), 'inputmode="decimal" placeholder="z. B. 11"')}${fld('T-Zug noch frei', `urlaub.jahre.${Y}.tzugRest`, deNum(jc.tzugRest ?? ''), 'inputmode="decimal" placeholder="optional"')}
+        <div><label class="label">Stand vom</label><input class="field" type="date" data-set="urlaub.jahre.${Y}.restDatum" value="${esc(jc.restDatum || '')}"></div></div>
+        <div class="hint">${jc.rest !== undefined && jc.rest !== '' ? `Ab ${jc.restDatum ? dShort(jc.restDatum) : 'heute'} wird jeder geplante Tarifurlaub von ${D1(jc.rest)} Tagen abgezogen → aktuell <b>${D1(yv.rest ?? 0)} T</b> frei. Rest wird bis 31.03.${Y + 1} mitgenommen.` : yv.carryIn ? `${D1(yv.carryIn)} T aus ${Y - 1} kommen dazu (nutzbar bis 31.03.${Y}).` : 'Ohne Stand: Anspruch minus geplanter Urlaub.'}</div>
+      </div>
+      <div class="label mt">Standard für alle Jahre</div>
+      <div class="grid2">${fld('Tarifurlaub (Tage/Jahr)', 'urlaub.tarifTage', deNum(s.urlaub.tarifTage), 'inputmode="decimal"')}${fld('T-Zug (Tage/Jahr)', 'urlaub.tzugTage', deNum(s.urlaub.tzugTage), 'inputmode="decimal"')}</div>`)}
+    ${sec('steuer', 'Steuer (für Netto)', `<div class="grid2"><div><label class="label">Steuerklasse ${info('stkl')}</label><select class="field" data-set="steuer.klasse" data-type="num">${[1, 2, 3, 4, 5, 6].map((k) => `<option value="${k}" ${Number(s.steuer.klasse) === k ? 'selected' : ''}>${['I', 'II', 'III', 'IV', 'V', 'VI'][k - 1]}</option>`).join('')}</select></div>
+      ${fld(`KV-Zusatzbeitrag (%) ${info('kv')}`, 'steuer.kvZusatz', deNum(s.steuer.kvZusatz), 'inputmode="decimal"', 'Ø 2026: 2,9 %')}
+      ${fld('Kinderfreibeträge', 'steuer.kinderFB', deNum(s.steuer.kinderFB), 'inputmode="decimal"', 'laut Abrechnung, z. B. 0,5 / 1')}${fld('Kinder (Pflegevers.)', 'steuer.kinderPV', s.steuer.kinderPV, 'inputmode="numeric"', 'Anzahl Kinder')}</div>
+      <div class="grid2">${fld(`Geburtsjahr ${info('alter')}`, 'steuer.geburtsjahr', s.steuer.geburtsjahr || '', 'inputmode="numeric" placeholder="z. B. 1990"')}<div></div></div>
+      ${sw('Kirchensteuer', 'steuer.kirche', s.steuer.kirche)}
+      ${!s.steuer.geprueft ? '<button class="btn soft sm" data-act="steuerOk">✓ Angaben stimmen so</button>' : '<p class="xs muted">✓ Steuerdaten geprüft</p>'}`)}
+    ${sec('daten', 'Datentransport', `<p class="small muted">Deine Daten liegen nur in diesem Browser auf diesem Gerät. Für Handy ↔ PC: hier exportieren und am anderen Gerät importieren.</p>
+      <div class="grid2"><button class="btn" data-act="export">Exportieren</button><label class="btn soft" style="position:relative">Importieren<input type="file" accept=".json,application/json" data-act="importFile" style="position:absolute;inset:0;opacity:0"></label></div>
+      <button class="btn ghost mt-s" data-act="importPaste">Aus Text einfügen</button>
+      <button class="btn danger mt" data-act="reset">Alle Daten löschen</button>`)}
+    <button class="btn savebar" data-act="saveAll">💾 Speichern</button>
+    <p class="xs muted onbg" style="text-align:center">Toki · Feierabend, Mehrarbeit & Urlaub · v1.2</p>`;
+  }
+
+  // ---------- Render ----------
+  const root = document.getElementById('app');
+  function render(keepScroll = true) {
+    recompute();
+    const y = window.scrollY;
+    const s = S();
+    document.body.dataset.theme = s.theme;
+    const page = { feierabend: pageFeierabend, mehrarbeit: pageMehrarbeit, urlaub: pageUrlaub, netto: pageNetto, einstellungen: pageSettings }[ui.tab] || pageFeierabend;
+    root.innerHTML = `<div class="top"><div class="brand"><img src="${LOGO}" alt=""><span>TOKI</span></div></div>${page()}`;
+    document.getElementById('nav').innerHTML = `<div class="in">${TABS.map(([id, l, ic]) => `<button data-act="tab" data-tab="${id}" ${ui.tab === id ? 'aria-current="page"' : ''}>${ic}<span>${l}</span></button>`).join('')}</div>`;
+    if (keepScroll) window.scrollTo(0, y);
+    applyTheme();
+  }
+  let lastTheme = null;
+  function applyTheme() {
+    if (lastTheme === S().theme) return;
+    lastTheme = S().theme;
+    const meta = document.querySelector('meta[name=theme-color]');
+    if (meta) meta.content = getComputedStyle(document.body).getPropertyValue('--bg').trim() || '#b4521f';
+    requestAnimationFrame(() => FX.set(lastTheme));
+  }
+
+  // ---------- Aktionen ----------
+  const setTab = (t) => { ui.tab = t; try { if (location.hash !== `#${t}`) history.replaceState(null, '', `#${t}`); } catch { /* */ } render(false); window.scrollTo({ top: 0 }); };
+  function loadDate(d) {
+    ui.date = d;
+    const e = st.entries[d];
+    if (e) { ui.start = e.start; ui.end = e.end; ui.half = !!e.half; }
+    else { ui.start = st.pref.start || ui.start; ui.end = ''; ui.half = false; }
+  }
+  function delEntry(d) { confirmBox('Eintrag löschen?', `Arbeitszeit vom ${dLong(d)} (${esc(st.entries[d].start)}–${esc(st.entries[d].end)}) wird gelöscht.`, 'Löschen', () => { delete st.entries[d]; save(); if (ui.date === d) loadDate(d); render(); toast('Eintrag gelöscht'); }); }
+  const A = {
+    tab: (t) => setTab(t.dataset.tab),
+    pickDate: () => { ui.pickM = ui.date.slice(0, 7); openPicker(); },
+    pickDay: (t) => { loadDate(t.dataset.d); closeSheet(); render(); },
+    pickNav: (t) => { ui.pickM = shiftMonth(ui.pickM, Number(t.dataset.d)); openPicker(); },
+    pickToday: () => { loadDate(today); closeSheet(); render(); },
+    calTo: (t) => { ui.cal = t.dataset.m; render(); const c = document.querySelector('.kwcal'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'center' }); },
+    close: () => closeSheet(),
+    info: (t) => { const [h, b] = INFO[t.dataset.k]; sheet(`<h3>${h}</h3><div class="infotext">${b}</div><button class="btn mt" data-act="close">Alles klar</button>`); },
+    toggle: (t) => { ui[t.dataset.k] = !ui[t.dataset.k]; save(); render(); },
+    setEnd: (t) => { if (t.dataset.t) { ui.end = t.dataset.t; render(); } },
+    saveEntry: () => {
+      const d = ui.date;
+      const { pause, special } = dayPause(d);
+      const raw = C.workedRaw(ui.start, ui.end, pause);
+      if (raw === null) return;
+      const r = C.capDay(raw);
+      st.entries[d] = { start: ui.start, end: ui.end, pause, hours: r.hours, raw, capped: r.capped, half: ui.half && !special };
+      st.pref.start = ui.start;
+      save(); render();
+      toast(`✓ Gespeichert · ${WD[C.dow(d)]}. ${dShort(d)} · ${ui.start}–${ui.end} Uhr`, 3000, 'ok');
+    },
+    dayMenu: (t) => delEntry(t.dataset.date),
+    openWeek: (t) => { const k = t.dataset.w; ui.open[k] = !ui.open[k]; render(); },
+    view: (t) => { ui.view = t.dataset.v; render(); },
+    kmonth: (t) => { ui.kmonth = shiftMonth(ui.kmonth, Number(t.dataset.d)); render(); },
+    year: (t) => { ui.year += Number(t.dataset.d); render(); },
+    eye: () => { S().lohn.zeigen = !S().lohn.zeigen; save(); render(); },
+    addNach: () => {
+      const v = num(document.getElementById('nachH').value);
+      if (v <= 0) return toast('Bitte Stunden eintragen');
+      st.nach.push({ id: uid(), month: C.ym(today), hours: v, date: today }); save(); toast('✓ Nachbeantragte Stunden eingetragen'); render();
+    },
+    delNach: (t) => confirmBox('Nachbeantragung löschen?', 'Die Stunden fallen wieder aus dem Kontingent.', 'Löschen', () => { st.nach = st.nach.filter((n) => n.id !== t.dataset.id); save(); render(); }),
+    vyear: (t) => { ui.vyear += Number(t.dataset.d); render(); },
+    cal: (t) => { ui.cal = shiftMonth(ui.cal, Number(t.dataset.d)); render(); },
+    selClear: (t, e) => { e.preventDefault(); ui.sel = null; render(); },
+    day: (t) => {
+      const d = t.dataset.d;
+      if (!ui.sel && absAt(d)) return openAbsenceInfo(d);
+      if (!ui.sel) { ui.sel = { from: d }; render(); return; }
+      let { from } = ui.sel; let to = d;
+      if (to < from) [from, to] = [to, from];
+      ui.sel = { from, to }; render(); openAbsenceSheet(from, to);
+    },
+    delAbs: (t) => {
+      const a = st.absences.find((x) => x.id === t.dataset.id);
+      if (!a) return;
+      confirmBox('Urlaub löschen?', `${C.TYPES[a.type].label}: ${a.from === a.to ? dLong(a.from) : `${dLong(a.from)} – ${dLong(a.to)}`}`, 'Löschen', () => { st.absences = st.absences.filter((x) => x.id !== a.id); save(); render(); });
+    },
+    nmonth: (t) => { ui.nmonth = shiftMonth(ui.nmonth, Number(t.dataset.d)); render(); },
+    nmode: (t) => { ui.nmode = t.dataset.v; render(); },
+    godManualOff: () => { const g = { ...godDefaults(), ...(st.pref.god || {}) }; g.manuell = ''; st.pref.god = g; save(); render(); },
+    godReset: () => { st.pref.god = godDefaults(); save(); render(); },
+    godCalc: () => { render(); toast('✓ Berechnet'); },
+    goSet: (t) => { ui.setOpen = t.dataset.sec; setTab('einstellungen'); },
+    theme: (t) => { S().theme = t.dataset.id; save(); render(); savedPill(); },
+    setYear: (t) => { ui.setYear = Number(t.dataset.y); render(); },
+    steuerOk: () => { S().steuer.geprueft = true; save(); render(); savedPill(); },
+    saveAll: () => { save(); render(); toast(storageOk ? '✓ Alle Einstellungen gespeichert' : '⚠ Speichern im Browser nicht möglich – bitte exportieren', 2600, storageOk ? 'ok' : ''); },
+    addSonder: () => { S().lohn.sonder.push({ id: uid(), name: '', art: 'einmalig', monat: 12, modus: 'betrag', wert: 0 }); save(); render(); },
+    delSonder: (t) => { S().lohn.sonder.splice(Number(t.dataset.i), 1); save(); render(); },
+    export: async () => {
+      const data = JSON.stringify({ app: 'Toki', v: 1, exported: new Date().toISOString(), ...st }, null, 1);
+      const filename = `toki-daten-${today}.json`;
+      try {
+        if (window.claude && window.claude.use) {
+          const dl = await window.claude.use('downloads');
+          if (dl) { await dl.save({ filename, data: new Blob([data], { type: 'application/json' }) }); return; }
+        }
+      } catch { /* Fallback */ }
+      try { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data], { type: 'application/json' })); a.download = filename; document.body.appendChild(a); a.click(); a.remove(); } catch { /* */ }
+      sheet(`<h3>Export</h3><p class="small muted">Falls kein Download startet: Text kopieren und am anderen Gerät unter „Aus Text einfügen“ einfügen.</p><textarea class="field" style="height:160px;font-size:12px;padding:10px" readonly id="exp">${esc(data)}</textarea><div class="grid2 mt"><button class="btn ghost" data-act="close">Schließen</button><button class="btn" id="cp">Kopieren</button></div>`,
+        (el) => el.querySelector('#cp').addEventListener('click', async () => { try { await navigator.clipboard.writeText(data); toast('✓ Kopiert'); } catch { el.querySelector('#exp').select(); toast('Text markiert – bitte kopieren'); } }));
+    },
+    importPaste: () => sheet(`<h3>Daten einfügen</h3><textarea class="field" style="height:160px;font-size:12px;padding:10px" id="imp" placeholder="Exportierten Text hier einfügen"></textarea><div class="grid2 mt"><button class="btn ghost" data-act="close">Abbrechen</button><button class="btn" id="go">Importieren</button></div>`,
+      (el) => el.querySelector('#go').addEventListener('click', () => doImport(el.querySelector('#imp').value))),
+    reset: () => confirmBox('Alles löschen?', 'Alle Arbeitszeiten, Urlaube und Einstellungen werden auf diesem Gerät gelöscht. Das lässt sich nicht rückgängig machen.', 'Endgültig löschen', () => { st = norm({}); save(); loadDate(today); render(); toast('Alles gelöscht'); }),
+  };
+  let pvT;
+  function showPreview() {
+    closePreview();
+    const name = (THEMES.find((x) => x[0] === S().theme) || [])[1] || '';
+    const pv = document.createElement('div'); pv.id = 'pv'; pv.className = 'pvwrap';
+    pv.innerHTML = `<div class="pvbar"><span>👁 Vorschau · <b>${esc(name)}</b></span><span class="xs">tippen zum Schließen</span></div><div class="pvframe"><div class="pvapp"><div class="top"><div class="brand"><img src="${LOGO}" alt=""><span>TOKI</span></div></div>${pageFeierabend()}</div></div>`;
+    const fr = pv.querySelector('.pvframe');
+    const fx = document.getElementById('fx');
+    if (fx) { const c = fx.cloneNode(true); c.removeAttribute('id'); c.className = 'pvfx'; fr.prepend(c); }
+    const ff = document.getElementById('fxf');
+    if (ff) { const c2 = ff.cloneNode(true); c2.removeAttribute('id'); c2.removeAttribute('style'); c2.className = 'pvfx pvfront'; c2.querySelectorAll('canvas').forEach((x) => x.remove()); fr.append(c2); }
+    pv.addEventListener('click', closePreview);
+    document.body.appendChild(pv);
+    requestAnimationFrame(() => pv.classList.add('on'));
+    pvT = setTimeout(closePreview, 3500);
+  }
+  function closePreview() { clearTimeout(pvT); const pv = document.getElementById('pv'); if (pv) pv.remove(); }
+  function openPicker() {
+    const m = ui.pickM;
+    sheet(`<div class="cal-head"><button class="iconbtn" data-act="pickNav" data-d="-1">${I.left}</button><h3 style="margin:0">${monthName(m)}</h3><button class="iconbtn" data-act="pickNav" data-d="1">${I.right}</button></div>
+      ${monthGrid(m, (d) => dayCell(d, m, 'pickDay'))}
+      <div class="legend" style="justify-content:center"><span><i style="background:var(--primary);border-radius:50%"></i>Zeit gespeichert</span><span><i class="tdot tarif"></i>Urlaub</span></div>
+      <div class="grid2 mt"><button class="btn ghost" data-act="close">Schließen</button><button class="btn soft" data-act="pickToday">Heute</button></div>`);
+  }
+  function doImport(text) {
+    try {
+      const d = JSON.parse(text);
+      if (!d || typeof d !== 'object' || !d.settings) throw new Error('x');
+      confirmBox('Daten ersetzen?', 'Die Daten auf diesem Gerät werden durch den Import ersetzt.', 'Importieren', () => { st = norm(d); save(); loadDate(ui.date); render(); toast('✓ Import erfolgreich'); }, false);
+    } catch { closeSheet(); toast('Das ist keine gültige Toki-Datei'); }
+  }
+
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('[data-act]');
+    if (!t || t.tagName === 'INPUT') return;
+    const f = A[t.dataset.act];
+    if (f) { e.preventDefault(); f(t, e); }
+  });
+  document.addEventListener('toggle', (e) => {
+    const t = e.target;
+    if (t.dataset && t.dataset.fold) ui[t.dataset.fold] = t.open;
+    if (t.dataset && t.dataset.vt) { ui.vopen = ui.vopen || {}; ui.vopen[t.dataset.vt] = t.open; }
+    if (t.dataset && t.dataset.sec) { if (t.open) ui.setOpen = t.dataset.sec; else if (ui.setOpen === t.dataset.sec) ui.setOpen = null; }
+  }, true);
+  function setPath(obj, path, val) {
+    const ks = path.split('.'); let o = obj;
+    for (let i = 0; i < ks.length - 1; i++) { if (o[ks[i]] === undefined || o[ks[i]] === null || typeof o[ks[i]] !== 'object') o[ks[i]] = {}; o = o[ks[i]]; }
+    if (val === undefined) delete o[ks[ks.length - 1]]; else o[ks[ks.length - 1]] = val;
+  }
+  function getPath(obj, path) { return path.split('.').reduce((o, k) => (o ? o[k] : undefined), obj); }
+  document.addEventListener('input', (e) => {
+    const t = e.target;
+    if (t.dataset.bind === 'start' || t.dataset.bind === 'end') {
+      ui[t.dataset.bind] = t.value;
+      if (t.dataset.bind === 'start') { st.pref.start = t.value; save(); }
+      // nur abhängige Teile neu zeichnen, damit das Feld nicht springt
+      const el = document.activeElement && document.activeElement.id;
+      render();
+      if (el) { const n = document.getElementById(el); if (n) n.focus({ preventScroll: true }); }
+    }
+  });
+  document.addEventListener('change', (e) => {
+    const t = e.target;
+    if (t.dataset.bind === 'date') { if (t.value) { loadDate(t.value); render(); } return; }
+    if (t.dataset.act === 'half') { ui.half = t.checked; render(); return; }
+    if (t.dataset.act === 'importFile') { const f = t.files && t.files[0]; if (f) f.text().then(doImport); t.value = ''; return; }
+    if (t.dataset.kont) { const v = t.value.trim(); if (v === '') delete st.kontingent[t.dataset.kont]; else st.kontingent[t.dataset.kont] = num(v); save(); render(); savedPill(); return; }
+    if (t.dataset.god !== undefined && t.dataset.god !== '') {
+      const g = { ...godDefaults(), ...(st.pref.god || {}) };
+      g[t.dataset.god] = t.type === 'checkbox' ? t.checked : t.dataset.str ? t.value : t.tagName === 'SELECT' ? Number(t.value) : t.dataset.god === 'manuell' && t.value.trim() === '' ? '' : num(t.value);
+      if (t.dataset.god === 'manuell' && g.manuell !== '') toast('✋ Manueller Wert – Grundlohn & Mehrarbeit werden ignoriert', 2800);
+      st.pref.god = g; save(); render(); return;
+    }
+    if (t.dataset.sonder) {
+      const [i, k] = t.dataset.sonder.split('.'); const o = S().lohn.sonder[Number(i)];
+      o[k] = k === 'wert' || k === 'monat' ? num(t.value) : t.value; save(); savedPill();
+      if (t.dataset.struct) render();
+      return;
+    }
+    if (t.dataset.set) {
+      const path = t.dataset.set;
+      const cur = getPath(C.defaults(), path);
+      let v;
+      if (t.dataset.type === 'bool' || t.type === 'checkbox') v = t.checked;
+      else if (t.type === 'date') v = t.value;
+      else if (path.startsWith('urlaub.jahre.')) v = t.value.trim() === '' ? undefined : num(t.value);
+      else if (typeof cur === 'number' || t.dataset.type === 'num') v = t.value.trim() === '' ? 0 : num(t.value);
+      else v = t.value;
+      setPath(S(), path, v);
+      if (path.startsWith('steuer.')) S().steuer.geprueft = true;
+      if (path === 'zk.stand' || path === 'zk.datum') { if (!S().zk.datum) S().zk.datum = today; S().zk.setAt = Date.now(); }
+      if (path === 'urlaub.fzaStand' || path === 'urlaub.fzaDatum') { if (!S().urlaub.fzaDatum) S().urlaub.fzaDatum = today; S().urlaub.fzaSetAt = Date.now(); }
+      if (/^urlaub\.jahre\.\d+\.(rest|tzugRest)$/.test(path) && v !== undefined) { const yy = path.split('.')[2]; if (!S().urlaub.jahre[yy].restDatum) S().urlaub.jahre[yy].restDatum = today; }
+      save(); savedPill();
+      // Feld bleibt stehen – nur bei Struktur-Änderungen neu zeichnen
+      if (t.dataset.struct || t.type === 'checkbox' || t.tagName === 'SELECT' || t.type === 'date' || path.startsWith('urlaub.jahre.') || path === 'zk.stand' || path === 'urlaub.fzaStand') {
+        const active = document.activeElement && document.activeElement !== t && document.activeElement.dataset ? document.activeElement.dataset.set : null;
+        render();
+        if (active) { const n = document.querySelector(`[data-set="${active}"]`); if (n) n.focus({ preventScroll: true }); }
+      }
+    }
+  });
+  window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (TABS.some((x) => x[0] === h) && h !== ui.tab) { ui.tab = h; render(false); } });
+
+  // Start
+  const h0 = location.hash.slice(1);
+  if (TABS.some((x) => x[0] === h0)) ui.tab = h0;
+  loadDate(today);
+  render(false);
+})();
+</script>
+</body>
+</html>

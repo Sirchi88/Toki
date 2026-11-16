@@ -1,0 +1,243 @@
+/* Toki – animierte Design-Hintergründe */
+const FX = (() => {
+  'use strict';
+  const reduce = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let raf = 0, cleanup = [];
+  const rnd = (a, b) => a + Math.random() * (b - a);
+
+  const BALL = `<svg viewBox="0 0 64 64"><defs><radialGradient id="bg" cx="38%" cy="32%" r="70%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#cfd6e4"/></radialGradient></defs><circle cx="32" cy="32" r="30" fill="url(#bg)" stroke="#1d2433" stroke-width="2"/><path d="M32 21l10.5 7.6-4 12.4h-13l-4-12.4z" fill="#1d2433"/><path d="M32 2.5V21M42.5 28.6l17.6-5.3M38.5 41l10.8 15.3M25.5 41L14.7 56.3M21.5 28.6L3.9 23.3" stroke="#1d2433" stroke-width="2.2" fill="none"/><path d="M26 3.2l6 4 6-4M58 19l-1 7 4 5M53 52l-7 1-3 6M11 52l7 1 3 6M6 19l1 7-4 5" fill="#1d2433"/></svg>`;
+
+  const STADIUM = `<svg viewBox="0 0 1200 420" preserveAspectRatio="xMidYMax slice" style="position:absolute;left:0;right:0;bottom:0;width:100%;height:46vh">
+    <defs>
+      <linearGradient id="st1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e2233a"/><stop offset="1" stop-color="#6d0b1a"/></linearGradient>
+      <radialGradient id="glow" cx="50%" cy="70%" r="60%"><stop offset="0" stop-color="#ff3b4f" stop-opacity=".55"/><stop offset="1" stop-color="#ff3b4f" stop-opacity="0"/></radialGradient>
+      <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+      <pattern id="rows" width="12" height="9" patternUnits="userSpaceOnUse"><rect width="12" height="9" fill="none"/><path d="M0 8h12" stroke="#ffffff" stroke-opacity=".18"/></pattern>
+    </defs>
+    <ellipse cx="600" cy="330" rx="640" ry="190" fill="url(#glow)"/>
+    <g opacity=".9"><path d="M150 60 L330 300" stroke="url(#beam)" stroke-width="60" opacity=".25"/><path d="M1050 60 L870 300" stroke="url(#beam)" stroke-width="60" opacity=".25"/></g>
+    <g fill="#1b2236"><rect x="142" y="60" width="8" height="250"/><rect x="1050" y="60" width="8" height="250"/></g>
+    <g fill="#fffbe6"><rect x="120" y="40" width="52" height="24" rx="3"/><rect x="1028" y="40" width="52" height="24" rx="3"/></g>
+    <g fill="#fff" opacity=".9"><circle cx="130" cy="47" r="3"/><circle cx="142" cy="47" r="3"/><circle cx="154" cy="47" r="3"/><circle cx="130" cy="57" r="3"/><circle cx="142" cy="57" r="3"/><circle cx="154" cy="57" r="3"/><circle cx="1038" cy="47" r="3"/><circle cx="1050" cy="47" r="3"/><circle cx="1062" cy="47" r="3"/><circle cx="1038" cy="57" r="3"/><circle cx="1050" cy="57" r="3"/><circle cx="1062" cy="57" r="3"/></g>
+    <path d="M60 420 C60 250 300 190 600 190 C900 190 1140 250 1140 420Z" fill="url(#st1)"/>
+    <path d="M60 420 C60 250 300 190 600 190 C900 190 1140 250 1140 420Z" fill="url(#rows)"/>
+    <path d="M60 300 C200 245 400 228 600 228 C800 228 1000 245 1140 300" stroke="#fff" stroke-opacity=".7" stroke-width="5" fill="none"/>
+    <ellipse cx="600" cy="370" rx="420" ry="80" fill="#0d3d22"/>
+    <g opacity=".35" stroke="#fff" fill="none" stroke-width="2"><ellipse cx="600" cy="370" rx="400" ry="70"/><path d="M600 300v140"/><ellipse cx="600" cy="370" rx="60" ry="14"/></g>
+    <g fill="#fff" font-family="Bebas Neue,Impact,sans-serif" font-size="34" text-anchor="middle" opacity=".92"><text x="600" y="268" letter-spacing="10">ROT · WEISS · ARENA</text></g>
+  </svg>`;
+
+  const SANTA = `<svg viewBox="0 0 260 90" width="230"><g fill="#6b4226"><path d="M10 40c6-6 14-8 22-6l10-10 4 3-8 9c4 3 6 8 4 13l-6 1-2 14h-4l-1-12-8-2-3 13h-4l1-15c-4-2-6-5-5-8z"/><path d="M62 40c6-6 14-8 22-6l10-10 4 3-8 9c4 3 6 8 4 13l-6 1-2 14h-4l-1-12-8-2-3 13h-4l1-15c-4-2-6-5-5-8z"/></g><path d="M24 22l-4-8M27 21l2-9M76 22l-4-8M79 21l2-9" stroke="#6b4226" stroke-width="2.5"/><circle cx="12" cy="40" r="3" fill="#e0242f"/><path d="M40 46 Q100 52 130 50" stroke="#c9a227" stroke-width="2" fill="none"/><path d="M125 34h70c10 0 14 10 10 20l-6 12h-74c-8 0-10-6-8-12z" fill="#c4122f"/><path d="M118 70h92" stroke="#c9a227" stroke-width="4" stroke-linecap="round"/><path d="M210 70c8 0 10-8 6-12" stroke="#c9a227" stroke-width="4" fill="none" stroke-linecap="round"/><rect x="180" y="20" width="22" height="20" rx="3" fill="#2f8f4e"/><path d="M191 20v20M180 30h22" stroke="#f2d16b" stroke-width="3"/><circle cx="160" cy="22" r="13" fill="#c4122f"/><circle cx="158" cy="12" r="7" fill="#f6d3b8"/><path d="M151 14c0 8 4 12 7 12s7-4 7-12c-2 3-12 3-14 0z" fill="#fff"/><path d="M150 8c2-9 14-11 18-2l7 4-3 3z" fill="#c4122f"/><circle cx="176" cy="12" r="3" fill="#fff"/><path d="M150 8h17" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>`;
+  const ELF = (c, d) => `<svg viewBox="0 0 50 70" width="34" style="animation-delay:${d}s"><path d="M10 26 L30 0 L40 26z" fill="${c}"/><circle cx="30" cy="1" r="3.5" fill="#f2d16b"/><rect x="8" y="24" width="34" height="6" rx="3" fill="#fff"/><ellipse cx="25" cy="38" rx="13" ry="12" fill="#f6d3b8"/><path d="M11 37l-6-5 2 8zM39 37l6-5-2 8z" fill="#f6d3b8"/><circle cx="20" cy="37" r="1.8" fill="#222"/><circle cx="30" cy="37" r="1.8" fill="#222"/><path d="M20 43q5 4 10 0" stroke="#a5452f" stroke-width="1.8" fill="none" stroke-linecap="round"/><circle cx="16" cy="42" r="2.5" fill="#f2a0a0" opacity=".7"/><circle cx="34" cy="42" r="2.5" fill="#f2a0a0" opacity=".7"/><path d="M12 50h26l3 20H9z" fill="${c}"/><path d="M12 56h26" stroke="#c9a227" stroke-width="3"/></svg>`;
+  const TREE = `<svg viewBox="0 0 120 160" width="110"><path d="M60 8 20 70h18L12 110h22L4 150h112L86 110h22L82 70h18z" fill="#1f6b3a"/><rect x="52" y="148" width="16" height="12" fill="#6b4226"/><path d="M60 0l4 8 9 1-7 6 2 9-8-5-8 5 2-9-7-6 9-1z" fill="#f2d16b"/><g><circle cx="45" cy="62" r="4" fill="#e0242f"/><circle cx="72" cy="80" r="4" fill="#f2d16b"/><circle cx="40" cy="100" r="4" fill="#4da3ff"/><circle cx="80" cy="118" r="4" fill="#e0242f"/><circle cx="55" cy="130" r="4" fill="#f2d16b"/><circle cx="66" cy="45" r="3.5" fill="#4da3ff"/></g><path d="M30 92q30 12 58-6M22 132q40 14 78-8" stroke="#f2d16b" stroke-width="2" fill="none" opacity=".8"/></svg>`;
+
+  const FRYER = (accent = '#ff8a2a') => `<svg viewBox="0 0 80 96" width="100%"><rect x="6" y="6" width="68" height="84" rx="20" fill="#26272c"/><rect x="6" y="6" width="68" height="84" rx="20" fill="url(#fg)" opacity=".5"/><defs><linearGradient id="fg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".25"/><stop offset=".4" stop-color="#fff" stop-opacity="0"/></linearGradient></defs><rect x="20" y="14" width="40" height="18" rx="6" fill="#0d0e10"/><text x="40" y="28" font-family="monospace" font-size="11" fill="${accent}" text-anchor="middle" font-weight="700">200°</text><circle cx="26" cy="38" r="2" fill="${accent}"/><circle cx="54" cy="38" r="2" fill="#5fd38d"/><rect x="12" y="44" width="56" height="38" rx="10" fill="#34363c"/><rect x="28" y="56" width="24" height="9" rx="4.5" fill="#15161a"/><path d="M14 92h10M56 92h10" stroke="#111" stroke-width="4" stroke-linecap="round"/></svg>`;
+  const FRIES = `<svg viewBox="0 0 70 90" width="100%"><g stroke="#c98a14" stroke-width="1"><rect x="14" y="8" width="8" height="44" rx="2" fill="#ffd34d" transform="rotate(-12 18 30)"/><rect x="24" y="2" width="8" height="48" rx="2" fill="#ffcb3a" transform="rotate(-4 28 26)"/><rect x="34" y="4" width="8" height="46" rx="2" fill="#ffd34d" transform="rotate(5 38 26)"/><rect x="44" y="10" width="8" height="42" rx="2" fill="#ffc52e" transform="rotate(14 48 30)"/><rect x="29" y="12" width="8" height="40" rx="2" fill="#ffe07a"/></g><path d="M8 36h54l-7 50H15z" fill="#e3262f"/><path d="M8 36h54l-2 12H10z" fill="#c21a24"/><circle cx="35" cy="64" r="11" fill="#fff"/><path d="M31 58v12M35 58v12M39 58v12" stroke="#e3262f" stroke-width="2.4"/></svg>`;
+  const HENDL = `<svg viewBox="0 0 110 80" width="100%"><ellipse cx="55" cy="72" rx="48" ry="7" fill="#e9e2d0"/><path d="M14 46c0-20 20-34 42-34s40 12 40 30c0 14-14 26-40 26S14 62 14 46z" fill="#c8741f"/><path d="M22 40c4-14 18-22 34-22" stroke="#e8a64a" stroke-width="5" fill="none" stroke-linecap="round" opacity=".8"/><path d="M80 30c10-8 20-6 22 0 2 5-4 10-12 8z" fill="#b5651a"/><circle cx="101" cy="28" r="5" fill="#fff6e8"/><circle cx="104" cy="33" r="4.5" fill="#fff6e8"/><path d="M76 52c12 4 20 10 20 14 0 4-6 4-10 1z" fill="#b5651a"/><circle cx="94" cy="68" r="4.5" fill="#fff6e8"/><path d="M30 60c6 2 12 2 18 0" stroke="#8f4a10" stroke-width="2" fill="none" opacity=".6"/><g fill="#4caf50"><path d="M10 66c4-6 10-6 12 0-4 3-8 3-12 0z"/><path d="M86 70c4-6 10-6 12 0-4 3-8 3-12 0z"/></g><g fill="#fff" opacity=".7"><circle cx="40" cy="30" r="1.5"/><circle cx="58" cy="26" r="1.5"/><circle cx="48" cy="40" r="1.5"/></g></svg>`;
+  const STEAM = `<svg viewBox="0 0 30 50" width="100%"><path d="M10 48c-8-10 8-14 0-24S8 6 14 2M20 48c-8-10 8-14 0-24" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" opacity=".8"/></svg>`;
+
+  const css = `
+  .fx-ball{position:absolute;width:var(--s);height:var(--s);left:-80px;top:var(--y);animation:fx-fly var(--d) linear var(--dl) infinite;filter:drop-shadow(0 6px 6px rgb(0 0 0/.35))}
+  .fx-ball svg{width:100%;height:100%;animation:fx-spin calc(var(--d)/3) linear infinite}
+  @keyframes fx-fly{0%{transform:translate(0,0)}25%{transform:translate(28vw,-14vh)}50%{transform:translate(56vw,-4vh)}75%{transform:translate(84vw,-16vh)}100%{transform:translate(calc(100vw + 160px),2vh)}}
+  @keyframes fx-spin{to{transform:rotate(360deg)}}
+  .fx-star{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;animation:fx-tw 3s ease-in-out infinite}
+  @keyframes fx-tw{50%{opacity:.2}}
+  .fx-santa{position:absolute;top:9vh;left:-260px;animation:fx-santa 26s linear 2s infinite;filter:drop-shadow(0 4px 8px rgb(0 0 0/.3))}
+  @keyframes fx-santa{0%{transform:translate(0,0) rotate(-3deg)}50%{transform:translate(60vw,-4vh) rotate(2deg)}100%{transform:translate(calc(100vw + 520px),2vh) rotate(-3deg)}}
+  .fx-elf{position:absolute;bottom:0}
+  .fx-elf svg{display:block;animation:fx-hop 2.4s ease-in-out infinite;transform-origin:bottom center}
+  @keyframes fx-hop{0%,60%,100%{transform:translateY(0)}70%{transform:translateY(-12px) rotate(-4deg)}80%{transform:translateY(0)}}
+  .fx-float{position:absolute;width:var(--s);top:110vh;left:var(--x);animation:fx-up var(--d) linear var(--dl) infinite;opacity:.95;filter:drop-shadow(0 8px 10px rgb(90 40 0/.22))}
+  .fx-float>div{animation:fx-wob 4s ease-in-out infinite alternate}
+  @keyframes fx-up{to{transform:translateY(-135vh) rotate(var(--r))}}
+  @keyframes fx-wob{from{transform:translateX(-12px) rotate(-6deg)}to{transform:translateX(12px) rotate(6deg)}}
+
+  .fx-floor{position:absolute;left:-50%;right:-50%;bottom:0;height:30vh;background:linear-gradient(#2a0a46,#12062b);overflow:hidden}
+  .fx-floor::before{content:'';position:absolute;inset:-100% 0 0;background-image:linear-gradient(#ff4fd8 2px,transparent 2px),linear-gradient(90deg,#ff4fd8 2px,transparent 2px);background-size:60px 40px;transform:perspective(260px) rotateX(62deg);transform-origin:50% 100%;animation:fx-grid 1.6s linear infinite;opacity:.75;filter:drop-shadow(0 0 3px #ff4fd8)}
+  @keyframes fx-grid{to{background-position:0 40px}}
+  .fx-sun{position:absolute;left:50%;bottom:calc(30vh - 60px);width:min(70vw,420px);aspect-ratio:1;transform:translateX(-50%);border-radius:50%;background:linear-gradient(#ffe36a,#ff9a3d 45%,#ff3d9a 80%);-webkit-mask:linear-gradient(#000 52%,transparent 52% 55%,#000 55% 63%,transparent 63% 67%,#000 67% 74%,transparent 74% 79%,#000 79% 85%,transparent 85% 91%,#000 91%);mask:linear-gradient(#000 52%,transparent 52% 55%,#000 55% 63%,transparent 63% 67%,#000 67% 74%,transparent 74% 79%,#000 79% 85%,transparent 85% 91%,#000 91%);filter:drop-shadow(0 0 40px #ff5ab4)}
+  .fx-streak{position:absolute;height:3px;width:90px;border-radius:3px;bottom:calc(30vh + 2px);left:-120px;animation:fx-drive var(--d) linear var(--dl) infinite}
+  @keyframes fx-drive{to{transform:translateX(calc(100vw + 240px))}}
+  .fx-cloud{position:absolute;width:var(--s);top:var(--y);left:-160px;animation:fx-drift var(--d) linear var(--dl) infinite}
+  @keyframes fx-drift{to{transform:translateX(calc(100vw + 320px))}}
+  .fx-head{transform-origin:110px 50px;animation:fx-nod 6s ease-in-out infinite}
+  @keyframes fx-nod{0%,100%{transform:rotate(4deg) translateY(2px)}50%{transform:rotate(-2deg) translateY(3px)}}
+  .fx-leaf{position:absolute;top:-30px;width:16px;height:10px;border-radius:0 10px;background:#c98a2a;animation:fx-fall var(--d) linear var(--dl) infinite}
+  @keyframes fx-fall{to{transform:translate(var(--x2),110vh) rotate(720deg)}}
+  @media (prefers-reduced-motion: reduce){#fx *,#fxf *{animation:none!important}}`;
+
+
+  const PALM = (flip) => `<svg viewBox="0 0 120 260" width="100%" style="${flip ? 'transform:scaleX(-1)' : ''}"><path d="M58 260 C62 200 66 150 60 90" stroke="#140726" stroke-width="9" fill="none" stroke-linecap="round"/><g fill="#140726"><path d="M60 92 C40 70 14 70 0 84 C20 76 40 80 60 92Z"/><path d="M60 92 C46 60 22 50 6 54 C28 56 46 70 60 92Z"/><path d="M60 92 C70 60 96 50 116 58 C94 58 76 70 60 92Z"/><path d="M60 92 C82 72 108 74 120 90 C102 82 82 82 60 92Z"/><path d="M60 92 C58 62 64 40 76 28 C68 46 64 66 60 92Z"/></g></svg>`;
+  const SKYLINE = () => {
+    let r = '', x = 0;
+    const cols = ['#ff4fd8', '#41e8ff', '#ffd25a'];
+    while (x < 1200) {
+      const w = 30 + Math.random() * 60, h = 60 + Math.random() * 170;
+      r += `<rect x="${x}" y="${260 - h}" width="${w}" height="${h}" fill="#1a0833"/>`;
+      for (let wy = 260 - h + 10; wy < 250; wy += 14) for (let wx = x + 6; wx < x + w - 8; wx += 12) if (Math.random() < 0.28) r += `<rect x="${wx}" y="${wy}" width="5" height="7" fill="${cols[(wx + wy) % 3 | 0]}" opacity="${0.5 + Math.random() * 0.5}"/>`;
+      x += w + 4;
+    }
+    return `<svg viewBox="0 0 1200 260" preserveAspectRatio="xMidYMax slice" style="position:absolute;left:0;right:0;bottom:30vh;width:100%;height:30vh">${r}<text x="600" y="70" text-anchor="middle" font-family="Bebas Neue,Impact,sans-serif" font-size="46" fill="#ff4fd8" style="filter:drop-shadow(0 0 6px #ff4fd8)" letter-spacing="8">NEON CITY</text></svg>`;
+  };
+  const BENCH = `<svg viewBox="0 0 220 150" width="100%">
+    <ellipse cx="110" cy="142" rx="105" ry="7" fill="#000" opacity=".15"/>
+    <g fill="#8a5a2b"><rect x="8" y="38" width="204" height="11" rx="3"/><rect x="8" y="54" width="204" height="11" rx="3"/><rect x="2" y="90" width="216" height="12" rx="3"/></g>
+    <g fill="#5d3b1a"><rect x="20" y="38" width="7" height="104"/><rect x="193" y="38" width="7" height="104"/><rect x="14" y="100" width="7" height="42"/><rect x="199" y="100" width="7" height="42"/></g>
+    <g class="fx-sad">
+      <path d="M91 34 C84 58 86 84 92 100 L128 100 C134 84 136 58 129 34 Z" fill="#e9c35a"/>
+      <rect x="93" y="55" width="34" height="38" rx="9" fill="#d0202e"/><rect x="93" y="70" width="34" height="6" fill="#fff"/><rect x="108" y="55" width="4" height="38" fill="#1f3f8f" opacity=".6"/>
+      <path d="M96 60 C86 72 92 92 100 104" stroke="#f3cfb3" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M124 60 C134 72 128 92 120 104" stroke="#f3cfb3" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <rect x="95" y="92" width="13" height="16" rx="3" fill="#1f3f8f"/><rect x="112" y="92" width="13" height="16" rx="3" fill="#1f3f8f"/>
+      <rect x="97" y="106" width="9" height="26" fill="#f3cfb3"/><rect x="114" y="106" width="9" height="26" fill="#f3cfb3"/>
+      <rect x="96" y="118" width="11" height="14" fill="#d0202e"/><rect x="113" y="118" width="11" height="14" fill="#d0202e"/>
+      <path d="M93 132h16v6H90z M111 132h16l3 6h-19z" fill="#222"/>
+      <g class="fx-head"><circle cx="110" cy="40" r="13" fill="#f3cfb3"/>
+      <path d="M97 40 C97 24 123 24 123 40 C119 31 101 31 97 40Z" fill="#f1cf6b"/>
+      <path d="M97 38 C93 50 94 62 96 70 M123 38 C127 50 126 62 124 70" stroke="#f1cf6b" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <path d="M104 43 q2 1.5 4 0 M112 43 q2 1.5 4 0" stroke="#6b4a2f" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <path d="M106 50 q4 -2.5 8 0" stroke="#a5452f" stroke-width="1.6" fill="none" stroke-linecap="round"/></g>
+    </g>
+    <g transform="translate(176 118)"><circle r="12" fill="#fff" stroke="#333" stroke-width="1.5"/><path d="M0 -5l5 3.5-2 6h-6l-2-6z" fill="#333"/></g>
+  </svg>`;
+  const CLOUD = `<svg viewBox="0 0 120 50" width="100%"><path d="M20 45h80c12 0 18-8 16-16s-10-12-18-10C96 8 86 2 74 6 66-2 48 0 44 12 36 6 24 10 22 20 10 20 4 28 6 36s8 9 14 9z" fill="#fff" opacity=".95"/></svg>`;
+
+  function ensureStyle() {
+    if (document.getElementById('fx-css')) return;
+    const s = document.createElement('style'); s.id = 'fx-css'; s.textContent = css; document.head.appendChild(s);
+  }
+  function layers() {
+    let back = document.getElementById('fx');
+    let front = document.getElementById('fxf');
+    if (!front) { front = document.createElement('div'); front.id = 'fxf'; front.style.cssText = 'position:fixed;inset:0;z-index:25;pointer-events:none;overflow:hidden'; document.body.appendChild(front); }
+    return { back, front };
+  }
+  function stop() { cancelAnimationFrame(raf); raf = 0; cleanup.forEach((f) => f()); cleanup = []; }
+
+  function arena(back, front) {
+    back.style.background = 'radial-gradient(120% 70% at 50% 0%, #2a3a72 0%, #121a3a 55%, #0a0f24 100%)';
+    let html = '';
+    for (let i = 0; i < 40; i++) html += `<i class="fx-star" style="left:${rnd(0, 100)}%;top:${rnd(0, 45)}%;animation-delay:${rnd(0, 3)}s;opacity:${rnd(.3, 1)}"></i>`;
+    html += STADIUM;
+    for (let i = 0; i < 7; i++) html += `<div class="fx-ball" style="--s:${rnd(26, 58)}px;--y:${rnd(8, 70)}vh;--d:${rnd(9, 17)}s;--dl:${-rnd(0, 17)}s">${BALL}</div>`;
+    back.innerHTML = html;
+    front.innerHTML = `<div class="fx-ball" style="--s:46px;--y:30vh;--d:13s;--dl:4s;opacity:.95">${BALL}</div>`;
+  }
+
+  function fryer(back) {
+    back.style.background = 'radial-gradient(circle at 20% 10%, #fff3d6 0, transparent 40%), radial-gradient(circle at 90% 80%, #ffe2b8 0, transparent 45%), repeating-linear-gradient(0deg, #f8e2b5 0 38px, #f1d49c 38px 40px), repeating-linear-gradient(90deg, transparent 0 38px, #f1d49c 38px 40px)';
+    const items = [];
+    for (let i = 0; i < 18; i++) {
+      const k = i % 6;
+      const svg = k === 0 || k === 3 ? FRYER(['#ff8a2a', '#5fd38d', '#4da3ff'][i % 3]) : k === 1 || k === 4 ? FRIES : k === 2 ? HENDL : STEAM;
+      const s = k === 2 ? rnd(80, 120) : k === 5 ? 28 : rnd(52, 86);
+      items.push(`<div class="fx-float" style="--s:${s}px;--x:${(i * 37) % 96}vw;--d:${rnd(16, 30)}s;--dl:${-rnd(0, 30)}s;--r:${rnd(-40, 40)}deg"><div style="animation-delay:${-rnd(0, 4)}s">${svg}</div></div>`);
+    }
+    back.innerHTML = items.join('');
+  }
+
+  function xmas(back, front) {
+    back.style.background = 'linear-gradient(#0e1a3d 0%, #1d3263 55%, #3c5a8f 100%)';
+    let html = '';
+    for (let i = 0; i < 50; i++) html += `<i class="fx-star" style="left:${rnd(0, 100)}%;top:${rnd(0, 50)}%;animation-delay:${rnd(0, 3)}s;opacity:${rnd(.3, 1)}"></i>`;
+    html += `<div style="position:absolute;right:8vw;top:6vh;width:70px;height:70px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fffbe6,#f3e3a6);box-shadow:0 0 60px 10px rgb(255 244 200/.35)"></div>`;
+    html += `<svg viewBox="0 0 1200 300" preserveAspectRatio="none" style="position:absolute;left:0;bottom:0;width:100%;height:28vh"><path d="M0 120 Q200 40 420 110 T820 90 T1200 110 V300 H0Z" fill="#e8f0fb"/><path d="M0 190 Q260 120 560 180 T1200 170 V300 H0Z" fill="#fff"/></svg>`;
+    html += `<div style="position:absolute;left:2vw;bottom:10vh">${TREE}</div><div style="position:absolute;right:3vw;bottom:12vh;transform:scale(.75);transform-origin:bottom right">${TREE}</div>`;
+    back.innerHTML = html;
+    front.innerHTML = `<canvas id="snow" style="position:absolute;inset:0;width:100%;height:100%"></canvas><div class="fx-santa">${SANTA}</div><div id="elves"></div>`;
+    const cv = front.querySelector('#snow'), ctx = cv.getContext('2d');
+    const elves = front.querySelector('#elves');
+    let W, H, dpr, ground, cols, base, flakes;
+    const STEP = 3, MAXH = 16;
+    function size() {
+      dpr = Math.min(2, window.devicePixelRatio || 1);
+      W = window.innerWidth; H = window.innerHeight;
+      cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const nav = document.querySelector('nav.tabs .in');
+      const r = nav ? nav.getBoundingClientRect() : null;
+      base = { y: r ? r.top + 1 : H, x0: r ? r.left + 8 : 0, x1: r ? r.right - 8 : W };
+      cols = Math.ceil(W / STEP);
+      const old = ground; ground = new Float32Array(cols); if (old) ground.set(old.subarray(0, Math.min(old.length, cols)));
+      const n = Math.min(170, Math.round((W * H) / 7000));
+      flakes = Array.from({ length: n }, () => mk(true));
+      elves.innerHTML = r ? `<div class="fx-elf" style="left:${r.left + 4}px;top:${r.top - 47}px">${ELF("#2f8f4e", 0)}</div><div class="fx-elf" style="left:${r.right - 40}px;top:${r.top - 47}px">${ELF('#c4122f', 1.1)}</div>` : '';
+    }
+    const mk = (any) => ({ x: rnd(0, W), y: any ? rnd(-H, H) : rnd(-40, -5), r: rnd(1, 3.4), vy: rnd(.5, 1.5), ph: rnd(0, 6.28), sw: rnd(.3, 1) });
+    function frame() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = '#fff';
+      for (const f of flakes) {
+        f.y += f.vy * (0.6 + f.r / 3); f.ph += 0.02; f.x += Math.sin(f.ph) * f.sw * 0.6;
+        const c = Math.floor(f.x / STEP);
+        const onNav = f.x > base.x0 && f.x < base.x1;
+        const gy = onNav ? base.y - (ground[c] || 0) : H + 10;
+        if (f.y + f.r >= gy) {
+          if (onNav) for (let k = -2; k <= 2; k++) { const i = c + k; if (i >= 0 && i < cols) ground[i] = Math.min(MAXH, ground[i] + f.r * (0.22 - Math.abs(k) * 0.05)); }
+          Object.assign(f, mk(false));
+          continue;
+        }
+        ctx.globalAlpha = 0.55 + f.r / 8;
+        ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, 6.283); ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      // Schneedecke auf der Navigationsleiste
+      if (Math.random() < 0.05) for (let i = 1; i < cols - 1; i++) ground[i] = (ground[i - 1] + ground[i] * 2 + ground[i + 1]) / 4;
+      ctx.beginPath(); ctx.moveTo(base.x0, base.y + 2);
+      for (let x = base.x0; x <= base.x1; x += STEP) ctx.lineTo(x, base.y - (ground[Math.floor(x / STEP)] || 0));
+      ctx.lineTo(base.x1, base.y + 2); ctx.closePath();
+      ctx.shadowColor = 'rgba(80,110,160,.35)'; ctx.shadowBlur = 4; ctx.fill(); ctx.shadowBlur = 0;
+      raf = requestAnimationFrame(frame);
+    }
+    size();
+    const onR = () => size();
+    window.addEventListener('resize', onR);
+    cleanup.push(() => window.removeEventListener('resize', onR));
+    if (!reduce()) raf = requestAnimationFrame(frame);
+  }
+
+
+  function neon(back) {
+    back.style.background = 'linear-gradient(#0d0322 0%, #2a0b52 35%, #8a1f7a 62%, #ff7a3d 70%, #2a0a46 70.2%)';
+    let html = '';
+    for (let i = 0; i < 40; i++) html += `<i class="fx-star" style="left:${rnd(0, 100)}%;top:${rnd(0, 35)}%;animation-delay:${rnd(0, 3)}s;opacity:${rnd(.3, 1)}"></i>`;
+    html += '<div class="fx-sun"></div>' + SKYLINE() + '<div class="fx-floor"></div>';
+    html += `<div style="position:absolute;left:-2vw;bottom:22vh;width:min(28vw,170px)">${PALM(false)}</div><div style="position:absolute;right:-3vw;bottom:20vh;width:min(32vw,200px)">${PALM(true)}</div>`;
+    for (let i = 0; i < 5; i++) html += `<div class="fx-streak" style="--d:${rnd(2.5, 5)}s;--dl:${-rnd(0, 5)}s;background:linear-gradient(90deg,transparent,${i % 2 ? '#ff3355' : '#fff6d0'});box-shadow:0 0 10px ${i % 2 ? '#ff3355' : '#fff6d0'}"></div>`;
+    back.innerHTML = html;
+  }
+  function dorf(back) {
+    back.style.background = 'linear-gradient(#7fc8ff 0%, #bfe6ff 52%, #6db35f 52.2%, #3f9b4b 100%)';
+    let html = `<div style="position:absolute;right:10vw;top:7vh;width:64px;height:64px;border-radius:50%;background:#ffe27a;box-shadow:0 0 50px 12px rgb(255 226 122/.6)"></div>`;
+    for (let i = 0; i < 5; i++) html += `<div class="fx-cloud" style="--s:${rnd(90, 170)}px;--y:${rnd(3, 30)}vh;--d:${rnd(50, 90)}s;--dl:${-rnd(0, 90)}s">${CLOUD}</div>`;
+    html += `<svg viewBox="0 0 1200 120" preserveAspectRatio="none" style="position:absolute;left:0;right:0;top:44vh;width:100%;height:9vh"><path d="M0 120 C200 40 360 60 520 90 S880 30 1200 80 V120Z" fill="#8cc779"/></svg>`;
+    html += `<div style="position:absolute;inset:52vh 0 0;background:repeating-linear-gradient(90deg,transparent 0 60px,rgb(255 255 255/.07) 60px 120px)"></div>`;
+    html += `<svg viewBox="0 0 1200 300" preserveAspectRatio="none" style="position:absolute;left:0;right:0;bottom:0;width:100%;height:48vh"><g fill="none" stroke="#fff" stroke-opacity=".75" stroke-width="3"><path d="M40 20 H1160 L1200 300 H0Z"/><path d="M600 20 V300"/><ellipse cx="600" cy="150" rx="110" ry="50"/><path d="M40 90 h140 l-10 120 H30"/></g></svg>`;
+    html += `<svg viewBox="0 0 160 70" style="position:absolute;left:4vw;top:47vh;width:min(34vw,200px)"><path d="M10 68 V8 H150 V68" stroke="#fff" stroke-width="5" fill="none"/><path d="M10 8 L30 20 H130 L150 8 M30 20 V68 M130 20 V68" stroke="#fff" stroke-opacity=".5" fill="none"/><g stroke="#fff" stroke-opacity=".35"><path d="M30 30 H130 M30 40 H130 M30 50 H130 M30 60 H130 M50 20 V68 M70 20 V68 M90 20 V68 M110 20 V68"/></g></svg>`;
+    let flags = '';
+    for (let i = 0; i < 24; i++) flags += `<path d="M${i * 50 + 5} ${16 + Math.sin(i) * 2} l20 0 l-10 22z" fill="${['#d0202e', '#ffffff', '#1f3f8f'][i % 3]}"/>`;
+    html += `<svg viewBox="0 0 1200 50" preserveAspectRatio="none" style="position:absolute;left:0;right:0;top:0;width:100%;height:6vh"><path d="M0 14 Q300 26 600 14 T1200 14" stroke="#555" fill="none"/>${flags}</svg>`;
+
+    for (let i = 0; i < 4; i++) html += `<i class="fx-leaf" style="left:${rnd(5, 95)}vw;--d:${rnd(12, 20)}s;--dl:${-rnd(0, 20)}s;--x2:${rnd(-80, 80)}px"></i>`;
+    back.innerHTML = html;
+  }
+  function set(theme) {
+    ensureStyle();
+    stop();
+    const { back, front } = layers();
+    back.innerHTML = ''; back.style.background = ''; front.innerHTML = '';
+    if (theme === 'arena') arena(back, front);
+    else if (theme === 'xmas') xmas(back, front);
+    else if (theme === 'fryer') fryer(back);
+    else if (theme === 'neon') neon(back);
+    else if (theme === 'dorf') { dorf(back); front.innerHTML = `<div style="position:absolute;right:max(14px,calc(50vw - 230px));bottom:calc(env(safe-area-inset-bottom) + 70px);width:150px">${BENCH}</div>`; }
+  }
+  const preview = (id) => ({
+    arena: `<div style="position:absolute;right:8px;top:8px;width:26px">${BALL}</div>`,
+    xmas: `<div style="position:absolute;right:6px;bottom:-4px;width:34px">${TREE}</div><div style="position:absolute;inset:0;background:radial-gradient(2px 2px at 20% 30%,#fff 50%,transparent 51%),radial-gradient(2px 2px at 50% 60%,#fff 50%,transparent 51%),radial-gradient(2px 2px at 35% 80%,#fff 50%,transparent 51%),radial-gradient(2px 2px at 70% 20%,#fff 50%,transparent 51%)"></div>`,
+    fryer: `<div style="position:absolute;left:8px;top:6px;width:34px">${FRYER()}</div><div style="position:absolute;right:8px;top:8px;width:34px">${FRIES}</div>`,
+    neon: `<div style="position:absolute;left:4px;bottom:0;width:22px">${PALM(false)}</div><div style="position:absolute;right:4px;bottom:0;width:22px">${PALM(true)}</div>`,
+    dorf: `<div style="position:absolute;right:6px;bottom:2px;width:64px">${BENCH}</div>`,
+    dark: '<div style="position:absolute;left:10px;top:12px;right:40%;height:8px;border-radius:4px;background:#3a3c42"></div><div style="position:absolute;left:10px;top:26px;right:55%;height:8px;border-radius:4px;background:#8fd1c1"></div>',
+  }[id] || '');
+  return { set, preview };
+})();
