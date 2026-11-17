@@ -98,6 +98,7 @@ const Core = (() => {
     },
     zk: { stand: 0, datum: '', samstagBonus: true, max: 35, min: -35 },
     urlaub: { tarifTage: 30, ugFaktor: 0.5, ugTeiler: 21.75, fzaStand: 0, fzaDatum: '', tzugTage: 8, jahre: {} },
+    mail: { anrede: '', an: '', name: '' },
     steuer: { klasse: 1, kirche: true, kinderFB: 0, kinderPV: 0, geburtsjahr: 0, kvZusatz: 2.9, geprueft: false },
   });
   const merge = (base, over) => {
@@ -231,24 +232,41 @@ const Core = (() => {
       if (zkDebit > 0 && T > 0) { offset = Math.min(T, zkDebit); T -= offset; }
       let zkChange = -zkDebit + offset;
       let mehr = 0, mehrNach = 0, toZK = 0, bonus = 0, under = 0;
+      const parts = [];
       if (T < 0) { under = -T; zkChange += T; }
       else if (T > 0) {
-        const u = used[w.month] || 0;
-        const baseK = Number(kont[w.month]) || 0;
-        const totalK = baseK + (nachByMonth[w.month] || 0);
-        const avail = Math.max(0, totalK - u);
-        // Samstag zuerst in Mehrarbeit, dann Wochentage
-        const satEff = Math.min(satOnly, T);
-        const satToMehr = Math.min(satEff, avail);
-        const restAvail = avail - satToMehr;
-        const wdToMehr = Math.min(T - satEff, restAvail);
-        mehr = satToMehr + wdToMehr;
-        const baseAvail = Math.max(0, baseK - u);
-        mehrNach = Math.max(0, mehr - baseAvail);
-        used[w.month] = u + mehr;
-        toZK = T - mehr;
-        const satToZK = satEff - satToMehr;
-        if (S.zk.samstagBonus) bonus = satToZK * 0.25;
+        // Endet ein Monat innerhalb der Woche, zählt jeder Tag zum Kontingent seines Monats.
+        // ZK-Verrechnung (offset) und Zuschläge bleiben wochenweise.
+        const segs = new Map();
+        for (const day of w.days) {
+          const mo = ym(day.date);
+          if (!segs.has(mo)) segs.set(mo, { month: mo, c: 0, sat: 0 });
+          if (day.entry && !(day.absence && day.absence.full)) {
+            const sg = segs.get(mo);
+            sg.c += day.entry.hours - day.target;
+            if (dow(day.date) === 6) sg.sat += day.entry.hours;
+          }
+        }
+        const pos = [...segs.values()].filter((x) => x.c > 0);
+        const sumPos = pos.reduce((a, x) => a + x.c, 0) || 1;
+        for (const sg of pos) {
+          const share = (sg.c / sumPos) * T; // Anteil am Wochen-Plus (nach ZK-Verrechnung und Unterzeit)
+          const u = used[sg.month] || 0;
+          const baseK = Number(kont[sg.month]) || 0;
+          const totalK = baseK + (nachByMonth[sg.month] || 0);
+          const avail = Math.max(0, totalK - u);
+          // Samstag zuerst in Mehrarbeit, dann Wochentage
+          const satEff = Math.min(sg.sat, share);
+          const satToMehr = Math.min(satEff, avail);
+          const wdToMehr = Math.min(share - satEff, avail - satToMehr);
+          const m1 = satToMehr + wdToMehr;
+          const nach1 = Math.max(0, m1 - Math.max(0, baseK - u));
+          used[sg.month] = u + m1;
+          const z1 = share - m1;
+          const b1 = S.zk.samstagBonus ? (satEff - satToMehr) * 0.25 : 0;
+          parts.push({ month: sg.month, mehr: m1, mehrNach: nach1, toZK: z1, bonus: b1 });
+          mehr += m1; mehrNach += nach1; toZK += z1; bonus += b1;
+        }
         zkChange += toZK + bonus;
       }
       const pay = zuschlag(mehr, rate);
@@ -280,7 +298,7 @@ const Core = (() => {
       fzaTodaySum += fzaNow;
       fza -= fzaUnits * soll;
       for (const day of w.days) if (day.absence && day.absence.type === 'zk' && day.date > today) { zkVerplant += day.absence.units * soll; zkVerplantTage += day.absence.units; }
-      Object.assign(w, { worked, wd, sat, satOnly, zkUnits, zkDebit, offset, mehr, mehrNach, toZK, bonus, under, zkChange: zkEff, zkAfter: zk, fzaAfter: fza, pay, capped });
+      Object.assign(w, { parts, worked, wd, sat, satOnly, zkUnits, zkDebit, offset, mehr, mehrNach, toZK, bonus, under, zkChange: zkEff, zkAfter: zk, fzaAfter: fza, pay, capped });
     }
     // Nachträglich eingetragene ZK-/FZA-Tage, die vor dem Stichtag liegen, trotzdem abziehen
     let late = 0, lateF = 0;
@@ -303,8 +321,15 @@ const Core = (() => {
     for (const w of weeks) {
       const m = mget(w.month);
       m.weeks.push(w);
-      for (const k of ['mehr', 'mehrNach', 'toZK', 'bonus', 'zkChange', 'under']) m[k] += w[k];
-      for (const k of Object.keys(m.pay)) m.pay[k] += w.pay[k];
+      for (const k of ['zkChange', 'under']) m[k] += w[k];
+      // Mehrarbeit und Bezahlung gehören zu dem Monat, in dem sie geleistet wurde
+      for (const pt of w.parts) {
+        const pm = mget(pt.month);
+        if (pm !== m && !pm.weeks.includes(w)) pm.weeks.push(w);
+        for (const k of ['mehr', 'mehrNach', 'toZK', 'bonus']) pm[k] += pt[k];
+        const share = w.mehr > 0 ? pt.mehr / w.mehr : 0;
+        for (const k of Object.keys(pm.pay)) pm.pay[k] += w.pay[k] * share;
+      }
     }
     for (const [m, k] of Object.entries(kont)) { const o = mget(m); o.kontingent = Number(k) || 0; }
     for (const m of months.values()) { m.kontingent = Number(kont[m.month]) || 0; m.nach = nachByMonth[m.month] || 0; m.used = used[m.month] || 0; }
@@ -406,8 +431,10 @@ const Core = (() => {
     const lstKfb = kids ? tarifFor(Math.max(0, zve - kids * P.kfb * (k === 4 ? 0.5 : 1)), k) : lst;
     const frei = k === 3 ? P.soliFrei * 2 : P.soliFrei;
     const soli = lstKfb > frei ? Math.min(lstKfb * 0.055, (lstKfb - frei) * 0.119) : 0;
-    const kist = T.kirche ? lstKfb * (['BY', 'BW'].includes(S.arbeit.land) ? 0.08 : 0.09) : 0;
-    return { lst, soli, kist, zve };
+    const kistSatz = ['BY', 'BW'].includes(S.arbeit.land) ? 0.08 : 0.09;
+    const kist = T.kirche ? lstKfb * kistSatz : 0;
+    const grenz = (tarifFor(zve + 100, k) - lst) / 100;
+    return { lst, soli, kist, zve, vors, kistSatz, grenz, soliFrei: frei, lstKfb, pausch: k !== 6 ? P.anPausch + P.saPausch : 0, entl: k === 2 ? P.entlastung2 : 0 };
   };
   /** Monatsabrechnung: laufend = regelmäßiger Lohn dieses Monats, einmal = sonstige Bezüge */
   const netto = (laufend, einmal, S, mo = 12, extraAbzug = 0) => {
@@ -426,7 +453,7 @@ const Core = (() => {
     const svSum = sv.kv + sv.pv + sv.rv + sv.av;
     const taxSum = lst + soli + kist;
     const abzug = Number(extraAbzug) || 0;
-    return { gross, laufend, einmal, sv, svSum, lst, soli, kist, taxSum, abzug, net: gross - svSum - taxSum - abzug, zveJahr: yL.zve };
+    return { gross, laufend, einmal, sv, svSum, lst, soli, kist, taxSum, abzug, net: gross - svSum - taxSum - abzug, zveJahr: yL.zve, rates: r, jahr: yL, kvBase, rvBase };
   };
 
   /** Brutto-Bestandteile eines Monats */
@@ -442,9 +469,11 @@ const Core = (() => {
       else if (Number(s.monat) === mo) lines.push({ k: s.name || 'Sonderzahlung', v: val, laufend: false });
     }
     // Mehrarbeit
-    const src = S.lohn.auszahlung === 'folgemonat' ? (mo === 1 ? `${y - 1}-12` : `${y}-${String(mo - 1).padStart(2, '0')}`) : m;
+    // Netto-Rechner rechnet immer mit der Mehrarbeit des Monats selbst (auch wenn sie später ausgezahlt wird)
+    const src = m;
+    void y;
     const mm = calc.months.get(src);
-    if (mm && mm.pay.total) lines.push({ k: `Mehrarbeit ${S.lohn.auszahlung === 'folgemonat' ? '(aus Vormonat)' : ''}`.trim(), v: mm.pay.total, laufend: true, mehr: mm });
+    if (mm && mm.pay.total) lines.push({ k: 'Mehrarbeit', v: mm.pay.total, laufend: true, mehr: mm });
     // Urlaubsgeld
     let tu = 0;
     for (const [d, a] of calc.absMap) if (a.type === 'tarif' && ym(d) === m) tu += a.units;

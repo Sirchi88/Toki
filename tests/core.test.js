@@ -93,4 +93,32 @@ test('Netto 2026 trifft Vergleichswerte (StKl I, kinderlos, ohne KiSt, 2,9 %)', 
   }
 });
 
+test('Monatswechsel in der Woche: jeder Tag zählt zum Kontingent seines Monats', () => {
+  const S = base();
+  const st = { settings: S, entries: { '2026-11-30': ent('07:00', '17:45') }, absences: [], kontingent: { '2026-11': 2, '2026-12': 10 }, nach: [] };
+  for (const d of ['2026-12-01', '2026-12-02', '2026-12-03', '2026-12-04']) st.entries[d] = ent('07:00', '15:45');
+  const c = C.compute(st, '2026-12-06');
+  assert.strictEqual(c.months.get('2026-11').mehr, 2);
+  assert.strictEqual(c.months.get('2026-12').mehr, 4);
+  assert.strictEqual(c.weekMap.get('2026-11-30').pay.h25, 6);
+});
+
+test('Monatswechsel + ZK-Tag in derselben Woche: Wochenbetrachtung, Plus geht ans Zeitkonto', () => {
+  const S = base();
+  const st = { settings: S, entries: { '2026-11-30': ent('07:00', '16:45') }, absences: [{ id: 'z', from: '2026-12-04', to: '2026-12-04', type: 'zk' }], kontingent: { '2026-11': 10, '2026-12': 10 }, nach: [] };
+  for (const d of ['2026-12-01', '2026-12-02', '2026-12-03']) st.entries[d] = ent('07:00', '15:45');
+  const w = C.compute(st, '2026-12-06').weekMap.get('2026-11-30');
+  assert.strictEqual(w.mehr, 0);
+  assert.strictEqual(w.zkChange, -2);
+});
+
+test('Netto-Monat nutzt die Mehrarbeit desselben Monats', () => {
+  const S = base(); S.lohn.stundenlohn = 25;
+  const st = { settings: S, entries: {}, absences: [], kontingent: { '2026-11': 10 }, nach: [] };
+  for (const d of ['2026-11-16', '2026-11-17']) st.entries[d] = ent('07:00', '16:45');
+  const c = C.compute(st, '2026-11-20');
+  const mp = C.monthPay(st, c, '2026-11');
+  assert.ok(mp.lines.some((l) => l.mehr && Math.abs(l.v - 4 * 25 * 1.25) < 1e-9));
+});
+
 console.log(`\n${passed} Tests bestanden.`);
