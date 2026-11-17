@@ -416,9 +416,46 @@ dl.money dd{white-space:nowrap}
 dl.money .hl25 dt,dl.money .hl25 dd{color:var(--fg);font-weight:700}
 .grid3>div{display:flex;flex-direction:column;min-width:0}
 .grid3>div>.label{flex:1;display:flex;align-items:flex-end}
+
+/* Splash */
+#splash{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:#f6f4ef;animation:sp-out .32s ease-in 1.18s forwards;pointer-events:none}
+#splash.dark{background:#141519}
+#splash .sp-in{display:flex;flex-direction:column;align-items:center;gap:14px}
+.sp-logo{overflow:visible;filter:drop-shadow(0 10px 22px rgb(29 118 80/.35));animation:sp-pop .5s cubic-bezier(.2,1.4,.4,1) both}
+.sp-bar{transform-box:fill-box;transform-origin:50% 0;animation:sp-drop .34s cubic-bezier(.3,1.5,.5,1) .2s both}
+.sp-stem{transform-box:fill-box;transform-origin:50% 0;animation:sp-grow .32s ease-out .38s both}
+.sp-shine{animation:sp-shine .6s ease-in-out .62s both}
+.sp-word{font-family:'Bebas Neue',Impact,sans-serif;font-size:30px;color:#2a9c6b;letter-spacing:.32em;padding-left:.32em;animation:sp-word .45s ease-out .5s both}
+.sp-line{width:84px;height:3px;border-radius:3px;background:rgb(42 156 107/.18);overflow:hidden}
+.sp-line i{display:block;height:100%;width:100%;background:#2a9c6b;border-radius:3px;transform-origin:0 50%;animation:sp-load .9s cubic-bezier(.6,0,.2,1) .3s both}
+@keyframes sp-pop{from{opacity:0;transform:scale(.55) rotate(-8deg)}to{opacity:1;transform:none}}
+@keyframes sp-drop{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:none}}
+@keyframes sp-grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes sp-shine{from{transform:skewX(-18deg) translateX(0)}to{transform:skewX(-18deg) translateX(150px)}}
+@keyframes sp-word{from{opacity:0;letter-spacing:.8em;padding-left:.8em}to{opacity:1;letter-spacing:.32em;padding-left:.32em}}
+@keyframes sp-load{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes sp-out{to{opacity:0;transform:scale(1.04);visibility:hidden}}
+@media (prefers-reduced-motion: reduce){#splash *{animation:none!important}#splash{animation:sp-out .2s ease-in .5s forwards}}
 </style>
 </head>
 <body data-theme="standard">
+<div id="splash" aria-hidden="true">
+  <div class="sp-in">
+    <svg class="sp-logo" viewBox="0 0 82 80" width="96" height="94">
+      <defs><linearGradient id="spg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#36b982"/><stop offset=".55" stop-color="#2a9c6b"/><stop offset="1" stop-color="#1d7650"/></linearGradient><clipPath id="spc"><rect width="82" height="80" rx="16"/></clipPath></defs>
+      <rect class="sp-sq" width="82" height="80" rx="16" fill="url(#spg)"/>
+      <rect class="sp-bar" x="18.5" y="15" width="43" height="13" fill="#1d2025"/>
+      <rect class="sp-stem" x="33.5" y="27.5" width="13" height="35.5" fill="#1d2025"/>
+      <g clip-path="url(#spc)"><rect class="sp-shine" x="-40" y="0" width="22" height="80" fill="#fff" opacity=".22"/></g>
+    </svg>
+    <div class="sp-word">TOKI</div>
+    <div class="sp-line"><i></i></div>
+  </div>
+</div>
+<script>
+(function(){try{var d=JSON.parse(localStorage.getItem('takt-v1')||'{}');var t=d.settings&&d.settings.theme;if(['dark','neon','werk','xmas','arena'].indexOf(t)>-1)document.getElementById('splash').className='dark';}catch(e){}
+setTimeout(function(){var s=document.getElementById('splash');if(s)s.remove();},1500);})();
+</script>
 <div id="fx"></div>
 <main id="app"></main>
 <nav class="tabs" id="nav" aria-label="Bereiche"></nav>
