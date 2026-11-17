@@ -420,3 +420,18 @@ dl.money .hl25 dt,dl.money .hl25 dd{color:var(--fg);font-weight:700}
 @keyframes sp-load{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 @keyframes sp-out{to{opacity:0;transform:scale(1.04);visibility:hidden}}
 @media (prefers-reduced-motion: reduce){#splash *{animation:none!important}#splash{animation:sp-out .2s ease-in .5s forwards}}
+
+/* Kompakte Kontingent-Karte */
+.kcard{padding:10px 14px}
+.krow{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.krow b{font-family:var(--font-d);font-size:22px;font-weight:400}
+.iconbtn.sm{width:32px;height:32px}.iconbtn.sm svg{width:16px;height:16px}
+.kline{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:14px}
+.kline>span,.kline>label{flex:1;font-weight:700;color:var(--muted);font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+.kline b{font-family:var(--font-d);font-size:24px;font-weight:400}
+.kline .field.sm{width:96px;height:36px;font-size:16px}
+.kedit{border:0;background:transparent;color:var(--muted);font-size:16px;cursor:pointer;padding:2px 4px}
+.kmini{display:flex;justify-content:space-between;margin-top:6px;font-size:13px;color:var(--muted)}
+.kmini b{font-family:var(--font-d);font-size:22px;font-weight:400;color:var(--fg);margin-left:4px}
+.kmini b.acc{color:var(--primary)}
+.progress.thin{height:6px;margin-top:6px}
