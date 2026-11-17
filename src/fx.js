@@ -65,6 +65,28 @@ const FX = (() => {
   @keyframes fx-nod{0%,100%{transform:rotate(4deg) translateY(2px)}50%{transform:rotate(-2deg) translateY(3px)}}
   .fx-leaf{position:absolute;top:-30px;width:16px;height:10px;border-radius:0 10px;background:#c98a2a;animation:fx-fall var(--d) linear var(--dl) infinite}
   @keyframes fx-fall{to{transform:translate(var(--x2),110vh) rotate(720deg)}}
+
+  .fx-lamp{position:absolute;top:12vh;width:120px;height:46vh;margin-left:-60px;background:linear-gradient(rgb(255 244 210/.22),transparent 80%);clip-path:polygon(42% 0,58% 0,100% 100%,0 100%)}
+  .fx-lamp::before{content:'';position:absolute;left:44%;top:0;width:12%;height:8px;border-radius:0 0 6px 6px;background:#fff6d8;box-shadow:0 0 18px 6px rgb(255 244 210/.6)}
+  .fx-crane{position:absolute;left:0;right:0;top:12vh;height:30vh}
+  .fx-rail{position:absolute;left:0;right:0;top:0;height:10px;background:repeating-linear-gradient(90deg,#f2c200 0 30px,#1b1b1b 30px 60px)}
+  .fx-trolley{position:absolute;top:6px;left:0;animation:fx-crane 26s ease-in-out infinite alternate}
+  @keyframes fx-crane{from{transform:translateX(5vw)}to{transform:translateX(calc(100vw - 140px))}}
+  .fx-hazard{position:absolute;left:0;right:0;bottom:calc(22vh - 8px);height:8px;background:repeating-linear-gradient(-45deg,#f2c200 0 14px,#1b1b1b 14px 28px)}
+  .fx-floorlines{position:absolute;left:0;right:0;bottom:0;height:22vh;background:repeating-linear-gradient(90deg,transparent 0 118px,rgb(255 255 255/.05) 118px 120px),linear-gradient(transparent 46%,rgb(242 194 0/.55) 46% 48%,transparent 48%)}
+  .fx-spark{position:absolute;bottom:calc(22vh + 13vh);width:3px;height:3px;border-radius:50%;background:#ffd36b;box-shadow:0 0 6px 2px #ffb000;animation:fx-spark 1.4s ease-out infinite;opacity:0}
+  @keyframes fx-spark{0%{opacity:1;transform:translate(0,0)}100%{opacity:0;transform:translate(var(--dx),calc(var(--dy) * -1 + 40px))}}
+  .fx-blink{animation:fx-tw 1.6s steps(2) infinite}
+  .fx-spindle{animation:fx-spin-y 5s ease-in-out infinite alternate}
+  @keyframes fx-spin-y{from{transform:translateY(-6px)}to{transform:translateY(10px)}}
+  .fx-led{animation:fx-led 1.2s steps(2,jump-none) infinite}
+  @keyframes fx-led{0%{opacity:1}50%{opacity:.25}}
+  .fx-flow{animation:fx-flow 2.4s linear infinite}
+  @keyframes fx-flow{to{stroke-dashoffset:-92}}
+  .fx-pult{position:absolute;left:0;right:0;bottom:calc(70px + env(safe-area-inset-bottom));height:120px;filter:drop-shadow(0 -6px 14px rgb(0 0 0/.25))}
+  .fx-pult::after{content:'';position:absolute;left:0;right:0;top:100%;height:200px;background:#2c3136}
+  .fx-knob{transform-origin:0 0;animation:fx-knob 6s ease-in-out infinite}
+  @keyframes fx-knob{0%,40%{transform:rotate(-35deg)}50%,90%{transform:rotate(35deg)}}
   @media (prefers-reduced-motion: reduce){#fx *,#fxf *{animation:none!important}}`;
 
 
@@ -220,6 +242,57 @@ const FX = (() => {
     for (let i = 0; i < 4; i++) html += `<i class="fx-leaf" style="left:${rnd(5, 95)}vw;--d:${rnd(12, 20)}s;--dl:${-rnd(0, 20)}s;--x2:${rnd(-80, 80)}px"></i>`;
     back.innerHTML = html;
   }
+
+  // ---------- Werkhalle ----------
+  function werkhalle(back) {
+    back.style.background = 'linear-gradient(#1b222c 0%, #2a3442 45%, #39434f 72%, #2b313a 72.3%, #20252c 100%)';
+    let truss = '';
+    for (let x = 0; x < 1200; x += 120) truss += `<path d="M${x} 0 L${x + 60} 70 L${x + 120} 0" stroke="#4a5666" stroke-width="5" fill="none"/><path d="M${x + 60} 70 V0" stroke="#3d4855" stroke-width="3"/>`;
+    let html = `<svg viewBox="0 0 1200 90" preserveAspectRatio="none" style="position:absolute;left:0;right:0;top:0;width:100%;height:12vh"><rect width="1200" height="8" fill="#556273"/>${truss}<rect y="70" width="1200" height="8" fill="#556273"/></svg>`;
+    for (let i = 0; i < 4; i++) html += `<div class="fx-lamp" style="left:${12 + i * 25}%"></div>`;
+    html += `<div class="fx-crane"><div class="fx-rail"></div><div class="fx-trolley"><svg viewBox="0 0 120 200" width="120"><rect x="10" y="0" width="100" height="26" rx="4" fill="#f2c200"/><path d="M10 6h100M10 20h100" stroke="#1b1b1b" stroke-width="3" stroke-dasharray="10 10"/><path d="M58 26V150M62 26V150" stroke="#9aa3ad" stroke-width="2"/><path d="M48 150h24l-6 14h-12z" fill="#f2c200"/><path d="M60 164v10a8 8 0 1 1-8-8" stroke="#c9ced4" stroke-width="5" fill="none"/></svg></div></div>`;
+    const mc = (x, w, h, glow) => `<g transform="translate(${x} ${300 - h})"><rect width="${w}" height="${h}" rx="8" fill="#d9dde2"/><rect width="${w}" height="${h}" rx="8" fill="url(#mg)"/><rect x="${w * 0.1}" y="${h * 0.14}" width="${w * 0.55}" height="${h * 0.5}" rx="5" fill="#0d141c"/><rect x="${w * 0.1}" y="${h * 0.14}" width="${w * 0.55}" height="${h * 0.5}" rx="5" fill="url(#gl)" opacity=".5"/><g class="${glow ? 'fx-spindle' : ''}"><rect x="${w * 0.33}" y="${h * 0.18}" width="${w * 0.08}" height="${h * 0.26}" fill="#8b96a3"/><circle cx="${w * 0.37}" cy="${h * 0.47}" r="${w * 0.03}" fill="#ffd36b"/></g><rect x="${w * 0.72}" y="${h * 0.16}" width="${w * 0.2}" height="${h * 0.18}" rx="3" fill="#1d2630"/><rect x="${w * 0.74}" y="${h * 0.18}" width="${w * 0.16}" height="${h * 0.1}" rx="2" fill="#3fa9f5" opacity=".8"/><circle cx="${w * 0.77}" cy="${h * 0.42}" r="5" fill="#2ecc71" class="fx-blink"/><circle cx="${w * 0.84}" cy="${h * 0.42}" r="5" fill="#f2c200"/><rect y="${h - 14}" width="${w}" height="14" fill="#5d6874"/><rect x="${w * 0.88}" y="-60" width="10" height="60" fill="#5d6874"/><circle cx="${w * 0.88 + 5}" cy="-66" r="7" fill="#2ecc71" class="fx-blink"/></g>`;
+    html += `<svg viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax slice" style="position:absolute;left:0;right:0;bottom:22vh;width:100%;height:34vh"><defs><linearGradient id="mg" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity=".25"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".18"/></linearGradient><radialGradient id="gl" cx="45%" cy="75%" r="60%"><stop offset="0" stop-color="#ffd36b"/><stop offset="1" stop-color="#ffd36b" stop-opacity="0"/></radialGradient></defs>${mc(40, 260, 210, true)}${mc(360, 230, 190, false)}${mc(650, 280, 220, true)}${mc(990, 220, 180, false)}</svg>`;
+    html += '<div class="fx-hazard"></div><div class="fx-floorlines"></div>';
+    for (let i = 0; i < 14; i++) html += `<i class="fx-spark" style="left:${[13, 13.5, 14, 64, 64.5, 65][i % 6]}%;--dx:${rnd(-60, 60)}px;--dy:${rnd(-90, -30)}px;animation-delay:${rnd(0, 2)}s"></i>`;
+    back.innerHTML = html;
+  }
+
+  // ---------- Schaltschrank ----------
+  function schaltschrank(back) {
+    back.style.background = '#cfd2cf';
+    const W = 1200, H = 900;
+    let g = '';
+    // Kabelkanäle
+    const duct = (x, y, w, h) => { let sl = ''; const horiz = w > h; for (let i = 8; i < (horiz ? w : h) - 8; i += 16) sl += horiz ? `<rect x="${x + i}" y="${y}" width="8" height="${h * 0.32}" fill="#9ea39e"/><rect x="${x + i}" y="${y + h * 0.68}" width="8" height="${h * 0.32}" fill="#9ea39e"/>` : `<rect x="${x}" y="${y + i}" width="${w * 0.32}" height="8" fill="#9ea39e"/><rect x="${x + w * 0.68}" y="${y + i}" width="${w * 0.32}" height="8" fill="#9ea39e"/>`; return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="#b9bdb8" stroke="#8f948f"/>${sl}<rect x="${x + (horiz ? 0 : w * 0.3)}" y="${y + (horiz ? h * 0.3 : 0)}" width="${horiz ? w : w * 0.4}" height="${horiz ? h * 0.4 : h}" fill="#c7cbc6"/>`; };
+    g += duct(20, 20, W - 40, 50) + duct(20, 300, W - 40, 50) + duct(20, 580, W - 40, 50) + duct(20, 20, 50, 860) + duct(W - 70, 20, 50, 860);
+    // Hutschienen + Klemmen
+    const rail = (y) => { let r = `<rect x="80" y="${y}" width="${W - 160}" height="14" fill="#d8dcdf" stroke="#9aa0a6"/>`; const cols = ['#8c9196', '#8c9196', '#8c9196', '#3c6fd1', '#e6c229', '#8c9196', '#8c9196']; for (let x = 100; x < 520; x += 18) { const c = cols[(x / 18) % cols.length | 0]; r += `<rect x="${x}" y="${y - 40}" width="16" height="94" rx="2" fill="${c}"/><rect x="${x + 3}" y="${y - 34}" width="10" height="8" rx="1" fill="#ffffffaa"/>${c === '#e6c229' ? `<path d="M${x} ${y - 40}l16 30M${x} ${y - 10}l16 30M${x} ${y + 20}l16 30" stroke="#2f9e44" stroke-width="5"/>` : ''}`; } return r; };
+    g += rail(170) + rail(450) + rail(730);
+    // SPS mit LEDs
+    g += `<g transform="translate(560 100)"><rect width="300" height="150" rx="6" fill="#2e3338"/><rect x="10" y="10" width="70" height="130" rx="4" fill="#3f464d"/><text x="45" y="34" fill="#9aa3ad" font-size="12" text-anchor="middle" font-family="monospace">CPU</text>${Array.from({ length: 6 }, (_, i) => `<rect x="${90 + i * 34}" y="10" width="30" height="130" rx="3" fill="#3a4148"/>${Array.from({ length: 8 }, (_, j) => `<circle cx="${100 + i * 34}" cy="${26 + j * 14}" r="4" fill="${['#2ecc71', '#f1c40f', '#2ecc71', '#e74c3c'][(i + j) % 4]}" class="fx-led" style="animation-delay:${((i * 7 + j * 3) % 10) / 5}s;animation-duration:${0.8 + ((i + j) % 5) * 0.35}s"/>`).join('')}`).join('')}<rect x="18" y="50" width="54" height="30" rx="3" fill="#0e3b1f"/><text x="45" y="70" fill="#42f58d" font-size="13" text-anchor="middle" font-family="monospace" class="fx-led" style="animation-duration:2s">RUN</text></g>`;
+    // Schütze / Sicherungen
+    for (let i = 0; i < 6; i++) g += `<g transform="translate(${600 + i * 90} 395)"><rect width="70" height="110" rx="6" fill="#e9ece9" stroke="#a7aca7"/><rect x="10" y="12" width="50" height="22" rx="3" fill="#596068"/><rect x="24" y="48" width="22" height="30" rx="3" fill="${i % 2 ? '#3c6fd1' : '#596068'}"/><circle cx="35" cy="92" r="6" fill="${i === 2 ? '#e74c3c' : '#2ecc71'}" class="${i === 2 ? '' : 'fx-led'}" style="animation-duration:${1.4 + i * 0.3}s"/></g>`;
+    for (let i = 0; i < 10; i++) g += `<g transform="translate(${100 + i * 46} 655)"><rect width="40" height="100" rx="5" fill="#f3f4f2" stroke="#a7aca7"/><rect x="12" y="30" width="16" height="30" rx="3" fill="${i % 3 ? '#2b2f33' : '#c0392b'}"/><rect x="8" y="76" width="24" height="10" fill="#d0d4d0"/></g>`;
+    // Leitungen mit "Stromfluss"
+    const wires = [['#1f1f1f', 'M140 214 C140 280 420 260 640 250'], ['#3c6fd1', 'M300 214 C300 300 700 280 760 250'], ['#c0392b', 'M200 494 C260 560 640 540 700 505'], ['#2f9e44', 'M420 774 C480 700 860 620 900 505'], ['#7a4a2a', 'M500 494 C560 400 900 420 1000 250']];
+    for (const [c, d] of wires) g += `<path d="${d}" stroke="${c}" stroke-width="7" fill="none" stroke-linecap="round"/><path d="${d}" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="6 40" class="fx-flow" opacity=".75"/>`;
+    // Klemmenbeschriftung
+    g += `<text x="100" y="125" font-family="monospace" font-size="16" fill="#5b615b">-X1</text><text x="100" y="405" font-family="monospace" font-size="16" fill="#5b615b">-X2</text><text x="560" y="90" font-family="monospace" font-size="16" fill="#5b615b">-A1 SPS</text><text x="600" y="385" font-family="monospace" font-size="16" fill="#5b615b">-K1 … -K6</text><text x="100" y="645" font-family="monospace" font-size="16" fill="#5b615b">-F1 … -F10</text>`;
+    let html = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%"><defs><pattern id="perf" width="22" height="22" patternUnits="userSpaceOnUse"><rect width="22" height="22" fill="#d6d9d5"/><rect x="8" y="5" width="6" height="12" rx="3" fill="#b8bcb7"/></pattern></defs><rect width="${W}" height="${H}" fill="url(#perf)"/>${g}</svg>`;
+    // Bedienpult unten
+    html += `<div class="fx-pult"><svg viewBox="0 0 600 120" preserveAspectRatio="xMidYMax meet" width="100%" height="100%">
+      <defs><linearGradient id="pg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4b5258"/><stop offset="1" stop-color="#2c3136"/></linearGradient></defs>
+      <path d="M0 30 L600 30 L600 120 L0 120Z" fill="url(#pg)"/><rect y="26" width="600" height="6" fill="#6b737a"/>
+      <g transform="translate(60 76)"><circle r="30" fill="#f2c200"/><circle r="22" fill="#c4161c"/><circle r="22" fill="url(#pg)" opacity=".15"/><text y="48" fill="#d6d9dd" font-size="10" text-anchor="middle" font-family="sans-serif">NOT-HALT</text></g>
+      <g transform="translate(150 76)"><circle r="17" fill="#1c1f22"/><circle r="13" fill="#2ecc71" class="fx-led" style="animation-duration:1.6s"/><text y="34" fill="#d6d9dd" font-size="10" text-anchor="middle" font-family="sans-serif">START</text></g>
+      <g transform="translate(205 76)"><circle r="17" fill="#1c1f22"/><circle r="13" fill="#e74c3c"/><text y="34" fill="#d6d9dd" font-size="10" text-anchor="middle" font-family="sans-serif">STOP</text></g>
+      <g transform="translate(270 76)"><circle r="17" fill="#1c1f22"/><rect x="-4" y="-15" width="8" height="30" rx="3" fill="#cfd3d6" class="fx-knob"/><text y="34" fill="#d6d9dd" font-size="10" text-anchor="middle" font-family="sans-serif">AUTO</text></g>
+      <g transform="translate(340 60)"><rect x="-10" y="-10" width="150" height="58" rx="6" fill="#0d1a12"/><text x="65" y="16" fill="#42f58d" font-size="16" text-anchor="middle" font-family="monospace">TOKI 07:00</text><text x="65" y="38" fill="#42f58d" font-size="13" text-anchor="middle" font-family="monospace" class="fx-led" style="animation-duration:1s">● BEREIT</text></g>
+      <g transform="translate(530 60)">${['#2ecc71', '#f1c40f', '#3fa9f5'].map((c, i) => `<circle cx="${i * 22}" cy="0" r="8" fill="${c}" class="fx-led" style="animation-duration:${1.2 + i * 0.5}s"/>`).join('')}<text x="22" y="34" fill="#d6d9dd" font-size="10" text-anchor="middle" font-family="sans-serif">MELDUNG</text></g>
+    </svg></div>`;
+    back.innerHTML = html;
+  }
   function set(theme) {
     ensureStyle();
     stop();
@@ -229,6 +302,8 @@ const FX = (() => {
     else if (theme === 'xmas') xmas(back, front);
     else if (theme === 'fryer') fryer(back);
     else if (theme === 'neon') neon(back);
+    else if (theme === 'werk') werkhalle(back);
+    else if (theme === 'schrank') schaltschrank(back);
     else if (theme === 'dorf') { dorf(back); front.innerHTML = `<div style="position:absolute;right:max(14px,calc(50vw - 230px));bottom:calc(env(safe-area-inset-bottom) + 70px);width:150px">${BENCH}</div>`; }
   }
   const preview = (id) => ({
@@ -237,6 +312,8 @@ const FX = (() => {
     fryer: `<div style="position:absolute;left:8px;top:6px;width:34px">${FRYER()}</div><div style="position:absolute;right:8px;top:8px;width:34px">${FRIES}</div>`,
     neon: `<div style="position:absolute;left:4px;bottom:0;width:22px">${PALM(false)}</div><div style="position:absolute;right:4px;bottom:0;width:22px">${PALM(true)}</div>`,
     dorf: `<div style="position:absolute;right:6px;bottom:2px;width:64px">${BENCH}</div>`,
+    werk: '<div style="position:absolute;left:0;right:0;top:0;height:6px;background:repeating-linear-gradient(90deg,#f2c200 0 8px,#1b1b1b 8px 16px)"></div><div style="position:absolute;left:10px;bottom:6px;width:46px;height:30px;border-radius:4px;background:#d9dde2"><div style="margin:5px;width:22px;height:16px;border-radius:2px;background:#0d141c;box-shadow:inset 0 -6px 10px #ffd36b88"></div></div>',
+    schrank: '<div style="position:absolute;inset:6px 8px auto;height:8px;background:#b9bdb8;border-radius:2px"></div><div style="position:absolute;left:10px;top:20px;display:flex;gap:2px">' + ['#8c9196', '#8c9196', '#3c6fd1', '#e6c229', '#8c9196'].map((c) => `<i style="display:block;width:7px;height:22px;border-radius:1px;background:${c}"></i>`).join('') + '</div><div style="position:absolute;right:10px;bottom:6px;width:22px;height:22px;border-radius:50%;background:#f2c200;display:grid;place-items:center"><i style="display:block;width:14px;height:14px;border-radius:50%;background:#c4161c"></i></div>',
     dark: '<div style="position:absolute;left:10px;top:12px;right:40%;height:8px;border-radius:4px;background:#3a3c42"></div><div style="position:absolute;left:10px;top:26px;right:55%;height:8px;border-radius:4px;background:#8fd1c1"></div>',
   }[id] || '');
   return { set, preview };

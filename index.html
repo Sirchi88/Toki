@@ -18,7 +18,7 @@
   --bg:oklch(97% .015 80);--card:oklch(100% 0 0);--fg:oklch(22% .03 265);--muted:oklch(52% .04 257);
   --primary:oklch(55% .15 45);--on-primary:oklch(98% .01 80);--secondary:oklch(94% .02 75);--accent:oklch(92% .05 60);
   --border:oklch(90% .015 255);--danger:oklch(55% .22 27);--success:oklch(48% .13 150);--warn:oklch(70% .15 75);
-  --c-tarif:oklch(62% .16 45);--c-zk:oklch(55% .14 255);--c-fza:oklch(58% .13 300);--c-tzug:oklch(60% .13 175);--c-sonder:oklch(62% .15 350);--c-krank:oklch(55% .03 260);
+  --c-tarif:oklch(62% .16 45);--c-zk:oklch(55% .14 255);--c-fza:oklch(58% .13 300);--c-tzug:oklch(60% .13 175);--c-sonder:oklch(62% .15 350);--c-krank:oklch(55% .21 27);
   --radius:14px;--shadow:0 1px 2px rgb(0 0 0/.05),0 6px 20px -8px rgb(0 0 0/.12);
   --font-d:'Bebas Neue',Impact,'Arial Narrow',sans-serif;--font-b:'Barlow',system-ui,-apple-system,'Segoe UI',sans-serif;
 }
@@ -32,6 +32,16 @@ body[data-theme=neon] h1{text-shadow:0 0 12px #ff4fd8,0 0 2px #fff}
 body[data-theme=dorf]{--onbg:#13254f;--bg:#bfe6ff;--card:rgb(255 255 255/.95);--fg:#13254f;--primary:#d0202e;--on-primary:#fff;--secondary:#eef2fa;--accent:#ffe3e5;--border:#cfd8ea;--muted:#4f6290}
 body[data-theme=dorf] .card,body[data-theme=dorf] details.fold{border-top:4px solid #1f3f8f;box-shadow:inset 0 3px 0 #fff,0 1px 2px rgb(0 0 0/.05),0 6px 20px -8px rgb(0 0 0/.12)}
 body[data-theme=dorf] .card::after{content:'';position:absolute;left:0;right:0;top:-4px;height:4px;background:linear-gradient(90deg,#d0202e 0 33.3%,#fff 33.3% 66.6%,#1f3f8f 66.6%);border-radius:var(--radius) var(--radius) 0 0}
+body[data-theme=werk]{--onbg:#fff;--bg:#2a3442;--card:rgb(250 251 252/.96);--fg:#1c2530;--muted:#5d6874;--primary:#2f6fb3;--on-primary:#fff;--secondary:#eef1f4;--accent:#fff4c2;--border:#d3d9df}
+body[data-theme=werk] .card,body[data-theme=werk] details.fold{border-top:0;box-shadow:0 1px 2px rgb(0 0 0/.1),0 10px 28px -10px rgb(0 0 0/.55)}
+body[data-theme=werk] .card::before{content:'';position:absolute;left:0;right:0;top:0;height:5px;border-radius:var(--radius) var(--radius) 0 0;background:repeating-linear-gradient(-45deg,#f2c200 0 10px,#1b1b1b 10px 20px)}
+body[data-theme=werk] h1{text-shadow:0 2px 10px rgb(0 0 0/.5)}
+body[data-theme=werk] .seg{background:rgb(255 255 255/.15)}body[data-theme=werk] .seg button{color:#fff}body[data-theme=werk] .seg button[aria-pressed=true]{color:var(--fg)}
+body[data-theme=schrank]{--onbg:#2d3236;--bg:#cfd2cf;--card:rgb(250 251 250/.97);--fg:#24292d;--muted:#5f666b;--primary:#c4161c;--on-primary:#fff;--secondary:#eceeec;--accent:#fff1c2;--border:#c3c8c3;--radius:10px}
+body[data-theme=schrank] .card,body[data-theme=schrank] details.fold,body[data-theme=schrank] .amp,body[data-theme=schrank] .bal .b{border:1.5px solid #9ea39e;box-shadow:inset 0 1px 0 #fff,0 2px 0 #a9aea9,0 8px 18px -8px rgb(0 0 0/.3)}
+body[data-theme=schrank] .card::after{content:'';position:absolute;top:8px;right:10px;width:10px;height:10px;border-radius:50%;background:#2ecc71;box-shadow:0 0 6px #2ecc71}
+body[data-theme=schrank] #app{padding-bottom:calc(220px + env(safe-area-inset-bottom))}
+body[data-theme=schrank] h1{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:800;font-size:34px;letter-spacing:-.02em}
 body[data-theme=arena]{--onbg:#fff;--bg:oklch(20% .06 260);--card:oklch(99% .003 250/.96);--fg:oklch(24% .07 258);--primary:oklch(52% .21 25);--on-primary:#fff;--secondary:oklch(94% .03 250);--accent:oklch(92% .04 25);--border:oklch(85% .05 250);--muted:oklch(45% .06 255)}
 body[data-theme=xmas]{--onbg:#fff;--bg:oklch(28% .07 255);--card:oklch(99% .008 150/.96);--fg:oklch(27% .06 155);--primary:oklch(48% .18 25);--on-primary:#fff;--secondary:oklch(94% .04 150);--accent:oklch(92% .08 85);--border:oklch(84% .07 85);--muted:oklch(44% .05 155)}
 body[data-theme=fryer]{--bg:oklch(93% .06 80);--card:oklch(99.5% .012 85/.95);--fg:oklch(28% .06 50);--primary:oklch(56% .17 40);--on-primary:#fff;--secondary:oklch(94% .05 85);--accent:oklch(90% .1 90);--border:oklch(84% .08 70);--muted:oklch(48% .06 55)}
@@ -120,7 +130,7 @@ body[data-theme=neon] .seg{background:rgb(28 12 54/.8)}
 .tile{border-radius:12px;background:var(--secondary);padding:9px 4px;text-align:center;position:relative}
 .tile .k{font-size:12px;color:var(--muted);font-weight:600}
 .tile .v{font-family:var(--font-d);font-size:28px;color:var(--primary);line-height:1.05}
-.tile.max{outline:2px dashed color-mix(in oklch,var(--danger) 45%,transparent)}
+
 .tile.single{grid-column:1/-1}
 details.fold{background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);margin-bottom:14px}
 details.fold summary{list-style:none;display:flex;align-items:center;justify-content:space-between;padding:11px 14px;cursor:pointer;font-size:14px;font-weight:600}
@@ -139,8 +149,8 @@ details.fold .body{padding:0 14px 12px}
 .day[data-act]{cursor:pointer}
 .day .wd{font-weight:700;line-height:1.05}.day .wd small{display:block;font-weight:500;color:var(--muted);font-size:11px}
 .bar{position:relative;height:26px;box-sizing:border-box;border-radius:7px;background:var(--secondary);overflow:hidden}
-.bar .f{position:absolute;inset:0 auto 0 0;background:color-mix(in oklch,var(--primary) 55%,var(--card));border-radius:7px}
-.bar .o{position:absolute;top:0;bottom:0;background:var(--success);border-radius:0 7px 7px 0}
+.bar .f{position:absolute;inset:0 auto 0 0;background:color-mix(in oklch,var(--primary) 28%,var(--card));border-radius:7px}
+.bar .o{position:absolute;top:0;bottom:0;background:var(--primary);border-radius:0 7px 7px 0}
 .bar .u{position:absolute;top:0;bottom:0;background:repeating-linear-gradient(135deg,color-mix(in oklch,var(--danger) 30%,transparent) 0 4px,transparent 4px 8px)}
 .bar .s{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--fg);opacity:.5}
 .bar .t{position:absolute;inset:0;display:flex;align-items:center;padding:0 8px;font-size:12px;font-weight:600;white-space:nowrap}
@@ -362,6 +372,50 @@ div.field.big2{font-size:19px;white-space:nowrap;overflow:hidden}
 .syncdot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--muted)}
 .syncdot.ok,.syncdot.idle{background:var(--success)}.syncdot.busy{background:var(--warn);animation:pulse 1s infinite}.syncdot.err{background:var(--danger)}
 @keyframes pulse{50%{opacity:.3}}
+
+/* v1.5 */
+.worked{flex-direction:column;justify-content:center;align-items:center;gap:0;background:color-mix(in oklch,var(--primary) 10%,var(--card));color:var(--fg);border:1.5px solid color-mix(in oklch,var(--primary) 30%,transparent);padding:10px 14px}
+.worked .k{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.worked .v{font-size:44px;color:var(--primary);line-height:1.05}
+.subh{font-size:13px;font-weight:800;margin:16px 0 8px;padding-top:12px;border-top:1px solid var(--border);color:var(--fg)}
+.subh:first-child{margin-top:0;padding-top:0;border-top:0}
+.field.calc{display:flex;align-items:center;background:var(--secondary);font-weight:700;border-style:dashed}
+details.mini{margin:8px 0}
+details.mini>summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--primary);list-style:none;padding:4px 0}
+details.mini>summary::-webkit-details-marker{display:none}
+details.mini>summary::before{content:'▸ ';}details.mini[open]>summary::before{content:'▾ ';}
+.grid2.even>div>.label{min-height:34px}
+.kstat{display:grid;gap:6px}
+.kstat>div{display:flex;justify-content:space-between;align-items:baseline;padding:8px 12px;border-radius:10px;background:var(--secondary)}
+.kstat span{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.kstat b{font-family:var(--font-d);font-size:30px;font-weight:400;line-height:1}
+.acc{color:var(--primary)}
+.kpi{background:var(--secondary)}
+.zus{margin-top:10px;border:1px solid var(--border);border-radius:10px;overflow:hidden;font-size:14px}
+.zus .zr{display:grid;grid-template-columns:1fr 74px 92px;gap:8px;align-items:center;padding:7px 12px;border-radius:0;background:transparent;white-space:normal;font-weight:500}
+.zus .zr+.zr{border-top:1px solid var(--border)}
+.zus .zr b{font-weight:700;text-align:right}.zus .zr>span:last-child{text-align:right}
+.zus .zr.sub{color:var(--muted);font-size:13px}.zus .zr.sub>span:first-child{padding-left:12px}
+.zus .zr.tot{background:var(--secondary);font-weight:700}
+.bal .b{min-height:120px;text-align:center;align-items:center;justify-content:space-between;padding:10px 10px 12px}
+.bal .tn{font-family:var(--font-b);font-size:14px;font-weight:800;letter-spacing:.02em;display:flex;align-items:center;gap:6px;align-self:stretch;justify-content:center}
+.bal .v{font-size:36px;margin:4px 0 2px}
+.bal .s{display:block;font-size:12px;color:var(--muted);margin-top:0;padding-top:0}
+.bal .side{font-size:11px;color:var(--muted);margin-top:2px}
+.ysep{grid-column:1/-1;font-size:10.5px;font-weight:800;color:var(--muted);margin-top:8px;border-top:1px dashed var(--border);padding-top:6px}
+.ym small{font-size:8px;margin-left:1px;opacity:.7}
+.codebox{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-radius:12px;background:var(--secondary);font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;font-weight:700;letter-spacing:.04em}
+.steps{display:grid;gap:12px;margin-top:10px}
+.steps>div{display:flex;gap:10px;align-items:flex-start}
+.sn{flex:none;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--primary);color:var(--on-primary);font-weight:800;font-size:13px}
+dl.money dt small{display:block;font-size:11px;font-weight:500;color:var(--muted)}
+dl.money .grp{margin-top:6px;padding-top:6px;border-top:1px solid var(--border)}
+dl.money .grp:first-child{margin-top:0;padding-top:2px;border-top:0}
+dl.money .grp dt,dl.money .grp dd{color:var(--fg);font-weight:800}
+dl.money dd{white-space:nowrap}
+dl.money .hl25 dt,dl.money .hl25 dd{color:var(--fg);font-weight:700}
+.grid3>div{display:flex;flex-direction:column;min-width:0}
+.grid3>div>.label{flex:1;display:flex;align-items:flex-end}
 </style>
 </head>
 <body data-theme="standard">
@@ -468,6 +522,7 @@ const Core = (() => {
     },
     zk: { stand: 0, datum: '', samstagBonus: true, max: 35, min: -35 },
     urlaub: { tarifTage: 30, ugFaktor: 0.5, ugTeiler: 21.75, fzaStand: 0, fzaDatum: '', tzugTage: 8, jahre: {} },
+    mail: { anrede: '', an: '', name: '' },
     steuer: { klasse: 1, kirche: true, kinderFB: 0, kinderPV: 0, geburtsjahr: 0, kvZusatz: 2.9, geprueft: false },
   });
   const merge = (base, over) => {
@@ -601,24 +656,41 @@ const Core = (() => {
       if (zkDebit > 0 && T > 0) { offset = Math.min(T, zkDebit); T -= offset; }
       let zkChange = -zkDebit + offset;
       let mehr = 0, mehrNach = 0, toZK = 0, bonus = 0, under = 0;
+      const parts = [];
       if (T < 0) { under = -T; zkChange += T; }
       else if (T > 0) {
-        const u = used[w.month] || 0;
-        const baseK = Number(kont[w.month]) || 0;
-        const totalK = baseK + (nachByMonth[w.month] || 0);
-        const avail = Math.max(0, totalK - u);
-        // Samstag zuerst in Mehrarbeit, dann Wochentage
-        const satEff = Math.min(satOnly, T);
-        const satToMehr = Math.min(satEff, avail);
-        const restAvail = avail - satToMehr;
-        const wdToMehr = Math.min(T - satEff, restAvail);
-        mehr = satToMehr + wdToMehr;
-        const baseAvail = Math.max(0, baseK - u);
-        mehrNach = Math.max(0, mehr - baseAvail);
-        used[w.month] = u + mehr;
-        toZK = T - mehr;
-        const satToZK = satEff - satToMehr;
-        if (S.zk.samstagBonus) bonus = satToZK * 0.25;
+        // Endet ein Monat innerhalb der Woche, zählt jeder Tag zum Kontingent seines Monats.
+        // ZK-Verrechnung (offset) und Zuschläge bleiben wochenweise.
+        const segs = new Map();
+        for (const day of w.days) {
+          const mo = ym(day.date);
+          if (!segs.has(mo)) segs.set(mo, { month: mo, c: 0, sat: 0 });
+          if (day.entry && !(day.absence && day.absence.full)) {
+            const sg = segs.get(mo);
+            sg.c += day.entry.hours - day.target;
+            if (dow(day.date) === 6) sg.sat += day.entry.hours;
+          }
+        }
+        const pos = [...segs.values()].filter((x) => x.c > 0);
+        const sumPos = pos.reduce((a, x) => a + x.c, 0) || 1;
+        for (const sg of pos) {
+          const share = (sg.c / sumPos) * T; // Anteil am Wochen-Plus (nach ZK-Verrechnung und Unterzeit)
+          const u = used[sg.month] || 0;
+          const baseK = Number(kont[sg.month]) || 0;
+          const totalK = baseK + (nachByMonth[sg.month] || 0);
+          const avail = Math.max(0, totalK - u);
+          // Samstag zuerst in Mehrarbeit, dann Wochentage
+          const satEff = Math.min(sg.sat, share);
+          const satToMehr = Math.min(satEff, avail);
+          const wdToMehr = Math.min(share - satEff, avail - satToMehr);
+          const m1 = satToMehr + wdToMehr;
+          const nach1 = Math.max(0, m1 - Math.max(0, baseK - u));
+          used[sg.month] = u + m1;
+          const z1 = share - m1;
+          const b1 = S.zk.samstagBonus ? (satEff - satToMehr) * 0.25 : 0;
+          parts.push({ month: sg.month, mehr: m1, mehrNach: nach1, toZK: z1, bonus: b1 });
+          mehr += m1; mehrNach += nach1; toZK += z1; bonus += b1;
+        }
         zkChange += toZK + bonus;
       }
       const pay = zuschlag(mehr, rate);
@@ -650,7 +722,7 @@ const Core = (() => {
       fzaTodaySum += fzaNow;
       fza -= fzaUnits * soll;
       for (const day of w.days) if (day.absence && day.absence.type === 'zk' && day.date > today) { zkVerplant += day.absence.units * soll; zkVerplantTage += day.absence.units; }
-      Object.assign(w, { worked, wd, sat, satOnly, zkUnits, zkDebit, offset, mehr, mehrNach, toZK, bonus, under, zkChange: zkEff, zkAfter: zk, fzaAfter: fza, pay, capped });
+      Object.assign(w, { parts, worked, wd, sat, satOnly, zkUnits, zkDebit, offset, mehr, mehrNach, toZK, bonus, under, zkChange: zkEff, zkAfter: zk, fzaAfter: fza, pay, capped });
     }
     // Nachträglich eingetragene ZK-/FZA-Tage, die vor dem Stichtag liegen, trotzdem abziehen
     let late = 0, lateF = 0;
@@ -673,8 +745,15 @@ const Core = (() => {
     for (const w of weeks) {
       const m = mget(w.month);
       m.weeks.push(w);
-      for (const k of ['mehr', 'mehrNach', 'toZK', 'bonus', 'zkChange', 'under']) m[k] += w[k];
-      for (const k of Object.keys(m.pay)) m.pay[k] += w.pay[k];
+      for (const k of ['zkChange', 'under']) m[k] += w[k];
+      // Mehrarbeit und Bezahlung gehören zu dem Monat, in dem sie geleistet wurde
+      for (const pt of w.parts) {
+        const pm = mget(pt.month);
+        if (pm !== m && !pm.weeks.includes(w)) pm.weeks.push(w);
+        for (const k of ['mehr', 'mehrNach', 'toZK', 'bonus']) pm[k] += pt[k];
+        const share = w.mehr > 0 ? pt.mehr / w.mehr : 0;
+        for (const k of Object.keys(pm.pay)) pm.pay[k] += w.pay[k] * share;
+      }
     }
     for (const [m, k] of Object.entries(kont)) { const o = mget(m); o.kontingent = Number(k) || 0; }
     for (const m of months.values()) { m.kontingent = Number(kont[m.month]) || 0; m.nach = nachByMonth[m.month] || 0; m.used = used[m.month] || 0; }
@@ -776,8 +855,10 @@ const Core = (() => {
     const lstKfb = kids ? tarifFor(Math.max(0, zve - kids * P.kfb * (k === 4 ? 0.5 : 1)), k) : lst;
     const frei = k === 3 ? P.soliFrei * 2 : P.soliFrei;
     const soli = lstKfb > frei ? Math.min(lstKfb * 0.055, (lstKfb - frei) * 0.119) : 0;
-    const kist = T.kirche ? lstKfb * (['BY', 'BW'].includes(S.arbeit.land) ? 0.08 : 0.09) : 0;
-    return { lst, soli, kist, zve };
+    const kistSatz = ['BY', 'BW'].includes(S.arbeit.land) ? 0.08 : 0.09;
+    const kist = T.kirche ? lstKfb * kistSatz : 0;
+    const grenz = (tarifFor(zve + 100, k) - lst) / 100;
+    return { lst, soli, kist, zve, vors, kistSatz, grenz, soliFrei: frei, lstKfb, pausch: k !== 6 ? P.anPausch + P.saPausch : 0, entl: k === 2 ? P.entlastung2 : 0 };
   };
   /** Monatsabrechnung: laufend = regelmäßiger Lohn dieses Monats, einmal = sonstige Bezüge */
   const netto = (laufend, einmal, S, mo = 12, extraAbzug = 0) => {
@@ -796,7 +877,7 @@ const Core = (() => {
     const svSum = sv.kv + sv.pv + sv.rv + sv.av;
     const taxSum = lst + soli + kist;
     const abzug = Number(extraAbzug) || 0;
-    return { gross, laufend, einmal, sv, svSum, lst, soli, kist, taxSum, abzug, net: gross - svSum - taxSum - abzug, zveJahr: yL.zve };
+    return { gross, laufend, einmal, sv, svSum, lst, soli, kist, taxSum, abzug, net: gross - svSum - taxSum - abzug, zveJahr: yL.zve, rates: r, jahr: yL, kvBase, rvBase };
   };
 
   /** Brutto-Bestandteile eines Monats */
@@ -812,9 +893,11 @@ const Core = (() => {
       else if (Number(s.monat) === mo) lines.push({ k: s.name || 'Sonderzahlung', v: val, laufend: false });
     }
     // Mehrarbeit
-    const src = S.lohn.auszahlung === 'folgemonat' ? (mo === 1 ? `${y - 1}-12` : `${y}-${String(mo - 1).padStart(2, '0')}`) : m;
+    // Netto-Rechner rechnet immer mit der Mehrarbeit des Monats selbst (auch wenn sie später ausgezahlt wird)
+    const src = m;
+    void y;
     const mm = calc.months.get(src);
-    if (mm && mm.pay.total) lines.push({ k: `Mehrarbeit ${S.lohn.auszahlung === 'folgemonat' ? '(aus Vormonat)' : ''}`.trim(), v: mm.pay.total, laufend: true, mehr: mm });
+    if (mm && mm.pay.total) lines.push({ k: 'Mehrarbeit', v: mm.pay.total, laufend: true, mehr: mm });
     // Urlaubsgeld
     let tu = 0;
     for (const [d, a] of calc.absMap) if (a.type === 'tarif' && ym(d) === m) tu += a.units;
@@ -900,6 +983,28 @@ const FX = (() => {
   @keyframes fx-nod{0%,100%{transform:rotate(4deg) translateY(2px)}50%{transform:rotate(-2deg) translateY(3px)}}
   .fx-leaf{position:absolute;top:-30px;width:16px;height:10px;border-radius:0 10px;background:#c98a2a;animation:fx-fall var(--d) linear var(--dl) infinite}
   @keyframes fx-fall{to{transform:translate(var(--x2),110vh) rotate(720deg)}}
+
+  .fx-lamp{position:absolute;top:12vh;width:120px;height:46vh;margin-left:-60px;background:linear-gradient(rgb(255 244 210/.22),transparent 80%);clip-path:polygon(42% 0,58% 0,100% 100%,0 100%)}
+  .fx-lamp::before{content:'';position:absolute;left:44%;top:0;width:12%;height:8px;border-radius:0 0 6px 6px;background:#fff6d8;box-shadow:0 0 18px 6px rgb(255 244 210/.6)}
+  .fx-crane{position:absolute;left:0;right:0;top:12vh;height:30vh}
+  .fx-rail{position:absolute;left:0;right:0;top:0;height:10px;background:repeating-linear-gradient(90deg,#f2c200 0 30px,#1b1b1b 30px 60px)}
+  .fx-trolley{position:absolute;top:6px;left:0;animation:fx-crane 26s ease-in-out infinite alternate}
+  @keyframes fx-crane{from{transform:translateX(5vw)}to{transform:translateX(calc(100vw - 140px))}}
+  .fx-hazard{position:absolute;left:0;right:0;bottom:calc(22vh - 8px);height:8px;background:repeating-linear-gradient(-45deg,#f2c200 0 14px,#1b1b1b 14px 28px)}
+  .fx-floorlines{position:absolute;left:0;right:0;bottom:0;height:22vh;background:repeating-linear-gradient(90deg,transparent 0 118px,rgb(255 255 255/.05) 118px 120px),linear-gradient(transparent 46%,rgb(242 194 0/.55) 46% 48%,transparent 48%)}
+  .fx-spark{position:absolute;bottom:calc(22vh + 13vh);width:3px;height:3px;border-radius:50%;background:#ffd36b;box-shadow:0 0 6px 2px #ffb000;animation:fx-spark 1.4s ease-out infinite;opacity:0}
+  @keyframes fx-spark{0%{opacity:1;transform:translate(0,0)}100%{opacity:0;transform:translate(var(--dx),calc(var(--dy) * -1 + 40px))}}
+  .fx-blink{animation:fx-tw 1.6s steps(2) infinite}
+  .fx-spindle{animation:fx-spin-y 5s ease-in-out infinite alternate}
+  @keyframes fx-spin-y{from{transform:translateY(-6px)}to{transform:translateY(10px)}}
+  .fx-led{animation:fx-led 1.2s steps(2,jump-none) infinite}
+  @keyframes fx-led{0%{opacity:1}50%{opacity:.25}}
+  .fx-flow{animation:fx-flow 2.4s linear infinite}
+  @keyframes fx-flow{to{stroke-dashoffset:-92}}
+  .fx-pult{position:absolute;left:0;right:0;bottom:calc(70px + env(safe-area-inset-bottom));height:120px;filter:drop-shadow(0 -6px 14px rgb(0 0 0/.25))}
+  .fx-pult::after{content:'';position:absolute;left:0;right:0;top:100%;height:200px;background:#2c3136}
+  .fx-knob{transform-origin:0 0;animation:fx-knob 6s ease-in-out infinite}
+  @keyframes fx-knob{0%,40%{transform:rotate(-35deg)}50%,90%{transform:rotate(35deg)}}
   @media (prefers-reduced-motion: reduce){#fx *,#fxf *{animation:none!important}}`;
 
 
@@ -1055,6 +1160,57 @@ const FX = (() => {
     for (let i = 0; i < 4; i++) html += `<i class="fx-leaf" style="left:${rnd(5, 95)}vw;--d:${rnd(12, 20)}s;--dl:${-rnd(0, 20)}s;--x2:${rnd(-80, 80)}px"></i>`;
     back.innerHTML = html;
   }
+
+  // ---------- Werkhalle ----------
+  function werkhalle(back) {
+    back.style.background = 'linear-gradient(#1b222c 0%, #2a3442 45%, #39434f 72%, #2b313a 72.3%, #20252c 100%)';
+    let truss = '';
+    for (let x = 0; x < 1200; x += 120) truss += `<path d="M${x} 0 L${x + 60} 70 L${x + 120} 0" stroke="#4a5666" stroke-width="5" fill="none"/><path d="M${x + 60} 70 V0" stroke="#3d4855" stroke-width="3"/>`;
+    let html = `<svg viewBox="0 0 1200 90" preserveAspectRatio="none" style="position:absolute;left:0;right:0;top:0;width:100%;height:12vh"><rect width="1200" height="8" fill="#556273"/>${truss}<rect y="70" width="1200" height="8" fill="#556273"/></svg>`;
+    for (let i = 0; i < 4; i++) html += `<div class="fx-lamp" style="left:${12 + i * 25}%"></div>`;
+    html += `<div class="fx-crane"><div class="fx-rail"></div><div class="fx-trolley"><svg viewBox="0 0 120 200" width="120"><rect x="10" y="0" width="100" height="26" rx="4" fill="#f2c200"/><path d="M10 6h100M10 20h100" stroke="#1b1b1b" stroke-width="3" stroke-dasharray="10 10"/><path d="M58 26V150M62 26V150" stroke="#9aa3ad" stroke-width="2"/><path d="M48 150h24l-6 14h-12z" fill="#f2c200"/><path d="M60 164v10a8 8 0 1 1-8-8" stroke="#c9ced4" stroke-width="5" fill="none"/></svg></div></div>`;
+    const mc = (x, w, h, glow) => `<g transform="translate(${x} ${300 - h})"><rect width="${w}" height="${h}" rx="8" fill="#d9dde2"/><rect width="${w}" height="${h}" rx="8" fill="url(#mg)"/><rect x="${w * 0.1}" y="${h * 0.14}" width="${w * 0.55}" height="${h * 0.5}" rx="5" fill="#0d141c"/><rect x="${w * 0.1}" y="${h * 0.14}" width="${w * 0.55}" height="${h * 0.5}" rx="5" fill="url(#gl)" opacity=".5"/><g class="${glow ? 'fx-spindle' : ''}"><rect x="${w * 0.33}" y="${h * 0.18}" width="${w * 0.08}" height="${h * 0.26}" fill="#8b96a3"/><circle cx="${w * 0.37}" cy="${h * 0.47}" r="${w * 0.03}" fill="#ffd36b"/></g><rect x="${w * 0.72}" y="${h * 0.16}" width="${w * 0.2}" height="${h * 0.18}" rx="3" fill="#1d2630"/><rect x="${w * 0.74}" y="${h * 0.18}" width="${w * 0.16}" height="${h * 0.1}" rx="2" fill="#3fa9f5" opacity=".8"/><circle cx="${w * 0.77}" cy="${h * 0.42}" r="5" fill="#2ecc71" class="fx-blink"/><circle cx="${w * 0.84}" cy="${h * 0.42}" r="5" fill="#f2c200"/><rect y="${h - 14}" width="${w}" height="14" fill="#5d6874"/><rect x="${w * 0.88}" y="-60" width="10" height="60" fill="#5d6874"/><circle cx="${w * 0.88 + 5}" cy="-66" r="7" fill="#2ecc71" class="fx-blink"/></g>`;
+    html += `<svg viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax slice" style="position:absolute;left:0;right:0;bottom:22vh;width:100%;height:34vh"><defs><linearGradient id="mg" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity=".25"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".18"/></linearGradient><radialGradient id="gl" cx="45%" cy="75%" r="60%"><stop offset="0" stop-color="#ffd36b"/><stop offset="1" stop-color="#ffd36b" stop-opacity="0"/></radialGradient></defs>${mc(40, 260, 210, true)}${mc(360, 230, 190, false)}${mc(650, 280, 220, true)}${mc(990, 220, 180, false)}</svg>`;
+    html += '<div class="fx-hazard"></div><div class="fx-floorlines"></div>';
+    for (let i = 0; i < 14; i++) html += `<i class="fx-spark" style="left:${[13, 13.5, 14, 64, 64.5, 65][i % 6]}%;--dx:${rnd(-60, 60)}px;--dy:${rnd(-90, -30)}px;animation-delay:${rnd(0, 2)}s"></i>`;
+    back.innerHTML = html;
+  }
+
+  // ---------- Schaltschrank ----------
+  function schaltschrank(back) {
+    back.style.background = '#cfd2cf';
+    const W = 1200, H = 900;
+    let g = '';
+    // Kabelkanäle
+    const duct = (x, y, w, h) => { let sl = ''; const horiz = w > h; for (let i = 8; i < (horiz ? w : h) - 8; i += 16) sl += horiz ? `<rect x="${x + i}" y="${y}" width="8" height="${h * 0.32}" fill="#9ea39e"/><rect x="${x + i}" y="${y + h * 0.68}" width="8" height="${h * 0.32}" fill="#9ea39e"/>` : `<rect x="${x}" y="${y + i}" width="${w * 0.32}" height="8" fill="#9ea39e"/><rect x="${x + w * 0.68}" y="${y + i}" width="${w * 0.32}" height="8" fill="#9ea39e"/>`; return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="#b9bdb8" stroke="#8f948f"/>${sl}<rect x="${x + (horiz ? 0 : w * 0.3)}" y="${y + (horiz ? h * 0.3 : 0)}" width="${horiz ? w : w * 0.4}" height="${horiz ? h * 0.4 : h}" fill="#c7cbc6"/>`; };
+    g += duct(20, 20, W - 40, 50) + duct(20, 300, W - 40, 50) + duct(20, 580, W - 40, 50) + duct(20, 20, 50, 860) + duct(W - 70, 20, 50, 860);
+    // Hutschienen + Klemmen
+    const rail = (y) => { let r = `<rect x="80" y="${y}" width="${W - 160}" height="14" fill="#d8dcdf" stroke="#9aa0a6"/>`; const cols = ['#8c9196', '#8c9196', '#8c9196', '#3c6fd1', '#e6c229', '#8c9196', '#8c9196']; for (let x = 100; x < 520; x += 18) { const c = cols[(x / 18) % cols.length | 0]; r += `<rect x="${x}" y="${y - 40}" width="16" height="94" rx="2" fill="${c}"/><rect x="${x + 3}" y="${y - 34}" width="10" height="8" rx="1" fill="#ffffffaa"/>${c === '#e6c229' ? `<path d="M${x} ${y - 40}l16 30M${x} ${y - 10}l16 30M${x} ${y + 20}l16 30" stroke="#2f9e44" stroke-width="5"/>` : ''}`; } return r; };
+    g += rail(170) + rail(450) + rail(730);
+    // SPS mit LEDs
+    g += `<g transform="translate(560 100)"><rect width="300" height="150" rx="6" fill="#2e3338"/><rect x="10" y="10" width="70" height="130" rx="4" fill="#3f464d"/><text x="45" y="34" fill="#9aa3ad" font-size="12" text-anchor="middle" font-family="monospace">CPU</text>${Array.from({ length: 6 }, (_, i) => `<rect x="${90 + i * 34}" y="10" width="30" height="130" rx="3" fill="#3a4148"/>${Array.from({ length: 8 }, (_, j) => `<circle cx="${100 + i * 34}" cy="${26 + j * 14}" r="4" fill="${['#2ecc71', '#f1c40f', '#2ecc71', '#e74c3c'][(i + j) % 4]}" class="fx-led" style="animation-delay:${((i * 7 + j * 3) % 10) / 5}s;animation-duration:${0.8 + ((i + j) % 5) * 0.35}s"/>`).join('')}`).join('')}<rect x="18" y="50" width="54" height="30" rx="3" fill="#0e3b1f"/><text x="45" y="70" fill="#42f58d" font-size="13" text-anchor="middle" font-family="monospace" class="fx-led" style="animation-duration:2s">RUN</text></g>`;
+    // Schütze / Sicherungen
+    for (let i = 0; i < 6; i++) g += `<g transform="translate(${600 + i * 90} 395)"><rect width="70" height="110" rx="6" fill="#e9ece9" stroke="#a7aca7"/><rect x="10" y="12" width="50" height="22" rx="3" fill="#596068"/><rect x="24" y="48" width="22" height="30" rx="3" fill="${i % 2 ? '#3c6fd1' : '#596068'}"/><circle cx="35" cy="92" r="6" fill="${i === 2 ? '#e74c3c' : '#2ecc71'}" class="${i === 2 ? '' : 'fx-led'}" style="animation-duration:${1.4 + i * 0.3}s"/></g>`;
+    for (let i = 0; i < 10; i++) g += `<g transform="translate(${100 + i * 46} 655)"><rect width="40" height="100" rx="5" fill="#f3f4f2" stroke="#a7aca7"/><rect x="12" y="30" width="16" height="30" rx="3" fill="${i % 3 ? '#2b2f33' : '#c0392b'}"/><rect x="8" y="76" width="24" height="10" fill="#d0d4d0"/></g>`;
+    // Leitungen mit "Stromfluss"
+    const wires = [['#1f1f1f', 'M140 214 C140 280 420 260 640 250'], ['#3c6fd1', 'M300 214 C300 300 700 280 760 250'], ['#c0392b', 'M200 494 C260 560 640 540 700 505'], ['#2f9e44', 'M420 774 C480 700 860 620 900 505'], ['#7a4a2a', 'M500 494 C560 400 900 420 1000 250']];
+    for (const [c, d] of wires) g += `<path d="${d}" stroke="${c}" stroke-width="7" fill="none" stroke-linecap="round"/><path d="${d}" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="6 40" class="fx-flow" opacity=".75"/>`;
+    // Klemmenbeschriftung
+    g += `<text x="100" y="125" font-family="monospace" font-size="16" fill="#5b615b">-X1</text><text x="100" y="405" font-family="monospace" font-size="16" fill="#5b615b">-X2</text><text x="560" y="90" font-family="monospace" font-size="16" fill="#5b615b">-A1 SPS</text><text x="600" y="385" font-family="monospace" font-size="16" fill="#5b615b">-K1 … -K6</text><text x="100" y="645" font-family="monospace" font-size="16" fill="#5b615b">-F1 … -F10</text>`;
+    let html = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%"><defs><pattern id="perf" width="22" height="22" patternUnits="userSpaceOnUse"><rect width="22" height="22" fill="#d6d9d5"/><rect x="8" y="5" width="6" height="12" rx="3" fill="#b8bcb7"/></pattern></defs><rect width="${W}" height="${H}" fill="url(#perf)"/>${g}</svg>`;
+    // Bedienpult unten
+    html += `<div class="fx-pult"><svg viewBox="0 0 600 120" preserveAspectRatio="xMidYMax meet" width="100%" height="100%">
+      <defs><linearGradient id="pg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4b5258"/><stop offset="1" stop-color="#2c3136"/></linearGradient></defs>
+      <path d="M0 30 L600 30 L600 120 L0 120Z" fill="url(#pg)"/><rect y="26" width="600" height="6" fill="#6b737a"/>
+      <g transform="translate(60 76)"><circle r="30" fill="#f2c200"/><circle r="22" fill="#c4161c"/><circle r="22" fill="url(#pg)" opacity=".15"/><text y="48" fill="#d6d9dd" font-size="10" text-anchor="middle" font-family="sans-serif">NOT-HALT</text></g>
+      <g transform="translate(150 76)"><circle r="17" fill="#1c1f22"/><circle r="13" fill="#2ecc71" class="fx-led" style="animation-duration:1.6s"/><text y="34" fill="#d6d9dd" font-size="10" text-anchor="middle" font-family="sans-serif">START</text></g>
+      <g transform="translate(205 76)"><circle r="17" fill="#1c1f22"/><circle r="13" fill="#e74c3c"/><text y="34" fill="#d6d9dd" font-size="10" text-anchor="middle" font-family="sans-serif">STOP</text></g>
+      <g transform="translate(270 76)"><circle r="17" fill="#1c1f22"/><rect x="-4" y="-15" width="8" height="30" rx="3" fill="#cfd3d6" class="fx-knob"/><text y="34" fill="#d6d9dd" font-size="10" text-anchor="middle" font-family="sans-serif">AUTO</text></g>
+      <g transform="translate(340 60)"><rect x="-10" y="-10" width="150" height="58" rx="6" fill="#0d1a12"/><text x="65" y="16" fill="#42f58d" font-size="16" text-anchor="middle" font-family="monospace">TOKI 07:00</text><text x="65" y="38" fill="#42f58d" font-size="13" text-anchor="middle" font-family="monospace" class="fx-led" style="animation-duration:1s">● BEREIT</text></g>
+      <g transform="translate(530 60)">${['#2ecc71', '#f1c40f', '#3fa9f5'].map((c, i) => `<circle cx="${i * 22}" cy="0" r="8" fill="${c}" class="fx-led" style="animation-duration:${1.2 + i * 0.5}s"/>`).join('')}<text x="22" y="34" fill="#d6d9dd" font-size="10" text-anchor="middle" font-family="sans-serif">MELDUNG</text></g>
+    </svg></div>`;
+    back.innerHTML = html;
+  }
   function set(theme) {
     ensureStyle();
     stop();
@@ -1064,6 +1220,8 @@ const FX = (() => {
     else if (theme === 'xmas') xmas(back, front);
     else if (theme === 'fryer') fryer(back);
     else if (theme === 'neon') neon(back);
+    else if (theme === 'werk') werkhalle(back);
+    else if (theme === 'schrank') schaltschrank(back);
     else if (theme === 'dorf') { dorf(back); front.innerHTML = `<div style="position:absolute;right:max(14px,calc(50vw - 230px));bottom:calc(env(safe-area-inset-bottom) + 70px);width:150px">${BENCH}</div>`; }
   }
   const preview = (id) => ({
@@ -1072,83 +1230,76 @@ const FX = (() => {
     fryer: `<div style="position:absolute;left:8px;top:6px;width:34px">${FRYER()}</div><div style="position:absolute;right:8px;top:8px;width:34px">${FRIES}</div>`,
     neon: `<div style="position:absolute;left:4px;bottom:0;width:22px">${PALM(false)}</div><div style="position:absolute;right:4px;bottom:0;width:22px">${PALM(true)}</div>`,
     dorf: `<div style="position:absolute;right:6px;bottom:2px;width:64px">${BENCH}</div>`,
+    werk: '<div style="position:absolute;left:0;right:0;top:0;height:6px;background:repeating-linear-gradient(90deg,#f2c200 0 8px,#1b1b1b 8px 16px)"></div><div style="position:absolute;left:10px;bottom:6px;width:46px;height:30px;border-radius:4px;background:#d9dde2"><div style="margin:5px;width:22px;height:16px;border-radius:2px;background:#0d141c;box-shadow:inset 0 -6px 10px #ffd36b88"></div></div>',
+    schrank: '<div style="position:absolute;inset:6px 8px auto;height:8px;background:#b9bdb8;border-radius:2px"></div><div style="position:absolute;left:10px;top:20px;display:flex;gap:2px">' + ['#8c9196', '#8c9196', '#3c6fd1', '#e6c229', '#8c9196'].map((c) => `<i style="display:block;width:7px;height:22px;border-radius:1px;background:${c}"></i>`).join('') + '</div><div style="position:absolute;right:10px;bottom:6px;width:22px;height:22px;border-radius:50%;background:#f2c200;display:grid;place-items:center"><i style="display:block;width:14px;height:14px;border-radius:50%;background:#c4161c"></i></div>',
     dark: '<div style="position:absolute;left:10px;top:12px;right:40%;height:8px;border-radius:4px;background:#3a3c42"></div><div style="position:absolute;left:10px;top:26px;right:55%;height:8px;border-radius:4px;background:#8fd1c1"></div>',
   }[id] || '');
   return { set, preview };
 })();
 </script>
-<script>/* Toki – Cloud-Sync mit Supabase (Login per E-Mail-Link, eine Zeile pro Person). Keine Bibliothek nötig. */
+<script>/* Toki – Cloud-Sync per persönlichem Sync-Code (ohne Login). Supabase-RPC, keine Bibliothek nötig.
+   Der Code ist das Geheimnis: Wer ihn kennt, sieht die Daten. In der Datenbank liegt nur sein SHA-256-Hash. */
 const Sync = (() => {
   'use strict';
   const BASE = 'https://niqkdhjzcpmyjuopgrnu.supabase.co';
-  // Publishable Key: darf öffentlich im Code stehen, Zugriff regeln die RLS-Policies der Tabelle.
+  // Publishable Key: darf öffentlich im Code stehen. Zugriff nur über die Funktionen toki_laden / toki_speichern.
   const KEY = 'sb_publishable_6yXuxHgXlb12TCTrcKYkUg_Z7l6HXxA';
-  const SKEY = 'toki-session';
-  const TABLE = 'toki_daten';
+  const CKEY = 'toki-sync-code';
+  const ALPHA = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // ohne 0/O, 1/I
 
-  const read = () => { try { return JSON.parse(localStorage.getItem(SKEY)); } catch { return null; } };
-  let session = read();
-  const store = (s) => { session = s; try { if (s) localStorage.setItem(SKEY, JSON.stringify(s)); else localStorage.removeItem(SKEY); } catch { /* */ } };
-  const jwt = (t) => { try { return JSON.parse(decodeURIComponent(escape(atob(t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))))); } catch { return {}; } };
-  const headers = (extra = {}) => ({ apikey: KEY, 'Content-Type': 'application/json', ...extra });
-  const errText = async (r) => { const j = await r.json().catch(() => ({})); return j.msg || j.error_description || j.message || j.error || `Fehler ${r.status}`; };
+  const read = () => { try { return localStorage.getItem(CKEY) || ''; } catch { return ''; } };
+  let code = read();
+  const store = (c) => { code = c || ''; try { if (c) localStorage.setItem(CKEY, c); else localStorage.removeItem(CKEY); } catch { /* */ } };
 
-  /** Läuft die Seite an einem Ort, von dem aus Supabase erreichbar ist? (nicht in der Claude-Vorschau / als Datei) */
+  /** Eingabe säubern: Groß, ohne Leerzeichen/Striche/Präfix */
+  const clean = (s) => String(s || '').toUpperCase().replace(/^TOKI/, '').replace(/[^A-Z0-9]/g, '');
+  const valid = (c) => c.length === 16 && [...c].every((ch) => ALPHA.includes(ch));
+  const pretty = (c) => (c ? `TOKI-${c.match(/.{1,4}/g).join('-')}` : '');
+  function generate() {
+    const r = new Uint8Array(16);
+    crypto.getRandomValues(r);
+    return [...r].map((b) => ALPHA[b % ALPHA.length]).join('');
+  }
+
   const available = () => /^https?:$/.test(location.protocol) && !/(^|\.)claude\.ai$|claudeusercontent|anthropic/.test(location.hostname);
 
-  /** Nach dem Klick auf den Login-Link stehen die Tokens im #-Teil der Adresse. */
+  async function rpc(fn, body) {
+    let r;
+    try {
+      r = await fetch(`${BASE}/rest/v1/rpc/${fn}`, { method: 'POST', headers: { apikey: KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    } catch { throw new Error('Keine Verbindung zum Server'); }
+    if (!r.ok) {
+      const j = await r.json().catch(() => ({}));
+      const msg = j.message || j.msg || j.error || `Fehler ${r.status}`;
+      if (/Could not find the function|does not exist|PGRST202/i.test(msg + (j.code || ''))) throw new Error('Die Datenbank ist noch nicht eingerichtet (SQL aus supabase/schema.sql ausführen).');
+      throw new Error(msg);
+    }
+    const t = await r.text();
+    return t ? JSON.parse(t) : null;
+  }
+
+  /** Daten zu einem Code holen: { daten, aktualisiert } oder null */
+  async function pull(c = code) {
+    const rows = await rpc('toki_laden', { p_code: c });
+    return (rows && rows[0]) || null;
+  }
+  async function push(daten, updatedMs, c = code) {
+    await rpc('toki_speichern', { p_code: c, p_daten: daten, p_aktualisiert: new Date(updatedMs || Date.now()).toISOString() });
+  }
+
+  /** Link wie …/Toki/#sync=CODE verbindet ein neues Gerät mit einem Tipp */
   function fromHash() {
-    const h = location.hash || '';
-    if (!/access_token=|error=|error_description=/.test(h)) return null;
-    const p = new URLSearchParams(h.slice(1));
+    const m = /[#&]sync=([A-Za-z0-9-]+)/.exec(location.hash || '');
+    if (!m) return null;
     try { history.replaceState(null, '', location.pathname + location.search); } catch { /* */ }
-    if (p.get('error') || p.get('error_description')) return { error: (p.get('error_description') || p.get('error')).replace(/\+/g, ' ') };
-    const at = p.get('access_token');
-    const pl = jwt(at);
-    store({ access_token: at, refresh_token: p.get('refresh_token'), expires_at: Number(p.get('expires_at')) || Math.floor(Date.now() / 1000) + Number(p.get('expires_in') || 3600), user: { id: pl.sub, email: pl.email } });
-    return { ok: true };
+    const c = clean(m[1]);
+    return valid(c) ? c : { error: 'Ungültiger Sync-Link' };
   }
 
-  async function token() {
-    if (!session) throw new Error('Nicht angemeldet');
-    if (session.expires_at - 60 > Date.now() / 1000) return session.access_token;
-    const r = await fetch(`${BASE}/auth/v1/token?grant_type=refresh_token`, { method: 'POST', headers: headers(), body: JSON.stringify({ refresh_token: session.refresh_token }) });
-    if (!r.ok) { if (r.status === 400 || r.status === 401) store(null); throw new Error('Anmeldung abgelaufen – bitte neu anmelden'); }
-    const j = await r.json();
-    store({ access_token: j.access_token, refresh_token: j.refresh_token, expires_at: j.expires_at || Math.floor(Date.now() / 1000) + (j.expires_in || 3600), user: { id: (j.user && j.user.id) || session.user.id, email: (j.user && j.user.email) || session.user.email } });
-    return session.access_token;
-  }
-
-  async function sendLink(email, redirectTo) {
-    const r = await fetch(`${BASE}/auth/v1/otp?redirect_to=${encodeURIComponent(redirectTo)}`, { method: 'POST', headers: headers(), body: JSON.stringify({ email, create_user: true }) });
-    if (!r.ok) throw new Error(await errText(r));
-  }
-
-  /** Eigenen Datensatz holen: { daten, aktualisiert } oder null */
-  async function pull() {
-    const t = await token();
-    const r = await fetch(`${BASE}/rest/v1/${TABLE}?select=daten,aktualisiert`, { headers: headers({ Authorization: `Bearer ${t}` }) });
-    if (!r.ok) throw new Error(await errText(r));
-    const rows = await r.json();
-    return rows[0] || null;
-  }
-
-  async function push(daten, updatedMs) {
-    const t = await token();
-    const r = await fetch(`${BASE}/rest/v1/${TABLE}?on_conflict=user_id`, {
-      method: 'POST',
-      headers: headers({ Authorization: `Bearer ${t}`, Prefer: 'resolution=merge-duplicates,return=minimal' }),
-      body: JSON.stringify({ user_id: session.user.id, daten, aktualisiert: new Date(updatedMs || Date.now()).toISOString() }),
-    });
-    if (!r.ok) throw new Error(await errText(r));
-  }
-
-  async function logout() {
-    try { if (session) await fetch(`${BASE}/auth/v1/logout`, { method: 'POST', headers: headers({ Authorization: `Bearer ${session.access_token}` }) }); } catch { /* egal */ }
-    store(null);
-  }
-
-  return { get session() { return session; }, available, fromHash, sendLink, pull, push, logout };
+  return {
+    get code() { return code; }, set: store, clean, valid, pretty, generate, available, pull, push, fromHash,
+    link: (c = code) => `${location.origin}${location.pathname}#sync=${c}`,
+  };
 })();
 </script>
 <script>/* Toki – Oberfläche */
@@ -1175,6 +1326,8 @@ const Sync = (() => {
     ['arena', 'Rot-Weiß Arena', 'radial-gradient(120% 90% at 50% 120%,#e2233a 0 45%,transparent 46%),linear-gradient(#2a3a72,#0a0f24)'],
     ['neon', 'Neon City', 'radial-gradient(circle at 50% 75%,#ffcf5a 0 14%,transparent 15%),linear-gradient(#1a0b3a,#7a1d7a 60%,#ff6a3d)'],
     ['dorf', 'Auswechselspieler', 'linear-gradient(#8fd0ff 0 55%,#3f9b4b 55%)'],
+    ['werk', 'Werkhalle', 'linear-gradient(#1b222c,#39434f 70%,#20252c 70%)'],
+    ['schrank', 'Schaltschrank', 'linear-gradient(#d6d9d5,#cfd2cf)'],
     ['xmas', 'Weihnachten', 'linear-gradient(#0e1a3d,#3c5a8f)'],
     ['fryer', 'Airfryer', 'repeating-linear-gradient(0deg,#f8e2b5 0 14px,#f1d49c 14px 16px)'],
   ];
@@ -1195,29 +1348,29 @@ const Sync = (() => {
     schedulePush();
   }
 
-  // ---------- Cloud-Sync ----------
-  const sync = { status: Sync.session ? 'idle' : 'off', msg: '', busy: false };
+  // ---------- Cloud-Sync (Sync-Code) ----------
+  const sync = { status: Sync.code ? 'idle' : 'off', msg: '', busy: false };
   let pushT = null;
   function setSync(status, msg = '') {
     sync.status = status; sync.msg = msg;
-    const el = document.getElementById('syncdot'); if (el) { el.className = `syncdot ${status}`; el.title = syncLabel(); }
+    const el = document.getElementById('syncdot'); if (el) { el.className = `syncdot ${status}`; el.parentElement.title = syncLabel(); }
     const box = document.getElementById('syncinfo'); if (box) box.innerHTML = syncInfoHtml();
   }
   function syncLabel() {
-    return { off: 'Nicht angemeldet', idle: 'Cloud verbunden', busy: 'Synchronisiere …', ok: 'Gespeichert in der Cloud', err: `Sync-Fehler: ${sync.msg}` }[sync.status] || '';
+    return { off: 'Sync aus', idle: 'Sync aktiv', busy: 'Synchronisiere …', ok: 'In der Cloud gespeichert', err: `Sync-Fehler: ${sync.msg}` }[sync.status] || '';
   }
   function schedulePush() {
-    if (!Sync.session || !Sync.available()) return;
+    if (!Sync.code || !Sync.available()) return;
     clearTimeout(pushT);
-    pushT = setTimeout(() => pushNow(), 1500);
+    pushT = setTimeout(() => pushNow(), 1200);
   }
   async function pushNow() {
-    if (!Sync.session) return;
+    if (!Sync.code) return;
     try { setSync('busy'); await Sync.push(st, st.meta.updated); st.meta.syncedAt = Date.now(); persist(); setSync('ok'); }
-    catch (e) { setSync('err', e.message); if (!Sync.session) render(); }
+    catch (e) { setSync('err', e.message); }
   }
   async function syncNow(manual = false) {
-    if (!Sync.session || !Sync.available() || sync.busy) return;
+    if (!Sync.code || !Sync.available() || sync.busy) return;
     sync.busy = true; setSync('busy');
     try {
       const remote = await Sync.pull();
@@ -1228,14 +1381,12 @@ const Sync = (() => {
         if (!st.meta.updated) st.meta.updated = Date.now();
         await Sync.push(st, st.meta.updated);
         st.meta.syncedAt = Date.now(); persist(); setSync('ok');
-        if (manual || localHasData) toast('✓ Deine Daten liegen jetzt in der Cloud', 2600, 'ok');
       } else if (!st.meta.syncedAt && localHasData && Math.abs(remoteUp - localUp) > 1000) {
-        // Erstes Anmelden auf einem Gerät, das schon eigene Daten hat: fragen
         sync.busy = false; setSync('idle');
         sheet(`<h3>Welche Daten behalten?</h3><p class="small">In der Cloud liegen schon Daten (Stand ${new Date(remoteUp).toLocaleString('de-DE')}), und auf diesem Gerät auch (Stand ${localUp ? new Date(localUp).toLocaleString('de-DE') : 'unbekannt'}).</p>
           <div class="grid2 mt"><button class="btn soft" id="useLocal">Dieses Gerät</button><button class="btn" id="useCloud">Cloud</button></div><p class="hint">Die andere Version wird überschrieben.</p>`, (el) => {
           el.querySelector('#useCloud').addEventListener('click', () => { closeSheet(); applyRemote(remote, remoteUp); toast('✓ Daten aus der Cloud übernommen', 2600, 'ok'); });
-          el.querySelector('#useLocal').addEventListener('click', async () => { closeSheet(); st.meta.updated = Date.now(); persist(); await pushNow(); toast('✓ Daten dieses Geräts in die Cloud übernommen', 2600, 'ok'); });
+          el.querySelector('#useLocal').addEventListener('click', async () => { closeSheet(); st.meta.updated = Date.now(); persist(); await pushNow(); toast('✓ Daten dieses Geräts übernommen', 2600, 'ok'); });
         });
         return;
       } else if (remoteUp > localUp) {
@@ -1245,8 +1396,22 @@ const Sync = (() => {
         await Sync.push(st, localUp); st.meta.syncedAt = Date.now(); persist(); setSync('ok');
         if (manual) toast('✓ In die Cloud gespeichert', 2200, 'ok');
       } else { st.meta.syncedAt = Date.now(); persist(); setSync('ok'); if (manual) toast('✓ Alles aktuell', 2000, 'ok'); }
-    } catch (e) { setSync('err', e.message); if (manual) toast(`⚠ ${e.message}`, 3500); if (!Sync.session) render(); }
+    } catch (e) { setSync('err', e.message); if (manual) toast(`⚠ ${e.message}`, 4500); }
     finally { sync.busy = false; }
+  }
+  async function connectCode(c, created) {
+    if (!Sync.available()) { toast('Sync geht nur unter sirchi88.github.io/Toki', 3500); return; }
+    try {
+      if (!created) {
+        setSync('busy');
+        const remote = await Sync.pull(c);
+        if (!remote) { setSync('off'); toast('⚠ Zu diesem Code gibt es keine Daten – bitte Code prüfen', 4500); return; }
+      }
+      Sync.set(c); st.meta.syncedAt = 0; persist();
+      if (created) { if (!st.meta.updated) st.meta.updated = Date.now(); await Sync.push(st, st.meta.updated); st.meta.syncedAt = Date.now(); persist(); setSync('ok'); ui.showCode = true; toast('✓ Sync ist an – Code auf dem anderen Gerät eingeben', 3500, 'ok'); }
+      else { await syncNow(false); toast('✓ Verbunden', 2500, 'ok'); }
+    } catch (e) { if (created) Sync.set(''); setSync(Sync.code ? 'err' : 'off', e.message); toast(`⚠ ${e.message}`, 6000); }
+    render();
   }
   function applyRemote(remote, remoteUp) {
     const keepPref = st.pref;
@@ -1256,15 +1421,18 @@ const Sync = (() => {
     persist(); loadDate(ui.date); setSync('ok'); render();
   }
   function syncInfoHtml() {
-    if (!Sync.available()) return '<div class="notice warn"><div>Die Cloud funktioniert nur, wenn Toki unter seiner eigenen Adresse läuft (<b>sirchi88.github.io/Toki</b>) – nicht in der Claude-Vorschau.</div></div>';
-    if (!Sync.session) return `<p class="small muted">Melde dich mit deiner E-Mail an – du bekommst einen Login-Link. Danach sind deine Daten auf Handy und PC gleich.</p>
-      <div class="grid2"><input class="field" id="loginMail" type="email" inputmode="email" autocomplete="email" placeholder="deine@email.de" value="${esc(st.pref.mail || '')}"><button class="btn" data-act="sendLink">Login-Link senden</button></div>
-      ${st.pref.linkSent ? `<p class="hint">📧 Link an <b>${esc(st.pref.linkSent)}</b> geschickt – Mail öffnen und auf den Link tippen (am besten im selben Browser). Auch im Spam schauen.</p>` : ''}`;
+    if (!Sync.available()) return '<div class="notice warn"><div>Der Sync funktioniert nur, wenn Toki unter seiner eigenen Adresse läuft: <b>sirchi88.github.io/Toki</b> – nicht in der Claude-Vorschau.</div></div>';
+    if (!Sync.code) return `<p class="small">Mit einem <b>persönlichen Sync-Code</b> hast du am Handy und am Laptop dieselben Daten – ohne Anmeldung, ohne Passwort, ohne E-Mail.</p>
+      <div class="steps"><div><span class="sn">1</span><div class="grow">Auf dem <b>ersten Gerät</b> (dort, wo deine Daten schon sind):<button class="btn mt-s" data-act="syncCreate">Sync-Code erstellen</button></div></div>
+      <div><span class="sn">2</span><div class="grow">Auf dem <b>anderen Gerät</b> den Code eingeben oder den Sync-Link öffnen:<div class="grid2 mt-s"><input class="field" id="syncCode" placeholder="TOKI-XXXX-…" autocapitalize="characters" autocomplete="off" spellcheck="false"><button class="btn soft" data-act="syncJoin">Verbinden</button></div></div></div></div>`;
     const last = st.meta && st.meta.syncedAt ? new Date(st.meta.syncedAt).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '–';
-    return `<div class="between"><div><b>☁ ${esc(Sync.session.user.email || 'Angemeldet')}</b><div class="xs muted">${esc(syncLabel())} · zuletzt ${last}</div></div><span class="syncdot ${sync.status}"></span></div>
-      <div class="grid2 mt"><button class="btn soft" data-act="syncNow">Jetzt synchronisieren</button><button class="btn ghost" data-act="logout">Abmelden</button></div>`;
+    const shown = ui.showCode ? Sync.pretty(Sync.code) : Sync.pretty(Sync.code).replace(/(TOKI-\w{4})-.*/, '$1-••••-••••-••••');
+    return `<div class="between"><div><b>☁ Sync aktiv</b><div class="xs muted">${esc(syncLabel())} · zuletzt ${last}</div></div><span class="syncdot ${sync.status}"></span></div>
+      <div class="codebox mt"><span class="num">${shown}</span><button class="btn sm soft" data-act="syncShow">${ui.showCode ? 'Verbergen' : 'Anzeigen'}</button></div>
+      <div class="grid2 mt-s"><button class="btn soft sm" style="width:100%" data-act="syncCopy">Code kopieren</button><button class="btn soft sm" style="width:100%" data-act="syncMail">Sync-Link per Mail</button></div>
+      <p class="hint">Auf dem anderen Gerät: Code bei „Verbinden“ eingeben oder den Link aus der Mail öffnen. <b>Code nicht weitergeben</b> – wer ihn kennt, sieht deine Daten.</p>
+      <div class="grid2 mt"><button class="btn soft" data-act="syncNow">Jetzt synchronisieren</button><button class="btn ghost" data-act="syncOff">Sync ausschalten</button></div>`;
   }
-
   const today = C.todayIso();
   const curY = Number(today.slice(0, 4));
   const ui = {
@@ -1391,7 +1559,8 @@ const Sync = (() => {
     if (ui.half || C.halfDay(d, s)) return { pause: s.arbeit.brotzeit, special };
     return { pause: (ui.bz ? s.arbeit.brotzeit : 0) + (ui.mi ? s.arbeit.mittag : 0), special };
   }
-  function pageFeierabend() {
+  /** Teile des Feierabend-Reiters, die sich beim Tippen ändern (werden ohne Neuaufbau der Eingabefelder aktualisiert) */
+  function faParts() {
     const s = S();
     const d = ui.date, w = C.dow(d);
     const hol = C.holidayName(d, opt());
@@ -1416,6 +1585,21 @@ const Sync = (() => {
     if (res && res.capped) notes += `<div class="notice danger">⚠ <div><b>Zeitverstoß:</b> mehr als 10 Std. gearbeitet (${nf(raw)} h). Gezählt werden nur 10 Std.</div></div>`;
     const pauseLbl = special ? `Wochenende: ${pause ? '30 min Mittag' : 'keine Pause'}` : `Pausen ${pause} min`;
     const modeLbl = ui.half ? '½ Urlaubstag' : 'normaler Tag';
+    const live = `<div class="worked"><span class="k">Gearbeitet (Industriestunden)</span><span class="v num">${res ? H(res.hours) : '– h'}</span></div>
+      ${notes}
+      <button class="btn mt" data-act="saveEntry" ${!res || blocked ? 'disabled' : ''}>${entry ? 'Eintrag aktualisieren' : 'Zeit speichern'}</button>`;
+    const tiles = targets.map((t) => { const at = C.leaveAt(ui.start, pauseFor(t), t); return `<button type="button" class="tile ${targets.length === 1 ? 'single' : ''} ${at && at === ui.end ? 'on' : ''}" data-act="setEnd" data-t="${at || ''}" ${at ? '' : 'disabled'}><div class="k">${D1(t)} Std.</div><div class="v num">${at ?? '–'}</div></button>`; }).join('');
+    return { s, d, w, special, soll, live, tiles, summary: `${pauseLbl} · ${modeLbl}` };
+  }
+  function updateFA() {
+    if (ui.tab !== 'feierabend') return;
+    recompute();
+    const f = faParts();
+    const a = document.getElementById('fa-live'), b = document.getElementById('fa-tiles'), c = document.getElementById('fa-sum');
+    if (a) a.innerHTML = f.live; if (b) b.innerHTML = f.tiles; if (c) c.textContent = f.summary;
+  }
+  function pageFeierabend() {
+    const { s, d, w, special, soll, live, tiles, summary } = faParts();
     return `${ampel()}
     <section class="card">
       <label class="label" for="work-date">Arbeitstag</label>
@@ -1424,16 +1608,14 @@ const Sync = (() => {
         <div><label class="label" for="work-start">Beginn</label><input id="work-start" class="field big" type="time" value="${esc(ui.start)}" data-bind="start"></div>
         <div><label class="label" for="work-end">Ende (Wunsch)</label><input id="work-end" class="field big" type="time" value="${esc(ui.end)}" data-bind="end"></div>
       </div>
-      <div class="worked"><span class="small" style="opacity:.85">Gearbeitet (Industriestd.)</span><span class="v num">${res ? H(res.hours) : '– h'}</span></div>
-      ${notes}
-      <button class="btn mt" data-act="saveEntry" ${!res || blocked ? 'disabled' : ''}>${entry ? 'Eintrag aktualisieren' : 'Zeit speichern'}</button>
+      <div id="fa-live">${live}</div>
     </section>
     <section class="card">
       <h2>Gehen um … <span class="xs muted" style="text-transform:none;letter-spacing:0;font-weight:500">· antippen übernimmt die Zeit</span></h2>
-      <div class="tiles">${targets.map((t) => { const at = C.leaveAt(ui.start, pauseFor(t), t); return `<button class="tile ${targets.length === 1 ? 'single' : ''} ${t === 10 ? 'max' : ''} ${at && at === ui.end ? 'on' : ''}" data-act="setEnd" data-t="${at || ''}" ${at ? '' : 'disabled'}><div class="k">${D1(t)} Std.${t === 10 ? ' · max' : ''}</div><div class="v num">${at ?? '–'}</div></button>`; }).join('')}</div>
+      <div class="tiles" id="fa-tiles">${tiles}</div>
     </section>
     <details class="fold" ${ui.foldOpen ? 'open' : ''} data-fold="foldOpen">
-      <summary><span>${pauseLbl} · ${modeLbl}</span>${I.chev}</summary>
+      <summary><span id="fa-sum">${summary}</span>${I.chev}</summary>
       <div class="body">
         <div class="minirow">
           <button class="chip" aria-pressed="${ui.bz && !ui.half}" data-act="toggle" data-k="bz" ${special || ui.half ? 'disabled' : ''}>Brotzeit ${s.arbeit.brotzeit}</button>
@@ -1445,6 +1627,17 @@ const Sync = (() => {
   }
 
   // ---------- Seite: Mehrarbeit ----------
+  /** Schlichte Aufstellung: wie sich die Mehrarbeit zusammensetzt (Stunden + €) */
+  function zusTable(p, mehr, nach = 0) {
+    if (!(mehr > 0)) return '';
+    const show = S().lohn.zeigen;
+    return `<div class="zus">
+      <div class="zr"><span>Mehrarbeit${nach > 0 ? ` <span class="badge nach">${H(nach, 1)} nachbeantragt</span>` : ''}</span><b class="num">${H(mehr)}</b>${show ? `<span class="num">${EUR(p.base)}</span>` : ''}</div>
+      <div class="zr sub"><span>Zuschlag 25 %</span><b class="num">${H(p.h25)}</b>${show ? `<span class="num">${EUR(p.z25)}</span>` : ''}</div>
+      ${p.h50 > 0 ? `<div class="zr sub"><span>Zuschlag 50 %</span><b class="num">${H(p.h50)}</b>${show ? `<span class="num">${EUR(p.z50)}</span>` : ''}</div>` : ''}
+      ${show ? `<div class="zr tot"><span>Gesamt brutto</span><b></b><span class="num">${EUR(p.total)}</span></div>` : ''}
+    </div>`;
+  }
   function weekStats(w) {
     const es = w.days.filter((x) => x.entry && !(x.absence && x.absence.full));
     if (!es.length) return null;
@@ -1467,25 +1660,25 @@ const Sync = (() => {
       const a = ws.st0[i], b = ws.en[i];
       const sollEnd = d.target > 0 ? a + d.target * 60 + (d.entry.pause || 0) : null;
       return `<text x="2" y="${y + 13}" font-size="10" font-weight="700" fill="currentColor">${WD[C.dow(d.date)]}</text>
-        <rect x="${x(a)}" y="${y + 3}" width="${Math.max(2, x(Math.min(b, sollEnd ?? a)) - x(a))}" height="14" rx="4" fill="var(--primary)" opacity=".55"/>
-        ${sollEnd !== null && b > sollEnd ? `<rect x="${x(sollEnd)}" y="${y + 3}" width="${x(b) - x(sollEnd)}" height="14" rx="4" fill="var(--success)"/>` : ''}
-        ${sollEnd === null ? `<rect x="${x(a)}" y="${y + 3}" width="${x(b) - x(a)}" height="14" rx="4" fill="var(--success)"/>` : ''}
-        <circle cx="${x(a)}" cy="${y + 10}" r="3.5" fill="var(--c-zk)"/><circle cx="${x(b)}" cy="${y + 10}" r="3.5" fill="var(--danger)"/>`;
+        <rect x="${x(a)}" y="${y + 3}" width="${Math.max(2, x(Math.min(b, sollEnd ?? a)) - x(a))}" height="14" rx="4" fill="var(--primary)" opacity=".3"/>
+        ${sollEnd !== null && b > sollEnd ? `<rect x="${x(sollEnd)}" y="${y + 3}" width="${x(b) - x(sollEnd)}" height="14" rx="4" fill="var(--primary)"/>` : ''}
+        ${sollEnd === null ? `<rect x="${x(a)}" y="${y + 3}" width="${x(b) - x(a)}" height="14" rx="4" fill="var(--primary)"/>` : ''}
+        <circle cx="${x(a)}" cy="${y + 10}" r="3" fill="var(--card)" stroke="var(--fg)" stroke-width="1.5"/><circle cx="${x(b)}" cy="${y + 10}" r="3" fill="var(--fg)"/>`;
     }).join('');
-    const avgLine = `<line x1="${x(ws.avgStart)}" x2="${x(ws.avgStart)}" y1="${top}" y2="${h - 6}" stroke="var(--c-zk)" stroke-dasharray="3 3"/><line x1="${x(ws.avgEnd)}" x2="${x(ws.avgEnd)}" y1="${top}" y2="${h - 6}" stroke="var(--danger)" stroke-dasharray="3 3"/>`;
+    const avgLine = `<line x1="${x(ws.avgStart)}" x2="${x(ws.avgStart)}" y1="${top}" y2="${h - 6}" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="3 3"/><line x1="${x(ws.avgEnd)}" x2="${x(ws.avgEnd)}" y1="${top}" y2="${h - 6}" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="3 3"/>`;
     // Dauer-Balken
     const maxD = Math.max(10, ...ws.es.map((d) => d.entry.hours));
     const bw = 300, bh = 90;
     const colW = bw / Math.max(5, ws.es.length);
     const by = (v) => bh - 14 - (v / maxD) * (bh - 24);
-    const bars = ws.es.map((d, i) => { const v = d.entry.hours; const cx = i * colW + colW / 2; return `<rect x="${cx - colW * 0.3}" y="${by(v)}" width="${colW * 0.6}" height="${bh - 14 - by(v)}" rx="4" fill="${v > (d.target || 0) ? 'var(--success)' : 'var(--primary)'}" opacity="${d.target === 0 ? 1 : 0.85}"/><text x="${cx}" y="${by(v) - 3}" font-size="9.5" text-anchor="middle" font-weight="700" fill="currentColor">${nf(v, 1)}</text><text x="${cx}" y="${bh - 2}" font-size="9.5" text-anchor="middle" fill="currentColor" fill-opacity=".6">${WD[C.dow(d.date)]}</text>`; }).join('');
+    const bars = ws.es.map((d, i) => { const v = d.entry.hours; const cx = i * colW + colW / 2; return `<rect x="${cx - colW * 0.3}" y="${by(v)}" width="${colW * 0.6}" height="${bh - 14 - by(v)}" rx="4" fill="var(--primary)" opacity="${v > (d.target || 0) ? 1 : 0.35}"/><text x="${cx}" y="${by(v) - 3}" font-size="9.5" text-anchor="middle" font-weight="700" fill="currentColor">${nf(v, 1)}</text><text x="${cx}" y="${bh - 2}" font-size="9.5" text-anchor="middle" fill="currentColor" fill-opacity=".6">${WD[C.dow(d.date)]}</text>`; }).join('');
     return `<div class="anal">
       <div class="label">Kommen &amp; Gehen</div>
       <svg viewBox="0 0 ${W} ${h}" width="100%" style="color:var(--fg)">${grid}${avgLine}${rows}</svg>
-      <div class="legend"><span><i style="background:var(--c-zk);border-radius:50%"></i>Kommen</span><span><i style="background:var(--danger);border-radius:50%"></i>Gehen</span><span><i style="background:var(--success)"></i>über Soll</span><span>– – Ø</span></div>
+      <div class="legend"><span><i style="background:var(--card);border:1.5px solid var(--fg);border-radius:50%"></i>Kommen</span><span><i style="background:var(--fg);border-radius:50%"></i>Gehen</span><span><i style="background:var(--primary)"></i>über Soll</span><span>– – Durchschnitt</span></div>
       <div class="label mt">Stunden pro Tag</div>
       <svg viewBox="0 0 ${bw} ${bh}" width="100%" style="color:var(--fg)"><line x1="0" x2="${bw}" y1="${by(soll)}" y2="${by(soll)}" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="4 3"/><text x="${bw}" y="${by(soll) - 3}" font-size="9" text-anchor="end" fill="currentColor" fill-opacity=".55">Soll ${D1(soll)} h</text>${bars}</svg>
-      <div class="grid4 stats">
+      <div class="grid2 stats">
         <div><span>Ø Kommen</span><b>${minToClock(ws.avgStart)}</b></div><div><span>Ø Gehen</span><b>${minToClock(ws.avgEnd)}</b></div>
         <div><span>Ø Dauer</span><b>${nf(ws.avgDur, 1)} h</b></div><div><span>Längster</span><b>${WD[C.dow(ws.longest.date)]} ${nf(ws.longest.entry.hours, 1)}</b></div>
       </div>
@@ -1526,24 +1719,17 @@ const Sync = (() => {
       </div>
       <div class="kpis">
         <div class="kpi"><div class="k">Gearbeitet</div><div class="v num">${H(w.worked)}</div></div>
-        <div class="kpi hl ${w.mehrNach > 0 ? 'nach' : ''}"><div class="k">Mehrarbeit</div><div class="v num">${H(w.mehr)}</div>${w.mehrNach > 0 ? `<div class="xs"><b>davon ${H(w.mehrNach, 1)} nachbeantr.</b></div>` : ''}</div>
-        <div class="kpi zkk"><div class="k">Zeitkonto</div><div class="v num">${sH(w.zkChange)}</div></div>
+        <div class="kpi"><div class="k">Mehrarbeit</div><div class="v num acc">${H(w.mehr)}</div></div>
+        <div class="kpi"><div class="k">Zeitkonto</div><div class="v num">${sH(w.zkChange)}</div></div>
       </div>
-      ${w.mehr > 0 ? `<div class="zrows">
-        <div class="zr z25"><span class="zb">+25 %</span><span class="grow">${H(w.pay.h25)}</span>${show ? `<b>${EUR(p.z25)}</b>` : ''}</div>
-        <div class="zr z50 ${p.h50 ? '' : 'off'}"><span class="zb">+50 %</span><span class="grow">${H(p.h50)}</span>${show ? `<b>${EUR(p.z50)}</b>` : ''}</div>
-      </div>` : ''}
+      ${zusTable(w.pay, w.mehr, w.mehrNach)}
       <div class="days">${days}</div>
-      <button class="morebtn" data-act="openWeek" data-w="${w.monday}">${open ? 'Auswertung ausblenden ▲' : 'Auswertung & Diagramme ▼'}</button>
+      <button class="morebtn" data-act="openWeek" data-w="${w.monday}">${open ? 'Diagramme ausblenden ▲' : 'Diagramme ▼'}</button>
       ${open && ws ? `${weekChart(w, ws)}
         ${diff !== null ? `<p class="xs muted mt-s">Mehrarbeit ggü. Vorwoche (KW ${prev.kw}): <b class="${diff > 0 ? 'pos' : diff < 0 ? 'neg' : ''}">${sH(diff)}</b></p>` : ''}
         ${w.offset > 0 ? `<p class="xs muted mt-s">${H(w.offset)} Plus dieser Woche wurden mit dem Zeitkonto-Tag verrechnet (zählen nicht als Mehrarbeit).</p>` : ''}
         ${w.bonus > 0 ? `<p class="xs muted mt-s">Samstag ins Zeitkonto: +${H(w.bonus)} Zeitzuschlag (25 %).</p>` : ''}
-        ${w.mehr > 0 && show ? `<dl class="money">
-          <div><dt>Grundvergütung (${H(w.mehr)} × ${EUR(calc.rate)})</dt><dd>${EUR(p.base)}</dd></div>
-          <div class="hl25"><dt>Zuschlag 25 % auf ${H(p.h25)}</dt><dd>${EUR(p.z25)}</dd></div>
-          <div class="hl50"><dt>Zuschlag 50 % auf ${H(p.h50)}</dt><dd>${EUR(p.z50)}</dd></div>
-          <div class="sum"><dt>Gesamt brutto</dt><dd>${EUR(p.total)}</dd></div></dl>` : ''}` : ''}
+` : ''}
     </section>`;
   }
   function monthCard(m) {
@@ -1553,13 +1739,12 @@ const Sync = (() => {
     return `<section class="card">
       <div class="between"><h3>${monthName(m.month)}</h3><span class="big-r num">${show ? EUR(p.total) : H(m.mehr)}</span></div>
       <div class="kpis">
-        <div class="kpi hl"><div class="k">Mehrarbeit</div><div class="v num">${H(m.mehr)}</div></div>
-        <div class="kpi"><div class="k">Zeitkonto</div><div class="v num">${sH(m.zkChange)}</div></div>
         <div class="kpi"><div class="k">Gearbeitet</div><div class="v num">${H(m.worked, 1)}</div></div>
+        <div class="kpi"><div class="k">Mehrarbeit</div><div class="v num acc">${H(m.mehr)}</div></div>
+        <div class="kpi"><div class="k">Zeitkonto</div><div class="v num">${sH(m.zkChange)}</div></div>
       </div>
-      ${m.mehr > 0 ? `<div class="zrows"><div class="zr z25"><span class="zb">+25 %</span><span class="grow">${H(p.h25)}</span>${show ? `<b>${EUR(p.z25)}</b>` : ''}</div><div class="zr z50 ${p.h50 ? '' : 'off'}"><span class="zb">+50 %</span><span class="grow">${H(p.h50)}</span>${show ? `<b>${EUR(p.z50)}</b>` : ''}</div></div>` : ''}
+      ${zusTable(p, m.mehr, m.mehrNach)}
       ${K ? `<div class="mt"><div class="xs muted">MEA-Kontingent ${H(m.used, 1)} von ${H(K, 1)}${m.nach ? ` · inkl. <span class="badge nach">${H(m.nach, 1)} nachbeantragt</span>` : ''}</div><div class="progress mt-s"><i style="width:${usedPct}%"></i></div></div>` : ''}
-      ${m.mehr > 0 && show ? `<dl class="money"><div><dt>Grundvergütung</dt><dd>${EUR(p.base)}</dd></div><div class="hl25"><dt>Zuschlag 25 %</dt><dd>${EUR(p.z25)}</dd></div><div class="hl50"><dt>Zuschlag 50 %</dt><dd>${EUR(p.z50)}</dd></div><div class="sum"><dt>Gesamt brutto</dt><dd>${EUR(p.total)}</dd></div></dl>` : ''}
       <p class="xs muted mt-s">${m.days} Tage erfasst · Zuschläge werden je Woche berechnet</p>
     </section>`;
   }
@@ -1572,13 +1757,13 @@ const Sync = (() => {
       <div class="between"><button class="iconbtn" data-act="year" data-d="-1">${I.left}</button><h3>Jahr ${y}</h3><button class="iconbtn" data-act="year" data-d="1">${I.right}</button></div>
       <div class="kpis">
         <div class="kpi"><div class="k">Gearbeitet</div><div class="v num">${H(tot.worked, 0)}</div></div>
-        <div class="kpi hl"><div class="k">Mehrarbeit</div><div class="v num">${H(tot.mehr, 1)}</div></div>
+        <div class="kpi"><div class="k">Mehrarbeit</div><div class="v num acc">${H(tot.mehr, 1)}</div></div>
         <div class="kpi"><div class="k">Ins Zeitkonto</div><div class="v num">${sH(tot.zk)}</div></div>
       </div>
       <div class="chart">${ms.map((m, i) => `<div class="c" title="${MON[i]}"><b style="height:${m ? (m.mehr / max) * 100 : 0}%"></b><b class="zk" style="height:${m && m.zkChange > 0 ? (m.zkChange / max) * 100 : 0}%;opacity:.7"></b><span>${MON[i].slice(0, 1)}</span></div>`).join('')}</div>
       <div class="legend"><span><i style="background:var(--primary)"></i>Mehrarbeit</span><span><i style="background:var(--c-zk)"></i>ins Zeitkonto</span></div>
-      <div class="zrows"><div class="zr z25"><span class="zb">+25 %</span><span class="grow">${H(tot.h25, 1)}</span>${S().lohn.zeigen ? `<b>${EUR(tot.z25)}</b>` : ''}</div><div class="zr z50 ${tot.h50 ? '' : 'off'}"><span class="zb">+50 %</span><span class="grow">${H(tot.h50, 1)}</span>${S().lohn.zeigen ? `<b>${EUR(tot.z50)}</b>` : ''}</div></div>
-      <dl class="money"><div><dt>Erfasste Arbeitstage</dt><dd>${tot.days}</dd></div><div><dt>davon nachbeantragt</dt><dd>${H(tot.nach, 1)}</dd></div><div class="sum"><dt>Mehrarbeit brutto gesamt</dt><dd>${EUR(tot.pay)}</dd></div></dl>
+      ${zusTable({ h25: tot.h25, h50: tot.h50, base: tot.pay - tot.z25 - tot.z50, z25: tot.z25, z50: tot.z50, total: tot.pay }, tot.mehr, tot.nach)}
+      <p class="xs muted mt-s">${tot.days} Arbeitstage erfasst</p>
     </section>`;
   }
   function pageMehrarbeit() {
@@ -1615,9 +1800,10 @@ const Sync = (() => {
     <section class="card">
       <div class="between"><button class="iconbtn" data-act="kmonth" data-d="-1">${I.left}</button><h3>${monthName(m)}</h3><button class="iconbtn" data-act="kmonth" data-d="1">${I.right}</button></div>
       <div class="grid2 mt">
-        <div><label class="label" for="kont">MEA-Kontingent (h)</label><input id="kont" class="field big2" inputmode="decimal" placeholder="z. B. 20" value="${deNum(st.kontingent[m] ?? '')}" data-kont="${m}"></div>
-        <div><span class="label">Geleistet / offen</span><div class="field big2 num" style="display:flex;align-items:center;background:var(--secondary)">${H(mm ? mm.mehr : 0, 1)} / ${k.has ? H(Math.max(0, k.open), 1) : '–'}</div></div>
+        <div style="grid-column:1/-1"><label class="label" for="kont">MEA-Kontingent (h)</label><input id="kont" class="field big2" inputmode="decimal" placeholder="z. B. 20" value="${deNum(st.kontingent[m] ?? '')}" data-kont="${m}"></div>
+        <div></div>
       </div>
+      <div class="kstat mt"><div><span>Geleistet</span><b class="num">${H(mm ? mm.mehr : 0, 1)}</b></div><div><span>Offen</span><b class="num acc">${k.has ? H(Math.max(0, k.open), 1) : '–'}</b></div></div>
       ${k.has ? `<div class="progress mt"><i style="width:${Math.min(100, (k.used / k.k) * 100)}%"></i></div>` : '<p class="hint">Ohne Kontingent laufen alle Überstunden ins Zeitkonto.</p>'}
       ${avg}
       ${z > s.zk.max ? `<div class="notice danger">⚠ <div><b>Vorsicht, Stundenkonto voll!</b> Zeitkonto ${sH(z)} – es wird weiter mitgezählt.</div></div>` : ''}
@@ -1682,7 +1868,7 @@ const Sync = (() => {
     const tarifBasis = v.hasStand ? v.stand : (v.anspruch ?? cfg.tarif) + (v.carryIn || 0);
     const tarifGen = v.hasStand ? (v.taken || 0) - (v.vorStand || 0) : v.taken || 0;
     const zkDays = v.zkDays || 0, fzaDays = v.fzaDays || 0;
-    const tile = (cls, name, val, sub, side = '') => `<div class="b ${cls}"><div class="tn">${name}</div><div class="v num">${val}</div><div class="s"><span>${sub}</span>${side ? `<span class="side">${side}</span>` : ''}</div></div>`;
+    const tile = (cls, name, val, sub, side = '') => `<div class="b ${cls}"><div class="tn"><span class="tdot ${cls}"></span>${name}</div><div class="v num">${val}</div><div class="s">${sub}</div>${side ? `<div class="side">${side}</div>` : ''}</div>`;
     const m = ui.cal;
     // Einträge des Jahres
     const items = [];
@@ -1700,12 +1886,15 @@ const Sync = (() => {
     // Jahresraster: 12 Monate × 31 Tage
     let grid = '<div class="ygrid"><div></div>';
     for (let d = 1; d <= 31; d++) grid += `<div class="yh">${d % 5 === 0 || d === 1 ? d : ''}</div>`;
-    for (let mo = 1; mo <= 12; mo++) {
-      grid += `<div class="ym" data-act="calTo" data-m="${y}-${String(mo).padStart(2, '0')}">${MON[mo - 1].slice(0, 3)}</div>`;
-      const dim = new Date(y, mo, 0).getDate();
+    const nextQ = st.absences.some((a) => a.to >= `${y + 1}-01-01` && a.from <= `${y + 1}-03-31`);
+    const rows = Array.from({ length: 12 }, (_, i) => [y, i + 1]).concat(nextQ ? [[y + 1, 1], [y + 1, 2], [y + 1, 3]] : []);
+    for (const [yy, mo] of rows) {
+      if (yy !== y && mo === 1) grid += `<div class="ysep">${yy} · Resturlaub nutzbar bis 31.03.</div>`;
+      grid += `<div class="ym" data-act="calTo" data-m="${yy}-${String(mo).padStart(2, '0')}">${MON[mo - 1].slice(0, 3)}${yy !== y ? `<small>${String(yy).slice(2)}</small>` : ''}</div>`;
+      const dim = new Date(yy, mo, 0).getDate();
       for (let d = 1; d <= 31; d++) {
         if (d > dim) { grid += '<i class="yc x"></i>'; continue; }
-        const iso = `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const iso = `${yy}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         const a = calc.absMap.get(iso), wd = C.dow(iso), hol = C.holidayName(iso, opt());
         const c = a ? `t-${a.type}${a.full ? '' : ' half'}` : hol ? 'hol' : wd === 0 || wd === 6 ? 'we' : '';
         grid += `<i class="yc ${c} ${iso === today ? 'td' : ''}" title="${dShort(iso)}${a ? ' · ' + C.TYPES[a.type].label : hol ? ' · ' + esc(hol) : ''}"></i>`;
@@ -1746,6 +1935,11 @@ const Sync = (() => {
       ${grid}
       <p class="xs muted" style="margin:4px 0 0">Monat antippen = Kalender springt dorthin</p>
       ${groups || '<p class="empty" style="color:var(--muted)">Für dieses Jahr ist noch nichts eingetragen.</p>'}
+    </section>
+    <section class="card"><h2>Urlaubsplanung an den Chef</h2>
+      <p class="small muted">Alle geplanten freien Tage ab heute (ohne Krankheitstage) als fertige Mail – mit Kategorie und Anzahl Tage.</p>
+      <button class="btn" data-act="vacMail">📧 Urlaubsplanung als Mail</button>
+      ${!S().mail.an ? '<p class="hint">Tipp: Anrede, Mail-Adresse und deinen Namen unter Mehr → Urlaub & Konten hinterlegen.</p>' : ''}
     </section>`;
   }
   function openAbsenceSheet(from, to) {
@@ -1834,12 +2028,36 @@ const Sync = (() => {
       <dl class="money ${cls}" style="margin-top:0">${lines.map((l) => `<div class="${l.cls || ''}"><dt>${l.k}</dt><dd>${nf(l.v)} €</dd></div>`).join('')}<div class="sum"><dt>Brutto gesamt</dt><dd>${nf(n.gross)} €</dd></div></dl>
       <h2 class="mt">Abzüge</h2>
       <dl class="money ${cls}" style="margin-top:0">
-        <div><dt>Lohnsteuer</dt><dd>−${nf(n.lst)} €</dd></div>${n.soli > 0.005 ? `<div><dt>Solidaritätszuschlag</dt><dd>−${nf(n.soli)} €</dd></div>` : ''}${S2.steuer.kirche ? `<div><dt>Kirchensteuer</dt><dd>−${nf(n.kist)} €</dd></div>` : ''}
-        <div><dt>Krankenversicherung</dt><dd>−${nf(n.sv.kv)} €</dd></div><div><dt>Pflegeversicherung</dt><dd>−${nf(n.sv.pv)} €</dd></div>
-        <div><dt>Rentenversicherung</dt><dd>−${nf(n.sv.rv)} €</dd></div><div><dt>Arbeitslosenversicherung</dt><dd>−${nf(n.sv.av)} €</dd></div>
+        <div class="grp"><dt>Steuern</dt><dd>−${nf(n.taxSum)} €</dd></div>
+        <div><dt>Lohnsteuer <small>StKl ${['I', 'II', 'III', 'IV', 'V', 'VI'][S2.steuer.klasse - 1]}</small></dt><dd>−${nf(n.lst)} €</dd></div>
+        <div><dt>Solidaritätszuschlag <small>${n.soli > 0.005 ? '5,5 % (Milderungszone)' : `0 € – unter Freigrenze ${nf(n.jahr.soliFrei, 0)} €/Jahr`}</small></dt><dd>−${nf(n.soli)} €</dd></div>
+        <div><dt>Kirchensteuer <small>${S2.steuer.kirche ? `${nf(n.jahr.kistSatz * 100, 0)} % der Lohnsteuer` : 'keine'}</small></dt><dd>−${nf(n.kist)} €</dd></div>
+        <div class="grp"><dt>Sozialversicherung</dt><dd>−${nf(n.svSum)} €</dd></div>
+        <div><dt>Krankenvers. <small>${nf(n.rates.kv * 100)} % von ${nf(n.kvBase, 0)} €</small></dt><dd>−${nf(n.sv.kv)} €</dd></div>
+        <div><dt>Pflegevers. <small>${nf(n.rates.pv * 100)} %${Number(S2.steuer.kinderPV) === 0 ? ' inkl. Kinderlosen-Zuschlag' : ''}</small></dt><dd>−${nf(n.sv.pv)} €</dd></div>
+        <div><dt>Rentenvers. <small>${nf(n.rates.rv * 100, 1)} % von ${nf(n.rvBase, 0)} €</small></dt><dd>−${nf(n.sv.rv)} €</dd></div>
+        <div><dt>Arbeitslosenvers. <small>${nf(n.rates.av * 100, 1)} %</small></dt><dd>−${nf(n.sv.av)} €</dd></div>
         ${n.abzug ? `<div><dt>Sonstige Abzüge (netto)</dt><dd>−${nf(n.abzug)} €</dd></div>` : ''}
         <div class="sum"><dt>Netto</dt><dd>${nf(n.net)} €</dd></div>
       </dl>
+      <details class="mini mt"><summary>So wird gerechnet</summary>
+        <dl class="money ${cls}">
+          <div><dt>Laufender Lohn × 12 (Jahresbasis)</dt><dd>${nf(n.laufend * 12)} €</dd></div>
+          ${n.einmal ? `<div><dt>Einmalzahlung (Jahreslohn-Methode)</dt><dd>${nf(n.einmal)} €</dd></div>` : ''}
+          <div><dt>− Vorsorgepauschale</dt><dd>${nf(n.jahr.vors)} €</dd></div>
+          <div><dt>− Arbeitnehmer- & Sonderausgaben-Pauschbetrag</dt><dd>${nf(n.jahr.pausch)} €</dd></div>
+          ${n.jahr.entl ? `<div><dt>− Entlastungsbetrag Alleinerziehende</dt><dd>${nf(n.jahr.entl)} €</dd></div>` : ''}
+          <div class="sum"><dt>Zu versteuerndes Einkommen (Jahr)</dt><dd>${nf(n.jahr.zve, 0)} €</dd></div>
+          <div><dt>Lohnsteuer Jahr</dt><dd>${nf(n.jahr.lst, 0)} €</dd></div>
+          <div><dt>Durchschnittssteuersatz</dt><dd>${nf(n.jahr.zve ? (n.jahr.lst / (n.laufend * 12)) * 100 : 0, 1)} %</dd></div>
+          <div><dt>Grenzsteuersatz (nächster Euro)</dt><dd>${nf(n.jahr.grenz * 100, 1)} %</dd></div>
+          <div><dt>Bundesland</dt><dd>${C.LAENDER[S2.arbeit.land]}</dd></div>
+          <div><dt>Kinderfreibeträge / Kinder (PV)</dt><dd>${D1(Number(S2.steuer.kinderFB) || 0)} / ${Number(S2.steuer.kinderPV) || 0}</dd></div>
+          <div><dt>KV-Zusatzbeitrag</dt><dd>${nf(S2.steuer.kvZusatz)} %</dd></div>
+          <div><dt>Beitragsbemessungsgrenze KV/PV · RV/AV</dt><dd>${nf(C.P.bbgKV)} € · ${nf(C.P.bbgRV, 0)} €</dd></div>
+        </dl>
+        <p class="xs muted">Lohnsteuer nach § 32a EStG 2026 und Programmablaufplan (Vorsorgepauschale), SV-Werte 2026. Arbeitgeberanteile sind nicht abgezogen.</p>
+      </details>
     </section>
     <section class="card"><h2>Lohnt sich Mehrarbeit?</h2>
       <div class="grid2 ${cls}">
@@ -1890,7 +2108,7 @@ const Sync = (() => {
         ${gf('alter', `Alter ${info('alter')}`, 'inputmode="numeric" placeholder="z. B. 35"')}
         ${gf('kinderPV', 'Kinder (PV)', 'inputmode="numeric"')}${gf('kinderFB', 'Kinderfreibeträge')}</div>
         <label class="switch"><span>Kirchensteuer</span><input type="checkbox" data-god="kirche" ${g.kirche ? 'checked' : ''}></label>
-        <details class="fold" style="margin:6px 0 0;box-shadow:none" ${ui.godSZ ? 'open' : ''} data-fold="godSZ"><summary><span>Sonderzulagen ${Number(g.zulage) || Number(g.einmal) || Number(g.utage) ? '· aktiv' : ''}</span>${I.chev}</summary><div class="body"><div class="grid2">${gf('zulage', 'Zulagen monatl. (€)')}${gf('einmal', 'Einmalzahlung (€)', 'inputmode="decimal"', 'z. B. Weihnachtsgeld')}${gf('utage', 'Urlaubstage (Urlaubsgeld)')}</div></div></details>
+        <details class="fold" style="margin:6px 0 0;box-shadow:none" ${ui.godSZ ? 'open' : ''} data-fold="godSZ"><summary><span>Sonderzulagen ${Number(g.zulage) || Number(g.einmal) || Number(g.utage) ? '· aktiv' : ''}</span>${I.chev}</summary><div class="body"><div class="grid2 even">${gf('zulage', 'Zulagen / Monat (€)')}${gf('einmal', 'Einmalzahlung (€)', 'inputmode="decimal" placeholder="z. B. Weihnachtsgeld"')}${gf('utage', 'Urlaubstage (für Urlaubsgeld)')}<div></div></div></div></details>
         <div class="grid2 mt"><button class="btn soft" data-act="godReset">Aus meinen Daten</button><button class="btn" data-act="godCalc">Berechnen</button></div>
       </section>
       ${nettoResult(lines, laufend, einmal, S2, 6, 0, rate, '', '', manual ? 0 : mea)}
@@ -1909,7 +2127,7 @@ const Sync = (() => {
     for (const x of s.lohn.sonder) if (x.art === 'einmalig' && Number(x.monat) === mo && !Number(x.wert)) miss.push(`${esc(x.name || 'Sonderzahlung')} ist für ${MON[mo - 1]} angelegt, aber ohne Betrag.`);
     const src = mp.src;
     const srcHas = Object.keys(st.entries).some((d) => d.startsWith(src));
-    if (!srcHas) miss.push(`Für ${monthName(src)} sind keine Arbeitszeiten erfasst – Mehrarbeit ${s.lohn.auszahlung === 'folgemonat' ? 'aus dem Vormonat ' : ''}fehlt deshalb.`);
+    if (!srcHas) miss.push(`Für ${monthName(src)} sind keine Arbeitszeiten erfasst – Mehrarbeit ist deshalb nicht enthalten.`);
     const note = miss.length ? `<div class="notice warn"><div><b>Dafür fehlen mir noch Infos:</b><ul style="margin:4px 0 0;padding-left:18px">${miss.map((x) => `<li>${x}</li>`).join('')}</ul><button class="btn sm soft mt-s" data-act="goSet" data-sec="steuer">Zu den Einstellungen</button></div></div>` : '';
     // Jahr
     const y = Number(m.slice(0, 4));
@@ -1950,17 +2168,20 @@ const Sync = (() => {
     return `<h1>Einstellungen</h1>
     ${!storageOk ? '<div class="notice danger" style="margin-bottom:14px">Dein Browser erlaubt hier kein dauerhaftes Speichern. Sichere deine Daten unter „Datentransport“.</div>' : ''}
     ${sec('design', 'Design', `<div class="themes">${THEMES.map(([id, l, bg]) => `<button class="th" aria-pressed="${s.theme === id}" data-act="theme" data-id="${id}"><div class="pv" style="background:${bg}">${FX.preview(id)}</div><div class="nm">${l}</div></button>`).join('')}</div>`)}
-    ${sec('arbeit', 'Arbeitszeit & Feiertage', `<div class="grid2">${fld('Wochenstunden', 'arbeit.wochenstunden', deNum(s.arbeit.wochenstunden), 'inputmode="decimal"', `= ${D1(C.tagessoll(s))} Std./Tag`)}<div></div>${fld('Brotzeit (min)', 'arbeit.brotzeit', s.arbeit.brotzeit, 'inputmode="numeric"')}${fld('Mittag (min)', 'arbeit.mittag', s.arbeit.mittag, 'inputmode="numeric"')}</div>
+    ${sec('arbeit', 'Arbeitszeit & Feiertage', `<div class="grid2"><div><label class="label">Wochenstunden</label><input class="field" data-set="arbeit.wochenstunden" value="${esc(deNum(s.arbeit.wochenstunden))}" inputmode="decimal"><div class="hint" id="tsoll">= ${D1(C.tagessoll(s))} Std./Tag</div></div><div></div>${fld('Brotzeit (min)', 'arbeit.brotzeit', s.arbeit.brotzeit, 'inputmode="numeric"')}${fld('Mittag (min)', 'arbeit.mittag', s.arbeit.mittag, 'inputmode="numeric"')}</div>
       <div class="mt"><label class="label">Bundesland (Feiertage)</label><select class="field" data-set="arbeit.land" data-struct="1">${Object.entries(C.LAENDER).map(([k, l]) => `<option value="${k}" ${s.arbeit.land === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
       ${s.arbeit.land === 'BY' ? sw('Mariä Himmelfahrt (15.08.) frei', 'arbeit.mariae', s.arbeit.mariae, 'gilt in überwiegend katholischen Gemeinden') : ''}
       ${sw('Heiligabend = halber Arbeitstag', 'arbeit.halb24', s.arbeit.halb24, 'für den freien Tag ist nur ½ Urlaubstag nötig')}${sw('Silvester = halber Arbeitstag', 'arbeit.halb31', s.arbeit.halb31, 'für den freien Tag ist nur ½ Urlaubstag nötig')}`)}
-    ${sec('verdienst', 'Verdienst', `<div class="grid2">${fld('Grundlohn / Monat (€ brutto)', 'lohn.grundlohn', deNum(s.lohn.grundlohn || ''), 'inputmode="decimal" placeholder="z. B. 4200"')}${fld('Stundenlohn (€)', 'lohn.stundenlohn', deNum(s.lohn.stundenlohn || ''), `inputmode="decimal" placeholder="${auto ? nf(C.stundenlohn(s)) + ' (auto)' : 'z. B. 27,50'}"`, auto ? 'leer = Grundlohn ÷ (Wochenstd. × 4,35)' : '')}</div>
-      ${sw('Lohn in der App anzeigen', 'lohn.zeigen', s.lohn.zeigen, 'aus = alle €-Beträge werden versteckt (z. B. wenn du Kollegen die App zeigst)')}
-      <div><label class="label">Mehrarbeit wird ausgezahlt</label><select class="field" data-set="lohn.auszahlung"><option value="folgemonat" ${s.lohn.auszahlung === 'folgemonat' ? 'selected' : ''}>im Folgemonat</option><option value="gleich" ${s.lohn.auszahlung === 'gleich' ? 'selected' : ''}>im selben Monat</option></select></div>
-      <div class="label mt">Sonderzahlungen</div>${sonder}<button class="btn soft sm" data-act="addSonder">+ Sonderzahlung</button>
-      <div class="label mt">Urlaubsgeld je Tarifurlaubstag</div><div class="grid2">${fld('Faktor', 'urlaub.ugFaktor', deNum(s.urlaub.ugFaktor), 'inputmode="decimal"')}${fld('Teiler', 'urlaub.ugTeiler', deNum(s.urlaub.ugTeiler), 'inputmode="decimal"')}</div>
-      <div class="hint">Grundlohn ÷ Teiler × Faktor${s.lohn.grundlohn ? ` = <b>${EUR((s.lohn.grundlohn / s.urlaub.ugTeiler) * s.urlaub.ugFaktor)}</b> pro Tag` : ''}</div>
-`)}
+    ${sec('verdienst', 'Verdienst', `
+      <div class="subh">💶 Lohn</div>
+      <div class="grid2">${fld('Grundlohn / Monat (€ brutto)', 'lohn.grundlohn', deNum(s.lohn.grundlohn || ''), 'inputmode="decimal" placeholder="z. B. 4.200"')}
+        <div><span class="label">Stundenlohn</span><div class="field calc num" id="slAuto">${nf(C.stundenlohn(s))} €</div><div class="hint" id="slHint">${Number(s.lohn.stundenlohn) ? 'eigener Wert' : `= Grundlohn ÷ (${D1(s.arbeit.wochenstunden)} h × 4,35)`}</div></div></div>
+      <details class="mini"><summary>Anderen Stundenlohn verwenden</summary>${fld('Eigener Stundenlohn (€) – leer = automatisch', 'lohn.stundenlohn', deNum(s.lohn.stundenlohn || ''), 'inputmode="decimal" placeholder="automatisch"')}</details>
+      ${sw('€-Beträge in der App anzeigen', 'lohn.zeigen', s.lohn.zeigen, 'aus = alle Beträge versteckt, z. B. wenn du Kollegen die App zeigst')}
+      <div class="subh">🎁 Sonderzahlungen</div>${sonder}<button class="btn soft sm" data-act="addSonder">+ Sonderzahlung</button>
+      <div class="subh">🌴 Urlaubsgeld je Tarifurlaubstag</div>
+      <div class="grid3">${fld('Faktor', 'urlaub.ugFaktor', deNum(s.urlaub.ugFaktor), 'inputmode="decimal"')}${fld('Teiler', 'urlaub.ugTeiler', deNum(s.urlaub.ugTeiler), 'inputmode="decimal"')}<div><span class="label">pro Tag</span><div class="field calc num" id="ugTag">${nf(((Number(s.lohn.grundlohn) || 0) / (Number(s.urlaub.ugTeiler) || 21.75)) * (Number(s.urlaub.ugFaktor) || 0))} €</div></div></div>
+      <div class="hint">Grundlohn ÷ Teiler × Faktor</div>`)}
     ${sec('mehrarbeit', 'Mehrarbeit & Zeitkonto', `<div class="grid2">${fld(`Zeitkonto-Stand (h) ${info('zk')}`, 'zk.stand', deNum(s.zk.stand), 'inputmode="decimal"')}<div><label class="label">Stand vom</label><input class="field" type="date" data-set="zk.datum" value="${esc(s.zk.datum)}"></div></div>
       <div class="notice info">${zkInfo}</div>
       <div class="grid2 mt">${fld('Maximum (h)', 'zk.max', deNum(s.zk.max), 'inputmode="decimal"')}${fld('Minimum (h)', 'zk.min', deNum(s.zk.min), 'inputmode="decimal"')}</div>
@@ -1976,20 +2197,22 @@ const Sync = (() => {
         <div class="hint">${jc.rest !== undefined && jc.rest !== '' ? `Ab ${jc.restDatum ? dShort(jc.restDatum) : 'heute'} wird jeder geplante Tarifurlaub von ${D1(jc.rest)} Tagen abgezogen → aktuell <b>${D1(yv.rest ?? 0)} T</b> frei. Rest wird bis 31.03.${Y + 1} mitgenommen.` : yv.carryIn ? `${D1(yv.carryIn)} T aus ${Y - 1} kommen dazu (nutzbar bis 31.03.${Y}).` : 'Ohne Stand: Anspruch minus geplanter Urlaub.'}</div>
       </div>
       <div class="label mt">Standard für alle Jahre</div>
-      <div class="grid2">${fld('Tarifurlaub (Tage/Jahr)', 'urlaub.tarifTage', deNum(s.urlaub.tarifTage), 'inputmode="decimal"')}${fld('T-Zug (Tage/Jahr)', 'urlaub.tzugTage', deNum(s.urlaub.tzugTage), 'inputmode="decimal"')}</div>`)}
+      <div class="grid2">${fld('Tarifurlaub (Tage/Jahr)', 'urlaub.tarifTage', deNum(s.urlaub.tarifTage), 'inputmode="decimal"')}${fld('T-Zug (Tage/Jahr)', 'urlaub.tzugTage', deNum(s.urlaub.tzugTage), 'inputmode="decimal"')}</div>
+      <div class="subh">📧 Urlaubsplanung per Mail</div>
+      <div class="grid2">${fld('Anrede', 'mail.anrede', s.mail.anrede, 'placeholder="z. B. Hallo Herr Maier"')}${fld('E-Mail Chef', 'mail.an', s.mail.an, 'type="email" inputmode="email" placeholder="chef@firma.de"')}</div>
+      <div class="grid2 mt-s">${fld('Dein Name (Gruß)', 'mail.name', s.mail.name, 'placeholder="z. B. Daniel"')}<div></div></div>`)}
     ${sec('steuer', 'Steuer (für Netto)', `<div class="grid2"><div><label class="label">Steuerklasse ${info('stkl')}</label><select class="field" data-set="steuer.klasse" data-type="num">${[1, 2, 3, 4, 5, 6].map((k) => `<option value="${k}" ${Number(s.steuer.klasse) === k ? 'selected' : ''}>${['I', 'II', 'III', 'IV', 'V', 'VI'][k - 1]}</option>`).join('')}</select></div>
       ${fld(`KV-Zusatzbeitrag (%) ${info('kv')}`, 'steuer.kvZusatz', deNum(s.steuer.kvZusatz), 'inputmode="decimal"', 'Ø 2026: 2,9 %')}
       ${fld('Kinderfreibeträge', 'steuer.kinderFB', deNum(s.steuer.kinderFB), 'inputmode="decimal"', 'laut Abrechnung, z. B. 0,5 / 1')}${fld('Kinder (Pflegevers.)', 'steuer.kinderPV', s.steuer.kinderPV, 'inputmode="numeric"', 'Anzahl Kinder')}</div>
       <div class="grid2">${fld(`Geburtsjahr ${info('alter')}`, 'steuer.geburtsjahr', s.steuer.geburtsjahr || '', 'inputmode="numeric" placeholder="z. B. 1990"')}<div></div></div>
       ${sw('Kirchensteuer', 'steuer.kirche', s.steuer.kirche)}
       ${!s.steuer.geprueft ? '<button class="btn soft sm" data-act="steuerOk">✓ Angaben stimmen so</button>' : '<p class="xs muted">✓ Steuerdaten geprüft</p>'}`)}
-    ${sec('konto', 'Konto & Cloud-Sync', '<div id="syncinfo">' + syncInfoHtml() + '</div>')}
+    ${sec('konto', 'Handy ↔ Laptop (Sync)', '<div id="syncinfo">' + syncInfoHtml() + '</div>')}
     ${sec('daten', 'Datentransport', `<p class="small muted">Deine Daten liegen nur in diesem Browser auf diesem Gerät. Für Handy ↔ PC: hier exportieren und am anderen Gerät importieren.</p>
       <div class="grid2"><button class="btn" data-act="export">Exportieren</button><label class="btn soft" style="position:relative">Importieren<input type="file" accept=".json,application/json" data-act="importFile" style="position:absolute;inset:0;opacity:0"></label></div>
       <button class="btn ghost mt-s" data-act="importPaste">Aus Text einfügen</button>
       <button class="btn danger mt" data-act="reset">Alle Daten löschen</button>`)}
-    <button class="btn savebar" data-act="saveAll">💾 Speichern</button>
-    <p class="xs muted onbg" style="text-align:center">Toki · Feierabend, Mehrarbeit & Urlaub · v1.2</p>`;
+    <p class="xs muted onbg" style="text-align:center">Toki · Feierabend, Mehrarbeit & Urlaub · v1.5</p>`;
   }
 
   // ---------- Render ----------
@@ -2000,7 +2223,7 @@ const Sync = (() => {
     const s = S();
     document.body.dataset.theme = s.theme;
     const page = { feierabend: pageFeierabend, mehrarbeit: pageMehrarbeit, urlaub: pageUrlaub, netto: pageNetto, einstellungen: pageSettings }[ui.tab] || pageFeierabend;
-    root.innerHTML = `<div class="top"><div class="brand"><img src="${LOGO}" alt=""><span>TOKI</span></div>${Sync.session ? `<button class="cloudbtn" data-act="goSet" data-sec="konto" title="${esc(syncLabel())}">☁<span id="syncdot" class="syncdot ${sync.status}"></span></button>` : ''}</div>${page()}`;
+    root.innerHTML = `<div class="top"><div class="brand"><img src="${LOGO}" alt=""><span>TOKI</span></div>${Sync.code ? `<button class="cloudbtn" data-act="goSet" data-sec="konto" title="${esc(syncLabel())}">☁<span id="syncdot" class="syncdot ${sync.status}"></span></button>` : ''}</div>${page()}`;
     document.getElementById('nav').innerHTML = `<div class="in">${TABS.map(([id, l, ic]) => `<button data-act="tab" data-tab="${id}" ${ui.tab === id ? 'aria-current="page"' : ''}>${ic}<span>${l}</span></button>`).join('')}</div>`;
     if (keepScroll) window.scrollTo(0, y);
     applyTheme();
@@ -2025,19 +2248,39 @@ const Sync = (() => {
   function delEntry(d) { confirmBox('Eintrag löschen?', `Arbeitszeit vom ${dLong(d)} (${esc(st.entries[d].start)}–${esc(st.entries[d].end)}) wird gelöscht.`, 'Löschen', () => { delete st.entries[d]; save(); if (ui.date === d) loadDate(d); render(); toast('Eintrag gelöscht'); }); }
   const A = {
     tab: (t) => setTab(t.dataset.tab),
-    sendLink: async (t) => {
-      const mail = (document.getElementById('loginMail') || {}).value || '';
-      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail.trim())) return toast('Bitte eine gültige E-Mail eintragen');
-      t.disabled = true; t.textContent = 'Sende …';
-      try {
-        await Sync.sendLink(mail.trim(), location.origin + location.pathname);
-        st.pref.mail = mail.trim(); st.pref.linkSent = mail.trim(); persist();
-        toast('📧 Login-Link verschickt – schau in dein Postfach', 3500, 'ok');
-      } catch (e) { toast(`⚠ ${e.message}`, 4000); }
-      render();
+    syncCreate: () => connectCode(Sync.generate(), true),
+    syncJoin: () => {
+      const c = Sync.clean((document.getElementById('syncCode') || {}).value);
+      if (!Sync.valid(c)) return toast('Bitte den kompletten Code eingeben (TOKI- und 16 Zeichen)', 3500);
+      connectCode(c, false);
     },
+    syncShow: () => { ui.showCode = !ui.showCode; setSync(sync.status, sync.msg); },
+    syncCopy: async () => { try { await navigator.clipboard.writeText(Sync.pretty(Sync.code)); toast('✓ Code kopiert', 1800, 'ok'); } catch { ui.showCode = true; setSync(sync.status, sync.msg); toast('Code angezeigt – bitte abschreiben', 2500); } },
+    syncMail: () => { location.href = `mailto:?subject=${encodeURIComponent('Toki Sync-Link')}&body=${encodeURIComponent(`Diesen Link auf dem anderen Gerät öffnen, dann sind die Toki-Daten verbunden:\n\n${Sync.link()}\n\nSync-Code: ${Sync.pretty(Sync.code)}`)}`; },
     syncNow: () => syncNow(true),
-    logout: () => confirmBox('Abmelden?', 'Die Daten bleiben auf diesem Gerät und in der Cloud erhalten. Änderungen werden erst nach erneutem Anmelden wieder synchronisiert.', 'Abmelden', async () => { await Sync.logout(); st.meta.syncedAt = 0; persist(); setSync('off'); render(); toast('Abgemeldet'); }, false),
+    vacMail: () => {
+      const s = S();
+      const list = st.absences.filter((a) => a.to >= today && a.type !== 'krank').sort((a, b) => (a.from < b.from ? -1 : 1));
+      const half = Object.entries(st.entries).filter(([d, e]) => e.half && d >= today).map(([d]) => ({ from: d, to: d, type: 'tarif', half: true, fromEntry: true }));
+      const all = list.concat(half).sort((a, b) => (a.from < b.from ? -1 : 1));
+      if (!all.length) return toast('Ab heute ist kein Urlaub geplant', 2500);
+      const fmtD = (d) => `${WD[C.dow(d)]} ${dShort(d)}${d.slice(0, 4)}`;
+      const sums = {};
+      const lines = all.map((a) => {
+        const n = a.fromEntry ? 0.5 : C.workdaysBetween(a.from < today ? today : a.from, a.to, opt()).reduce((acc, d) => acc + ((calc.absMap.get(d) || {}).id === a.id ? calc.absMap.get(d).units : 0), 0);
+        sums[a.type] = (sums[a.type] || 0) + n;
+        return `• ${a.from === a.to ? fmtD(a.from) : `${fmtD(a.from)} – ${fmtD(a.to)}`} · ${C.TYPES[a.type].label}${a.half || n === 0.5 ? ' (halber Tag)' : ''} · ${D1(n)} ${n === 1 ? 'Tag' : 'Tage'}${a.note ? ` (${a.note})` : ''}`;
+      });
+      const total = Object.values(sums).reduce((x, y2) => x + y2, 0);
+      const body = `${s.mail.anrede || 'Hallo'},\n\nhier meine geplanten Urlaubstage ab ${dShort(today)}${today.slice(0, 4)}:\n\n${lines.join('\n')}\n\nGesamt: ${D1(total)} Tage (${Object.entries(sums).map(([k, v]) => `${C.TYPES[k].label} ${D1(v)}`).join(', ')})\n\nViele Grüße\n${s.mail.name || ''}`.trim();
+      const subject = `Urlaubsplanung${s.mail.name ? ` ${s.mail.name}` : ''}`;
+      const href = `mailto:${encodeURIComponent(s.mail.an || '')}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      sheet(`<h3>Urlaubsplanung</h3><p class="small muted">An: ${esc(s.mail.an || '– (in den Einstellungen hinterlegen)')} · Betreff: ${esc(subject)}</p><textarea class="field" style="height:220px;font-size:13px;padding:10px;line-height:1.45" readonly id="vm">${esc(body)}</textarea>
+        <div class="grid2 mt"><button class="btn soft" id="vmc">Text kopieren</button><a class="btn" href="${href}" id="vmo">Mail öffnen</a></div>`, (el) => {
+        el.querySelector('#vmc').addEventListener('click', async () => { try { await navigator.clipboard.writeText(body); toast('✓ Kopiert', 1800, 'ok'); } catch { el.querySelector('#vm').select(); toast('Text markiert – bitte kopieren'); } });
+      });
+    },
+    syncOff: () => confirmBox('Sync ausschalten?', 'Die Daten bleiben auf diesem Gerät und in der Cloud. Mit dem Code kannst du dich jederzeit wieder verbinden – notier ihn dir vorher.', 'Ausschalten', () => { Sync.set(''); st.meta.syncedAt = 0; persist(); setSync('off'); render(); toast('Sync aus'); }, false),
     pickDate: () => { ui.pickM = ui.date.slice(0, 7); openPicker(); },
     pickDay: (t) => { loadDate(t.dataset.d); closeSheet(); render(); },
     pickNav: (t) => { ui.pickM = shiftMonth(ui.pickM, Number(t.dataset.d)); openPicker(); },
@@ -2046,7 +2289,7 @@ const Sync = (() => {
     close: () => closeSheet(),
     info: (t) => { const [h, b] = INFO[t.dataset.k]; sheet(`<h3>${h}</h3><div class="infotext">${b}</div><button class="btn mt" data-act="close">Alles klar</button>`); },
     toggle: (t) => { ui[t.dataset.k] = !ui[t.dataset.k]; save(); render(); },
-    setEnd: (t) => { if (t.dataset.t) { ui.end = t.dataset.t; render(); } },
+    setEnd: (t) => { if (!t.dataset.t) return; ui.end = t.dataset.t; const inp = document.getElementById('work-end'); if (inp) inp.value = ui.end; updateFA(); },
     saveEntry: () => {
       const d = ui.date;
       const { pause, special } = dayPause(d);
@@ -2092,9 +2335,9 @@ const Sync = (() => {
     godReset: () => { st.pref.god = godDefaults(); save(); render(); },
     godCalc: () => { render(); toast('✓ Berechnet'); },
     goSet: (t) => { ui.setOpen = t.dataset.sec; setTab('einstellungen'); },
-    theme: (t) => { S().theme = t.dataset.id; save(); render(); savedPill(); },
+    theme: (t) => { S().theme = t.dataset.id; save(); render(); },
     setYear: (t) => { ui.setYear = Number(t.dataset.y); render(); },
-    steuerOk: () => { S().steuer.geprueft = true; save(); render(); savedPill(); },
+    steuerOk: () => { S().steuer.geprueft = true; save(); render(); },
     saveAll: () => { save(); render(); toast(storageOk ? '✓ Alle Einstellungen gespeichert' : '⚠ Speichern im Browser nicht möglich – bitte exportieren', 2600, storageOk ? 'ok' : ''); },
     addSonder: () => { S().lohn.sonder.push({ id: uid(), name: '', art: 'einmalig', monat: 12, modus: 'betrag', wert: 0 }); save(); render(); },
     delSonder: (t) => { S().lohn.sonder.splice(Number(t.dataset.i), 1); save(); render(); },
@@ -2170,29 +2413,21 @@ const Sync = (() => {
     if (t.dataset.bind === 'start' || t.dataset.bind === 'end') {
       ui[t.dataset.bind] = t.value;
       if (t.dataset.bind === 'start') { st.pref.start = t.value; save(); }
-      // nur abhängige Teile neu zeichnen, damit das Feld nicht springt
-      const el = document.activeElement && document.activeElement.id;
-      render();
-      if (el) { const n = document.getElementById(el); if (n) n.focus({ preventScroll: true }); }
+      // nur abhängige Teile neu zeichnen – Eingabefelder bleiben stehen (Zeit-Auswahl am Handy schließt sich nicht)
+      updateFA();
     }
   });
-  document.addEventListener('change', (e) => {
-    const t = e.target;
-    if (t.dataset.bind === 'date') { if (t.value) { loadDate(t.value); render(); } return; }
-    if (t.dataset.act === 'half') { ui.half = t.checked; render(); return; }
-    if (t.dataset.act === 'importFile') { const f = t.files && t.files[0]; if (f) f.text().then(doImport); t.value = ''; return; }
-    if (t.dataset.kont) { const v = t.value.trim(); if (v === '') delete st.kontingent[t.dataset.kont]; else st.kontingent[t.dataset.kont] = num(v); save(); render(); savedPill(); return; }
+  /** Wert eines Eingabefelds übernehmen und speichern (ohne Neuzeichnen) */
+  function applyField(t) {
+    if (t.dataset.kont) { const v = t.value.trim(); if (v === '') delete st.kontingent[t.dataset.kont]; else st.kontingent[t.dataset.kont] = num(v); save(); return true; }
     if (t.dataset.god !== undefined && t.dataset.god !== '') {
       const g = { ...godDefaults(), ...(st.pref.god || {}) };
       g[t.dataset.god] = t.type === 'checkbox' ? t.checked : t.dataset.str ? t.value : t.tagName === 'SELECT' ? Number(t.value) : t.dataset.god === 'manuell' && t.value.trim() === '' ? '' : num(t.value);
-      if (t.dataset.god === 'manuell' && g.manuell !== '') toast('✋ Manueller Wert – Grundlohn & Mehrarbeit werden ignoriert', 2800);
-      st.pref.god = g; save(); render(); return;
+      st.pref.god = g; save(); return true;
     }
     if (t.dataset.sonder) {
       const [i, k] = t.dataset.sonder.split('.'); const o = S().lohn.sonder[Number(i)];
-      o[k] = k === 'wert' || k === 'monat' ? num(t.value) : t.value; save(); savedPill();
-      if (t.dataset.struct) render();
-      return;
+      o[k] = k === 'wert' || k === 'monat' ? num(t.value) : t.value; save(); return true;
     }
     if (t.dataset.set) {
       const path = t.dataset.set;
@@ -2208,30 +2443,51 @@ const Sync = (() => {
       if (path === 'zk.stand' || path === 'zk.datum') { if (!S().zk.datum) S().zk.datum = today; S().zk.setAt = Date.now(); }
       if (path === 'urlaub.fzaStand' || path === 'urlaub.fzaDatum') { if (!S().urlaub.fzaDatum) S().urlaub.fzaDatum = today; S().urlaub.fzaSetAt = Date.now(); }
       if (/^urlaub\.jahre\.\d+\.(rest|tzugRest)$/.test(path) && v !== undefined) { const yy = path.split('.')[2]; if (!S().urlaub.jahre[yy].restDatum) S().urlaub.jahre[yy].restDatum = today; }
-      save(); savedPill();
-      // Feld bleibt stehen – nur bei Struktur-Änderungen neu zeichnen
-      if (t.dataset.struct || t.type === 'checkbox' || t.tagName === 'SELECT' || t.type === 'date' || path.startsWith('urlaub.jahre.') || path === 'zk.stand' || path === 'urlaub.fzaStand') {
-        const active = document.activeElement && document.activeElement !== t && document.activeElement.dataset ? document.activeElement.dataset.set : null;
-        render();
-        if (active) { const n = document.querySelector(`[data-set="${active}"]`); if (n) n.focus({ preventScroll: true }); }
-      }
+      save(); return true;
     }
+    return false;
+  }
+  /** Kleine Live-Anzeigen in den Einstellungen nachziehen */
+  function liveHints() {
+    const s = S();
+    const sl = document.getElementById('slAuto'); if (sl) sl.textContent = `${nf(C.stundenlohn(s))} €`;
+    const slh = document.getElementById('slHint'); if (slh) slh.textContent = Number(s.lohn.stundenlohn) ? 'eigener Wert' : `= Grundlohn ÷ (${D1(s.arbeit.wochenstunden)} h × 4,35)`;
+    const ug = document.getElementById('ugTag'); if (ug) ug.textContent = `${nf(((Number(s.lohn.grundlohn) || 0) / (Number(s.urlaub.ugTeiler) || 21.75)) * (Number(s.urlaub.ugFaktor) || 0))} €`;
+    const ts = document.getElementById('tsoll'); if (ts) ts.textContent = `= ${D1(C.tagessoll(s))} Std./Tag`;
+  }
+  const isText = (t) => t.tagName === 'INPUT' && !['checkbox', 'date', 'file', 'time'].includes(t.type);
+  document.addEventListener('input', (e) => { const t = e.target; if (isText(t) && applyField(t)) liveHints(); });
+  document.addEventListener('change', (e) => {
+    const t = e.target;
+    if (t.dataset.bind === 'date') { if (t.value) { loadDate(t.value); render(); } return; }
+    if (t.dataset.act === 'half') { ui.half = t.checked; render(); return; }
+    if (t.dataset.act === 'importFile') { const f = t.files && t.files[0]; if (f) f.text().then(doImport); t.value = ''; return; }
+    if (!applyField(t)) return;
+    liveHints();
+    if (t.dataset.god === 'manuell' && t.value.trim() !== '') toast('✋ Manueller Wert – Grundlohn & Mehrarbeit werden ignoriert', 2800);
+    // Neu zeichnen nur, wo sich sichtbar etwas ändert; das als Nächstes angetippte Feld behält den Fokus
+    const path = t.dataset.set || '';
+    const needs = t.dataset.kont || t.dataset.god !== undefined || t.dataset.struct || t.type === 'checkbox' || t.tagName === 'SELECT' || t.type === 'date' || path.startsWith('urlaub.jahre.') || path === 'zk.stand' || path === 'urlaub.fzaStand';
+    if (!needs) return;
+    const ae = document.activeElement;
+    const key = ae && ae !== t && ae.dataset ? Object.entries(ae.dataset).find(([k]) => ['set', 'god', 'kont', 'sonder'].includes(k)) : null;
+    render();
+    if (key) { const n = document.querySelector(`[data-${key[0]}="${key[1]}"]`); if (n) n.focus({ preventScroll: true }); }
   });
   window.addEventListener('hashchange', () => {
     const lg = Sync.fromHash();
-    if (lg) { if (lg.ok) { st.pref.linkSent = ''; persist(); toast(`✓ Angemeldet als ${Sync.session.user.email || ''}`, 3000, 'ok'); render(); syncNow(false); } else toast(`⚠ Login fehlgeschlagen: ${lg.error}`, 5000); return; }
+    if (lg) { if (typeof lg === 'string') connectCode(lg, false); else toast(`⚠ ${lg.error}`, 4000); return; }
     const h = location.hash.slice(1); if (TABS.some((x) => x[0] === h) && h !== ui.tab) { ui.tab = h; render(false); } });
 
   // Start
   const login = Sync.fromHash();
-  if (login && login.ok) { st.pref.linkSent = ''; persist(); ui.setOpen = 'konto'; }
+  if (login) ui.setOpen = 'konto';
   const h0 = location.hash.slice(1);
   if (TABS.some((x) => x[0] === h0)) ui.tab = h0;
   loadDate(today);
   render(false);
-  if (login && login.error) toast(`⚠ Login fehlgeschlagen: ${login.error}`, 5000);
-  if (login && login.ok) toast(`✓ Angemeldet als ${Sync.session.user.email || ''}`, 3000, 'ok');
-  if (Sync.session) syncNow(false);
+  if (login && typeof login === 'string') { if (login !== Sync.code) connectCode(login, false); else syncNow(false); }
+  else { if (login && login.error) toast(`⚠ ${login.error}`, 4000); if (Sync.code) syncNow(false); }
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') syncNow(false); });
 })();
 </script>
