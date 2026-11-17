@@ -17,6 +17,23 @@
 <style>/*CSS*/</style>
 </head>
 <body data-theme="standard">
+<div id="splash" aria-hidden="true">
+  <div class="sp-in">
+    <svg class="sp-logo" viewBox="0 0 82 80" width="96" height="94">
+      <defs><linearGradient id="spg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#36b982"/><stop offset=".55" stop-color="#2a9c6b"/><stop offset="1" stop-color="#1d7650"/></linearGradient><clipPath id="spc"><rect width="82" height="80" rx="16"/></clipPath></defs>
+      <rect class="sp-sq" width="82" height="80" rx="16" fill="url(#spg)"/>
+      <rect class="sp-bar" x="18.5" y="15" width="43" height="13" fill="#1d2025"/>
+      <rect class="sp-stem" x="33.5" y="27.5" width="13" height="35.5" fill="#1d2025"/>
+      <g clip-path="url(#spc)"><rect class="sp-shine" x="-40" y="0" width="22" height="80" fill="#fff" opacity=".22"/></g>
+    </svg>
+    <div class="sp-word">TOKI</div>
+    <div class="sp-line"><i></i></div>
+  </div>
+</div>
+<script>
+(function(){try{var d=JSON.parse(localStorage.getItem('takt-v1')||'{}');var t=d.settings&&d.settings.theme;if(['dark','neon','werk','xmas','arena'].indexOf(t)>-1)document.getElementById('splash').className='dark';}catch(e){}
+setTimeout(function(){var s=document.getElementById('splash');if(s)s.remove();},1500);})();
+</script>
 <div id="fx"></div>
 <main id="app"></main>
 <nav class="tabs" id="nav" aria-label="Bereiche"></nav>

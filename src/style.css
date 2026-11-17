@@ -400,3 +400,23 @@ dl.money dd{white-space:nowrap}
 dl.money .hl25 dt,dl.money .hl25 dd{color:var(--fg);font-weight:700}
 .grid3>div{display:flex;flex-direction:column;min-width:0}
 .grid3>div>.label{flex:1;display:flex;align-items:flex-end}
+
+/* Splash */
+#splash{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:#f6f4ef;animation:sp-out .32s ease-in 1.18s forwards;pointer-events:none}
+#splash.dark{background:#141519}
+#splash .sp-in{display:flex;flex-direction:column;align-items:center;gap:14px}
+.sp-logo{overflow:visible;filter:drop-shadow(0 10px 22px rgb(29 118 80/.35));animation:sp-pop .5s cubic-bezier(.2,1.4,.4,1) both}
+.sp-bar{transform-box:fill-box;transform-origin:50% 0;animation:sp-drop .34s cubic-bezier(.3,1.5,.5,1) .2s both}
+.sp-stem{transform-box:fill-box;transform-origin:50% 0;animation:sp-grow .32s ease-out .38s both}
+.sp-shine{animation:sp-shine .6s ease-in-out .62s both}
+.sp-word{font-family:'Bebas Neue',Impact,sans-serif;font-size:30px;color:#2a9c6b;letter-spacing:.32em;padding-left:.32em;animation:sp-word .45s ease-out .5s both}
+.sp-line{width:84px;height:3px;border-radius:3px;background:rgb(42 156 107/.18);overflow:hidden}
+.sp-line i{display:block;height:100%;width:100%;background:#2a9c6b;border-radius:3px;transform-origin:0 50%;animation:sp-load .9s cubic-bezier(.6,0,.2,1) .3s both}
+@keyframes sp-pop{from{opacity:0;transform:scale(.55) rotate(-8deg)}to{opacity:1;transform:none}}
+@keyframes sp-drop{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:none}}
+@keyframes sp-grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes sp-shine{from{transform:skewX(-18deg) translateX(0)}to{transform:skewX(-18deg) translateX(150px)}}
+@keyframes sp-word{from{opacity:0;letter-spacing:.8em;padding-left:.8em}to{opacity:1;letter-spacing:.32em;padding-left:.32em}}
+@keyframes sp-load{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes sp-out{to{opacity:0;transform:scale(1.04);visibility:hidden}}
+@media (prefers-reduced-motion: reduce){#splash *{animation:none!important}#splash{animation:sp-out .2s ease-in .5s forwards}}
