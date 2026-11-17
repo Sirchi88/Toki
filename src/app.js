@@ -480,7 +480,8 @@
     const nachList = st.nach.slice().sort((a, b) => (a.month < b.month ? 1 : -1));
     let body = '';
     if (ui.view === 'woche') {
-      const all = calc.weeks.filter((w) => w.days.some((d) => d.entry || (d.absence && !d.absence.fromEntry)));
+      // Nur Wochen bis einschließlich der laufenden – geplanter Urlaub erscheint erst, wenn seine KW begonnen hat
+      const all = calc.weeks.filter((w) => w.monday <= today && w.days.some((d) => d.entry || (d.absence && !d.absence.fromEntry)));
       body = all.length ? all.map((w, i) => weekCard(w, all[i - 1] && all[i - 1].days.some((x) => x.entry) ? all[i - 1] : null)).reverse().join('') : '<p class="empty">Noch keine Tage gespeichert.</p>';
     } else if (ui.view === 'monat') {
       const ms = [...calc.months.values()].filter((x) => x.days || x.weeks.some((w) => w.mehr || w.zkChange)).sort((a, b) => (a.month < b.month ? 1 : -1));
@@ -493,14 +494,13 @@
     const fehltNote = fehlt.length ? `<div class="notice warn" style="margin:0 0 14px"><div><b>Damit alles stimmt, fehlen noch:</b><ul style="margin:4px 0 0;padding-left:18px">${fehlt.map((x) => `<li>${x}</li>`).join('')}</ul>${fehlt.some((x) => !x.startsWith('MEA')) ? `<button class="btn sm soft mt-s" data-act="goSet" data-sec="${!s.zk.datum && Number(s.lohn.grundlohn) ? 'mehrarbeit' : 'verdienst'}">Zu den Einstellungen</button>` : ''}</div></div>` : '';
     return `<div class="between"><h1>Mehrarbeit</h1><button class="iconbtn" data-act="eye" title="Lohn ein-/ausblenden">${s.lohn.zeigen ? I.eye : I.eyeoff}</button></div>
     ${fehltNote}
-    <section class="card">
-      <div class="between"><button class="iconbtn" data-act="kmonth" data-d="-1">${I.left}</button><h3>${monthName(m)}</h3><button class="iconbtn" data-act="kmonth" data-d="1">${I.right}</button></div>
-      <div class="grid2 mt">
-        <div style="grid-column:1/-1"><label class="label" for="kont">MEA-Kontingent (h)</label><input id="kont" class="field big2" inputmode="decimal" placeholder="z. B. 20" value="${deNum(st.kontingent[m] ?? '')}" data-kont="${m}"></div>
-        <div></div>
-      </div>
-      <div class="kstat mt"><div><span>Geleistet</span><b class="num">${H(mm ? mm.mehr : 0, 1)}</b></div><div><span>Offen</span><b class="num acc">${k.has ? H(Math.max(0, k.open), 1) : '–'}</b></div></div>
-      ${k.has ? `<div class="progress mt"><i style="width:${Math.min(100, (k.used / k.k) * 100)}%"></i></div>` : '<p class="hint">Ohne Kontingent laufen alle Überstunden ins Zeitkonto.</p>'}
+    <section class="card kcard">
+      <div class="krow"><button class="iconbtn sm" data-act="kmonth" data-d="-1">${I.left}</button><b>${monthName(m)}</b><button class="iconbtn sm" data-act="kmonth" data-d="1">${I.right}</button></div>
+      ${st.kontingent[m] !== undefined && !ui.kEdit
+        ? `<div class="kline"><span>MEA-Kontingent</span><b class="num">${H(Number(st.kontingent[m]) || 0, 1)}</b><button class="kedit" data-act="kEdit" title="Korrigieren" aria-label="Kontingent korrigieren">✎</button></div>`
+        : `<div class="kline"><label for="kont">MEA-Kontingent (h)</label><input id="kont" class="field sm" inputmode="decimal" placeholder="z. B. 20" value="${deNum(st.kontingent[m] ?? '')}" data-kont="${m}"><button class="btn sm" data-act="kDone">OK</button></div>`}
+      <div class="kmini"><span>Geleistet <b class="num">${H(mm ? mm.mehr : 0, 1)}</b></span><span>Offen <b class="num acc">${k.has ? H(Math.max(0, k.open), 1) : '–'}</b></span></div>
+      ${k.has ? `<div class="progress thin"><i style="width:${Math.min(100, (k.used / k.k) * 100)}%"></i></div>` : '<p class="hint" style="margin:6px 0 0">Ohne Kontingent laufen alle Überstunden ins Zeitkonto.</p>'}
       ${avg}
       ${z > s.zk.max ? `<div class="notice danger">⚠ <div><b>Vorsicht, Stundenkonto voll!</b> Zeitkonto ${sH(z)} – es wird weiter mitgezählt.</div></div>` : ''}
     </section>
@@ -954,6 +954,8 @@
     syncCopy: async () => { try { await navigator.clipboard.writeText(Sync.pretty(Sync.code)); toast('✓ Code kopiert', 1800, 'ok'); } catch { ui.showCode = true; setSync(sync.status, sync.msg); toast('Code angezeigt – bitte abschreiben', 2500); } },
     syncMail: () => { location.href = `mailto:?subject=${encodeURIComponent('Toki Sync-Link')}&body=${encodeURIComponent(`Diesen Link auf dem anderen Gerät öffnen, dann sind die Toki-Daten verbunden:\n\n${Sync.link()}\n\nSync-Code: ${Sync.pretty(Sync.code)}`)}`; },
     syncNow: () => syncNow(true),
+    kEdit: () => { ui.kEdit = true; render(); const i = document.getElementById('kont'); if (i) { i.focus(); i.select(); } },
+    kDone: () => { ui.kEdit = false; render(); },
     vacMail: () => {
       const s = S();
       const list = st.absences.filter((a) => a.to >= today && a.type !== 'krank').sort((a, b) => (a.from < b.from ? -1 : 1));
@@ -1159,6 +1161,7 @@
     if (t.dataset.act === 'half') { ui.half = t.checked; render(); return; }
     if (t.dataset.act === 'importFile') { const f = t.files && t.files[0]; if (f) f.text().then(doImport); t.value = ''; return; }
     if (!applyField(t)) return;
+    if (t.dataset.kont) ui.kEdit = false;
     liveHints();
     if (t.dataset.god === 'manuell' && t.value.trim() !== '') toast('✋ Manueller Wert – Grundlohn & Mehrarbeit werden ignoriert', 2800);
     // Neu zeichnen nur, wo sich sichtbar etwas ändert; das als Nächstes angetippte Feld behält den Fokus
