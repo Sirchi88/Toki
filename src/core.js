@@ -601,10 +601,164 @@ const Core = (() => {
     return { lines, laufend, einmal, extraL, extraE, extra: extraL + extraE, basis: laufend - mehrL, vlSpar: 0, src, tu, ugTag, modus };
   };
 
+  // ---------- Zeitnachweis (PDF des Arbeitgebers) ----------
+  const deZahl = (s) => { const t = String(s || '').trim().replace(/\./g, '').replace(',', '.'); return /^-?\d+(\.\d+)?$/.test(t) ? Number(t) : null; };
+  const deDatum = (s) => { const m = /(\d{2})\.(\d{2})\.(\d{4})/.exec(s || ''); return m ? `${m[3]}-${m[2]}-${m[1]}` : null; };
+  /** Art eines Tages aus der Beschreibung → Toki-Abwesenheit (oder null) */
+  const nachweisArt = (desc) => {
+    const d = String(desc || '').toLowerCase();
+    if (!d || /anwesend|dienstgang|dienstreise|homeoffice|mobil/.test(d)) return null;
+    if (/sonderurlaub/.test(d)) return { type: 'sonder', note: desc };
+    if (/\bkur\b|reha/.test(d)) return { type: 'sonder', note: desc };
+    if (/krank/.test(d)) return { type: 'krank', note: /^krank(heit)?$/i.test(desc.trim()) ? '' : desc };
+    if (/t-?zug|tarifl.*zusatz/.test(d)) return { type: 'tzug', note: '' };
+    if (/fza|freizeitausgleich/.test(d)) return { type: 'fza', note: '' };
+    if (/zeitkonto|zeitausgleich|gleit|zk\b/.test(d)) return { type: 'zk', note: '' };
+    if (/urlaub/.test(d)) return { type: 'tarif', note: '' };
+    return { type: '?', note: desc };
+  };
+  /**
+   * Zeitnachweis-PDF (als Zeilen mit Textstücken {x, s}) → Monatsdaten.
+   * Spalten werden über die Kopfzeile (Dat, Tag, Beschreibung, von, bis, Istz., …) zugeordnet.
+   */
+  const parseZeitnachweis = (rows) => {
+    const txt = (r) => r.items.map((i) => i.s).join(' ');
+    let from = null, to = null, head = null; const days = []; let summary = false;
+    const out = { from: null, to: null, month: null, days, zk: null, fza: null, kontingent: null, verbraucht: null, ist: null };
+    for (const r of rows) {
+      const line = txt(r);
+      if (!from && /Zeitraum/.test(line)) { const ds = line.match(/\d{2}\.\d{2}\.\d{4}/g) || []; from = deDatum(ds[0]); to = deDatum(ds[1]); continue; }
+      if (!head && r.items.some((i) => i.s.trim() === 'Dat') && /Beschreibung/.test(line)) { head = r.items.map((i) => ({ k: i.s.trim(), x: i.x })); continue; }
+      if (/Monats(ü|ue)bersicht/.test(line)) { summary = true; continue; }
+      if (summary) {
+        for (let k = 0; k < r.items.length; k++) {
+          const lab = r.items[k].s.trim(), val = r.items[k + 1] ? deZahl(r.items[k + 1].s) : null;
+          if (val === null) continue;
+          if (/^monatliches Kontingent/i.test(lab)) out.kontingent = val;
+          else if (/^verbrauchtes Kontingent/i.test(lab)) out.verbraucht = val;
+          else if (/^Ist-Zeit/i.test(lab)) out.ist = val;
+        }
+        continue;
+      }
+      if (!head || !from) continue;
+      const col = (x) => head.reduce((b, h) => (Math.abs(h.x - x) < Math.abs(b.x - x) ? h : b)).k;
+      const cells = {};
+      for (const i of r.items) { const k = col(i.x); cells[k] = cells[k] ? `${cells[k]} ${i.s.trim()}` : i.s.trim(); }
+      if (/^Woche/.test((r.items[0] || {}).s || '')) continue;
+      const dn = /^\d{1,2}$/.test(cells.Dat || '') ? Number(cells.Dat) : null;
+      const seg = { desc: cells.Beschreibung || '', von: /^\d{1,2}:\d{2}$/.test(cells.von || '') ? cells.von.padStart(5, '0') : null, bis: /^\d{1,2}:\d{2}$/.test(cells.bis || '') ? cells.bis.padStart(5, '0') : null };
+      if (dn !== null) {
+        const date = `${from.slice(0, 8)}${String(dn).padStart(2, '0')}`;
+        if (date < from || date > to) continue;
+        days.push({ date, segs: seg.desc || seg.von ? [seg] : [], ist: deZahl(cells['Istz.']), soll: deZahl(cells.Sollz), zkt: deZahl(cells.ZKT), zktK: deZahl(cells['ZKT K']), ma: deZahl(cells.MA), fzaK: deZahl(cells['FZA K']), holiday: '' });
+      } else if (days.length && (seg.desc || seg.von)) {
+        const d = days[days.length - 1];
+        if (!seg.von && !seg.bis && !d.segs.length) d.holiday = seg.desc; else d.segs.push(seg);
+      }
+    }
+    if (!from || !head || !days.length) throw new Error('Das sieht nicht nach einem Zeitnachweis aus – ich finde keine Tagesliste.');
+    Object.assign(out, { from, to, month: ym(from) });
+    const last = days.filter((d) => d.zktK !== null).pop(); if (last) out.zk = { date: to, value: last.zktK };
+    const lastF = days.filter((d) => d.fzaK !== null).pop(); if (lastF) out.fza = { date: to, value: lastF.fzaK };
+    // Tage auswerten
+    for (const d of days) {
+      const work = d.segs.filter((s) => s.von && s.bis);
+      const abs = d.segs.map((s) => nachweisArt(s.desc)).find((a) => a);
+      d.abs = work.length ? null : abs || null;
+      d.half = !!(work.length && abs && abs.type === 'tarif');
+      if (work.length && d.ist !== null) {
+        const start = work[0].von, end = work[work.length - 1].bis;
+        let span = toMin(end) - toMin(start); if (span < 0) span += 1440;
+        d.work = { start, end, pause: Math.max(0, Math.round(span - d.ist * 60)), hours: d.ist };
+      } else d.work = null;
+      d.desc = d.segs.map((s) => s.desc).filter(Boolean)[0] || '';
+    }
+    return out;
+  };
+
+  /** Zeitkonto/FZA, wie Toki sie am Ende eines Tages sieht (null, wenn der Startstand später liegt) */
+  const kontenAm = (st, date) => {
+    const S = st.settings;
+    const entries = {}; for (const [d, e] of Object.entries(st.entries || {})) if (d <= date) entries[d] = e;
+    const absences = (st.absences || []).filter((a) => a.from <= date).map((a) => ({ ...a, to: (a.to || a.from) > date ? date : a.to || a.from }));
+    const c = compute({ ...st, entries, absences }, date);
+    return { zk: S.zk.datum && S.zk.datum > date ? null : c.zkPlanned, fza: S.urlaub.fzaDatum && S.urlaub.fzaDatum > date ? null : c.fzaPlanned, mehr: (c.months.get(ym(date)) || {}).mehr || 0 };
+  };
+
+  /** Vergleich Toki ↔ Zeitnachweis: Tagesabweichungen, Konten, Kontingent */
+  const importPlan = (st, pdf) => {
+    const absMap = absenceDays(st);
+    const diffs = [];
+    const fmtW = (w) => `${w.start}–${w.end} (${w.hours.toFixed(2).replace('.', ',')} h)`;
+    const tokiTxt = (d) => {
+      const e = st.entries[d], a = absMap.get(d);
+      const parts = [];
+      if (a && !a.fromEntry) parts.push(TYPES[a.type] ? TYPES[a.type].label + (a.note ? ` (${a.note})` : '') : a.type);
+      if (e) parts.push(fmtW(e) + (e.half ? ' + ½ Urlaub' : ''));
+      return parts.join(' + ') || '–';
+    };
+    const pdfTxt = (p) => p.work ? fmtW(p.work) + (p.half ? ' + ½ Urlaub' : '') : p.abs ? (p.abs.type === '?' ? `„${p.abs.note}“ (nicht erkannt)` : TYPES[p.abs.type].label + (p.abs.note ? ` (${p.abs.note})` : '')) : '–';
+    let cnt = { work: 0, abs: {}, unbekannt: 0 };
+    for (const p of pdf.days) {
+      if (p.work) cnt.work++;
+      else if (p.abs) { if (p.abs.type === '?') cnt.unbekannt++; else cnt.abs[p.abs.type] = (cnt.abs[p.abs.type] || 0) + 1; }
+      const e = st.entries[p.date], a = absMap.get(p.date);
+      const tA = a && !a.fromEntry ? a.type : null;
+      let same;
+      if (p.work) same = !!e && e.start === p.work.start && e.end === p.work.end && Math.abs(e.hours - Math.min(MAX_DAY, p.work.hours)) < 0.01 && !!e.half === p.half && !tA;
+      else if (p.abs) same = !e && tA === p.abs.type;
+      else same = !e && !tA;
+      if (!same && !(p.abs && p.abs.type === '?' && !e && !tA)) diffs.push({ date: p.date, toki: tokiTxt(p.date), pdf: pdfTxt(p) });
+    }
+    const k = kontenAm(st, pdf.to);
+    const konten = [];
+    if (pdf.zk) konten.push({ k: 'Zeitkonto', toki: k.zk, pdf: pdf.zk.value, uebernehmen: !st.settings.zk.datum || pdf.to >= st.settings.zk.datum });
+    if (pdf.fza) konten.push({ k: 'FZA-Konto', toki: k.fza, pdf: pdf.fza.value, uebernehmen: !st.settings.urlaub.fzaDatum || pdf.to >= st.settings.urlaub.fzaDatum });
+    if (pdf.kontingent !== null) konten.push({ k: 'MEA-Kontingent', toki: st.kontingent && st.kontingent[pdf.month] !== undefined ? Number(st.kontingent[pdf.month]) : null, pdf: pdf.kontingent, uebernehmen: true });
+    if (pdf.verbraucht !== null) konten.push({ k: 'Mehrarbeit (verbraucht)', toki: k.mehr, pdf: pdf.verbraucht, info: true });
+    return { pdf, diffs, konten, cnt };
+  };
+
+  /** Zeitnachweis übernehmen: der Nachweis gilt für seinen Zeitraum (Zeiten, Abwesenheiten, Konten). Verändert st. */
+  const applyImport = (st, plan, now = Date.now(), newId = () => Math.random().toString(36).slice(2, 10)) => {
+    const { pdf } = plan; const S = st.settings;
+    for (const p of pdf.days) {
+      if (p.work) { const c = capDay(p.work.hours); st.entries[p.date] = { start: p.work.start, end: p.work.end, pause: p.work.pause, hours: c.hours, raw: p.work.hours, capped: c.capped, half: p.half, src: 'pdf' }; }
+      else if (!(p.abs && p.abs.type === '?')) delete st.entries[p.date];
+    }
+    // Abwesenheiten im Zeitraum durch die aus dem Nachweis ersetzen (nicht erkannte Tage bleiben unangetastet)
+    const keep = new Set(pdf.days.filter((p) => p.abs && p.abs.type === '?').map((p) => p.date));
+    const list = [];
+    for (const a of st.absences || []) {
+      const aTo = a.to || a.from;
+      if (aTo < pdf.from || a.from > pdf.to) { list.push(a); continue; }
+      if (a.from < pdf.from) list.push({ ...a, id: newId(), to: addDays(pdf.from, -1) });
+      if (aTo > pdf.to) list.push({ ...a, id: newId(), from: addDays(pdf.to, 1) });
+      for (const d of keep) if (d >= a.from && d <= aTo) list.push({ ...a, id: newId(), from: d, to: d });
+    }
+    let run = null;
+    const flush = () => { if (run) list.push({ id: newId(), created: 0, from: run.from, to: run.to, type: run.type, half: false, note: run.note, src: 'pdf' }); run = null; };
+    for (const p of pdf.days) {
+      const a = p.abs && p.abs.type !== '?' ? p.abs : null;
+      if (a && run && run.type === a.type && run.note === a.note) run.to = p.date;
+      else if (a) { flush(); run = { from: p.date, to: p.date, type: a.type, note: a.note }; }
+      else if (p.work || p.desc) flush(); // freie Tage (Wochenende/Feiertag) unterbrechen einen Block nicht
+    }
+    flush();
+    st.absences = list;
+    for (const k of plan.konten) {
+      if (!k.uebernehmen || k.info) continue;
+      if (k.k === 'Zeitkonto') Object.assign(S.zk, { stand: k.pdf, datum: pdf.to, setAt: now });
+      if (k.k === 'FZA-Konto') Object.assign(S.urlaub, { fzaStand: k.pdf, fzaDatum: pdf.to, fzaSetAt: now });
+      if (k.k === 'MEA-Kontingent') st.kontingent[pdf.month] = k.pdf;
+    }
+    return st;
+  };
+
   return {
     toMin, fmtClock, leaveAt, workedRaw, capDay, MAX_DAY, D, iso, addDays, dow, monday, isoWeek, ym, todayIso, range,
     LAENDER, easter, holidays, holidayName, isWorkday, workdaysBetween, defaults, merge, tagessoll, stundenlohn, holOpt,
-    TYPES, specialPause, presence, absenceDays, halfDay, dayNeed, yearCfg, dayTarget, zuschlag, compute, vacation, est, steuerJahr, netto, monthPay, monatsentgelt, sonderGruppe, prevMonth, KASSEN, P,
+    TYPES, specialPause, presence, absenceDays, halfDay, dayNeed, yearCfg, dayTarget, zuschlag, compute, vacation, est, steuerJahr, netto, monthPay, monatsentgelt, sonderGruppe, prevMonth, KASSEN, P, parseZeitnachweis, importPlan, applyImport, kontenAm,
   };
 })();
 if (typeof module !== 'undefined') module.exports = Core;

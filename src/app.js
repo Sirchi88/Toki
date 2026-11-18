@@ -219,6 +219,37 @@
       (el) => el.querySelector('#okb').addEventListener('click', () => { closeSheet(); onOk(); }));
   }
 
+  // ---------- Zeitnachweis-PDF einlesen (nur lokal, nichts wird hochgeladen) ----------
+  async function pdfImport(buf) {
+    let plan;
+    try {
+      const rows = await PdfText.lines(buf);
+      plan = C.importPlan(st, C.parseZeitnachweis(rows));
+    } catch (e) { sheet(`<h3>PDF nicht lesbar</h3><p class="muted">${esc(e.message || String(e))}</p><button class="btn mt" data-act="close">OK</button>`); return; }
+    const { pdf, diffs, konten, cnt } = plan;
+    const wd = (d) => `${WD[C.dow(d)]} ${dShort(d)}`;
+    const absTxt = Object.entries(cnt.abs).map(([k, v]) => `${v} × ${C.TYPES[k].label}`).join(' · ');
+    const kv = (v) => (v === null || v === undefined ? '–' : H(v));
+    const kRows = konten.map((k) => {
+      const diff = k.toki === null || k.toki === undefined ? null : k.pdf - k.toki;
+      const ok = diff !== null && Math.abs(diff) < 0.005;
+      return `<div class="li"><span class="grow">${k.k}${k.info ? ' <span class="xs muted">(nur Kontrolle)</span>' : !k.uebernehmen ? ' <span class="xs muted">(dein Stand ist neuer – bleibt)</span>' : ''}<br><span class="xs muted">Toki ${kv(k.toki)} · Nachweis ${kv(k.pdf)}</span></span><b class="num ${ok ? 'pos' : 'neg'}">${ok ? '✓' : diff === null ? '' : `${diff > 0 ? '+' : ''}${nf(diff)} h`}</b></div>`;
+    }).join('');
+    const dRows = diffs.map((x) => `<div class="li"><span class="badge">${wd(x.date)}</span><span class="grow xs">Toki: ${esc(x.toki)}<br><b>Nachweis: ${esc(x.pdf)}</b></span></div>`).join('');
+    sheet(`<h3>Zeitnachweis ${monthName(pdf.month)}</h3>
+      <p class="small muted">${cnt.work} Arbeitstage${absTxt ? ` · ${absTxt}` : ''}${cnt.unbekannt ? ` · ${cnt.unbekannt} nicht erkannt` : ''}${pdf.ist !== null ? ` · Ist ${H(pdf.ist)}` : ''}</p>
+      <h4 style="margin:12px 0 6px">${diffs.length ? `${diffs.length} ${diffs.length === 1 ? 'Tag weicht' : 'Tage weichen'} ab` : '✓ Alle Tage stimmen mit Toki überein'}</h4>
+      ${diffs.length ? `<div class="list" style="max-height:38vh;overflow:auto">${dRows}</div>` : ''}
+      <h4 style="margin:14px 0 6px">Konten</h4><div class="list">${kRows}</div>
+      <p class="xs muted mt-s">Beim Übernehmen gilt der Nachweis für ${dShort(pdf.from)}–${dShort(pdf.to)}${pdf.to.slice(0, 4)}: Zeiten, Urlaub/Krank/Kur und die Kontostände werden ersetzt. Das PDF wird nur auf deinem Gerät gelesen und nicht gespeichert.</p>
+      <div class="grid2 mt"><button class="btn ghost" data-act="close">Nur prüfen</button><button class="btn" id="pdfOk">Übernehmen</button></div>`,
+    (el) => el.querySelector('#pdfOk').addEventListener('click', () => {
+      C.applyImport(st, plan, Date.now(), uid);
+      save(); closeSheet(); render();
+      toast(`✓ ${monthName(pdf.month)} aus dem Zeitnachweis übernommen`, 3000, 'ok');
+    }));
+  }
+
   // ---------- Hilfen ----------
   function kontInfo(m = C.ym(today)) {
     const mm = calc.months.get(m);
@@ -515,6 +546,7 @@
       <div class="grid2 mt"><input class="field" id="nachH" inputmode="decimal" placeholder="Stunden"><button class="btn" data-act="addNach">Eintragen</button></div>
     </section>` : ''}
     ${nachList.length ? `<section class="card"><h2>Nachbeantragt</h2><div class="list">${nachList.map((n) => `<div class="li"><span class="badge nach">${H(num(n.hours))}</span><span class="grow">${monthName(n.month)}<br><span class="xs muted">eingetragen ${dShort(n.date)}${n.date.slice(0, 4)}</span></span><button class="btn sm danger" data-act="delNach" data-id="${n.id}">Löschen</button></div>`).join('')}</div></section>` : ''}
+    <label class="btn soft" style="position:relative;margin-bottom:14px;width:100%">📄 Zeitnachweis (PDF) einlesen<input type="file" accept=".pdf,application/pdf" data-act="pdfFile" style="position:absolute;inset:0;opacity:0"></label>
     <div class="seg" style="margin-bottom:14px">${[['woche', 'Wochen'], ['monat', 'Monate'], ['jahr', 'Jahr']].map(([kk, l]) => `<button aria-pressed="${ui.view === kk}" data-act="view" data-v="${kk}">${l}</button>`).join('')}</div>
     ${body}
     <p class="xs muted onbg" style="text-align:center">Mehrarbeit ab ${D1(C.tagessoll(s))} Std./Tag · Samstag komplett · Zuschläge je Woche: erste 6 h +25 %, danach +50 % · Tag antippen zum Löschen</p>`;
@@ -983,6 +1015,7 @@
     ${sec('daten', 'Datentransport', `<p class="small muted">Deine Daten liegen nur in diesem Browser auf diesem Gerät. Für Handy ↔ PC: hier exportieren und am anderen Gerät importieren.</p>
       <div class="grid2"><button class="btn" data-act="export">Exportieren</button><label class="btn soft" style="position:relative">Importieren<input type="file" accept=".json,application/json" data-act="importFile" style="position:absolute;inset:0;opacity:0"></label></div>
       <button class="btn ghost mt-s" data-act="importPaste">Aus Text einfügen</button>
+      <label class="btn soft mt-s" style="position:relative;width:100%">📄 Zeitnachweis (PDF) einlesen<input type="file" accept=".pdf,application/pdf" data-act="pdfFile" style="position:absolute;inset:0;opacity:0"></label>
       <button class="btn danger mt" data-act="reset">Alle Daten löschen</button>`)}
     <p class="xs muted onbg" style="text-align:center">Toki · Feierabend, Mehrarbeit & Urlaub · v1.7</p>`;
   }
@@ -1251,6 +1284,7 @@
       else { const g = { ...godDefaults(), ...(st.pref.god || {}) }; g.kasse = name; if (k) g.kvZusatz = k[1]; else if (!name) g.kvZusatz = 2.9; st.pref.god = g; }
       save(); render(); return;
     }
+    if (t.dataset.act === 'pdfFile') { const f = t.files && t.files[0]; if (f) f.arrayBuffer().then(pdfImport); t.value = ''; return; }
     if (t.dataset.act === 'importFile') { const f = t.files && t.files[0]; if (f) f.text().then(doImport); t.value = ''; return; }
     if (!applyField(t)) return;
     if (t.dataset.kont) ui.kEdit = false;

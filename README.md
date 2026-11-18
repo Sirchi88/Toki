@@ -10,7 +10,7 @@ Läuft im Browser am Handy (hochkant) und am PC, ohne Installation, ohne Login.
 | Reiter | Was er kann |
 |---|---|
 | **Feierabend** | Beginn eintragen → Gehzeiten für 7/8/9/10 h, Antippen übernimmt die Zeit. Pausen & halber Urlaubstag zuklappbar. Warnung bei > 10 h (gezählt wird max. 10 h). Konto-Ampel: Zeitkonto, offene MEA, Resturlaub. |
-| **Mehrarbeit** | MEA-Kontingent je Monat, Wochen (KW) / Monate / Jahr, Zuschläge je Woche (erste 6 h +25 %, danach +50 %), Diagramme „Kommen & Gehen“ und „Stunden pro Tag“, Mehrarbeit nachbeantragen. |
+| **Mehrarbeit** | MEA-Kontingent je Monat, Wochen (KW) / Monate / Jahr, Zuschläge je Woche (erste 6 h +25 %, danach +50 %), Diagramme „Kommen & Gehen“ und „Stunden pro Tag“, Mehrarbeit nachbeantragen. **Zeitnachweis-PDF einlesen:** Abgleich mit Toki, Abweichungen anzeigen und auf Wunsch übernehmen (PDF wird nur lokal gelesen). |
 | **Urlaub** | Kalender mit KW, Tarifurlaub, Zeitkonto, FZA, T-Zug, Sonderurlaub, Krank. Jahresüberblick, Urlaubsgeld, Resturlaub bis 31.03. des Folgejahres. |
 | **Gehalt** | Netto des Monats – Ansicht **Aktuell** (alles aus dem Monat) oder **Auszahlung** (Mehrarbeit, Urlaubsgeld & Sonderzahlungen aus dem Vormonat) (Lohnsteuer-Tarif & SV-Werte 2026), aufgeteilt in Grundgehalt und Mehrarbeit, mit allen Sätzen und Rechenweg. **God Mode** zum freien Durchspielen. Export als **PDF-Bericht** und **Excel** mit Statistiken. |
 | **⚙ (oben rechts)** | Einstellungen (Design, Arbeitszeit, Verdienst, Zeitkonto, Urlaub pro Jahr, Steuer) und Datentransport (Export/Import). |

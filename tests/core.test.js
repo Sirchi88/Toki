@@ -3,7 +3,8 @@ const assert = require('assert');
 const C = require('../src/core.js');
 
 let passed = 0;
-const test = (name, fn) => { fn(); passed++; console.log(`✓ ${name}`); };
+const tests = [];
+const test = (name, fn) => tests.push([name, fn]);
 const ent = (s, e, p = 45) => { const r = C.workedRaw(s, e, p); return { start: s, end: e, pause: p, ...C.capDay(r), raw: r }; };
 const base = () => { const S = C.defaults(); S.lohn.grundlohn = 4000; return S; };
 
@@ -181,4 +182,46 @@ test('Im Voraus eingetragene Arbeitszeit zählt sofort ins Zeitkonto, künftige 
   assert.ok(Math.abs(c.zkPlanned - 3.5) < 1e-9); // abzüglich verplantem ZK-Tag (7 h)
 });
 
-console.log(`\n${passed} Tests bestanden.`);
+test('Zeitnachweis-PDF: Tage erkennen, vergleichen und übernehmen', () => {
+  const R = (...a) => ({ items: a.map(([x, s]) => ({ x, s })) });
+  const head = R([51, 'Dat'], [65, 'Tag'], [83, 'Beschreibung'], [191, 'von'], [211, 'bis'], [252, 'Istz.'], [278, 'Sollz'], [306, 'Pause'], [338, 'Saldo'], [371, 'ZKT'], [400, 'ZKT K'], [435, 'MA'], [460, 'MAAus.'], [493, 'MEAV'], [524, 'FZA K'], [556, 'TAZP']);
+  const rows = [R([335, 'Zeitraum:'], [417, '01.06.2026'], [467, '-'], [477, '30.06.2026']), head,
+    R([51, '08'], [66, 'MO'], [84, 'Kur'], [256, '7,00'], [406, '5,00'], [531, '10,00']),
+    R([51, '09'], [66, 'DI'], [84, 'Kur'], [256, '7,00'], [406, '5,00'], [531, '10,00']),
+    R([51, '10'], [66, 'MI'], [84, 'anwesend'], [188, '07:00'], [208, '10:00'], [256, '8,50'], [406, '5,50'], [531, '10,00']),
+    R([84, 'anwesend'], [188, '10:30'], [208, '17:00']),
+    R([52, 'Woche'], [253, '22,50']),
+    R([51, '11'], [66, 'DO'], [84, 'Urlaub'], [256, '7,00'], [406, '5,50'], [531, '10,00']),
+    R([51, '12'], [66, 'FR'], [84, 'Krankheit ohne Attest'], [256, '7,00'], [406, '5,50'], [531, '9,00']),
+    R([49, 'Monatsübersicht zum Stichtag']), R([52, 'monatliches Kontingent Mehrarbeit'], [179, '20,00'])];
+  const z = C.parseZeitnachweis(rows);
+  assert.strictEqual(z.month, '2026-06');
+  assert.deepStrictEqual(z.days[2].work, { start: '07:00', end: '17:00', pause: 90, hours: 8.5 }); // zwei Buchungen → eine mit Pause
+  assert.deepStrictEqual([z.zk.value, z.fza.value, z.kontingent], [5.5, 9, 20]);
+  const S = base(); S.zk.stand = 1; S.zk.datum = '2026-05-31';
+  const st = { settings: S, entries: { '2026-06-11': ent('07:00', '15:45') }, absences: [{ id: 'a', from: '2026-05-28', to: '2026-06-02', type: 'tarif' }], kontingent: {}, nach: [] };
+  const plan = C.importPlan(st, z);
+  assert.deepStrictEqual(plan.diffs.map((d) => d.date), ['2026-06-08', '2026-06-09', '2026-06-10', '2026-06-11', '2026-06-12']);
+  C.applyImport(st, plan, 1, (() => { let i = 0; return () => `n${i++}`; })());
+  assert.ok(!st.entries['2026-06-11'] && st.entries['2026-06-10'].hours === 8.5);
+  const by = (t) => st.absences.filter((a) => a.type === t).map((a) => `${a.from}..${a.to}`);
+  assert.deepStrictEqual(by('tarif'), ['2026-05-28..2026-05-31', '2026-06-11..2026-06-11']);
+  assert.deepStrictEqual(by('sonder'), ['2026-06-08..2026-06-09']);
+  assert.strictEqual(st.absences.find((a) => a.type === 'sonder').note, 'Kur');
+  assert.deepStrictEqual(by('krank'), ['2026-06-12..2026-06-12']);
+  assert.deepStrictEqual([S.zk.stand, S.zk.datum, S.urlaub.fzaStand, st.kontingent['2026-06']], [5.5, '2026-06-30', 9, 20]);
+  assert.deepStrictEqual(C.importPlan(st, z).diffs, []);
+});
+
+test('PDF-Textleser: Text und Position aus einem Flate-Stream', async () => {
+  const zlib = require('zlib'); const Pdf = require('../src/pdf.js');
+  const content = zlib.deflateSync(Buffer.from('BT /F1 1 Tf 9 0 0 9 50 700 Tm (Zeitraum:)Tj 0 -2 Td (Gr\\374\\337e \\(Test\\))Tj ET', 'latin1'));
+  const pdf = Buffer.concat([Buffer.from('%PDF-1.4\n4 0 obj\n<</Filter/FlateDecode/Length ' + content.length + '>>stream\n', 'latin1'), content, Buffer.from('\nendstream\nendobj\n%%EOF', 'latin1')]);
+  const rows = await Pdf.lines(pdf);
+  assert.deepStrictEqual(rows.map((r) => r.items.map((i) => [Math.round(i.x), Math.round(i.y), i.s])), [[[50, 700, 'Zeitraum:']], [[50, 682, 'Grüße (Test)']]]);
+});
+
+(async () => {
+  for (const [name, fn] of tests) { await fn(); passed++; console.log(`✓ ${name}`); }
+  console.log(`\n${passed} Tests bestanden.`);
+})().catch((e) => { console.error(e); process.exit(1); });
