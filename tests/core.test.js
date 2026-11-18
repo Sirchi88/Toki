@@ -121,4 +121,16 @@ test('Netto-Monat nutzt die Mehrarbeit desselben Monats', () => {
   assert.ok(mp.lines.some((l) => l.mehr && Math.abs(l.v - 4 * 25 * 1.25) < 1e-9));
 });
 
+test('Gehalt "Auszahlung": Mehrarbeit und Sonderzahlung kommen aus dem Vormonat', () => {
+  const S = base(); S.lohn.stundenlohn = 25; S.lohn.sonder = [{ name: 'Weihnachtsgeld', art: 'einmalig', monat: 11, modus: 'betrag', wert: 2000 }];
+  const st = { settings: S, entries: {}, absences: [], kontingent: { '2026-11': 10 }, nach: [] };
+  for (const d of ['2026-11-16', '2026-11-17']) st.entries[d] = ent('07:00', '16:45');
+  const c = C.compute(st, '2026-12-05');
+  const akt = C.monthPay(st, c, '2026-12', 'aktuell');
+  const aus = C.monthPay(st, c, '2026-12', 'auszahlung');
+  assert.ok(!akt.lines.some((l) => l.mehr) && !akt.lines.some((l) => l.k.startsWith('Weihnachtsgeld')));
+  assert.ok(aus.lines.some((l) => l.mehr && Math.abs(l.v - 125) < 1e-9));
+  assert.ok(aus.lines.some((l) => l.k.startsWith('Weihnachtsgeld') && l.v === 2000));
+});
+
 console.log(`\n${passed} Tests bestanden.`);

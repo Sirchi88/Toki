@@ -90,7 +90,7 @@ const Core = (() => {
 
   // ---------- Einstellungen ----------
   const defaults = () => ({
-    theme: 'standard',
+    theme: 'dark',
     arbeit: { wochenstunden: 35, brotzeit: 15, mittag: 30, land: 'BY', mariae: true, halb24: false, halb31: false },
     lohn: {
       grundlohn: 0, stundenlohn: 0, zeigen: true, auszahlung: 'folgemonat', nettoAbzug: 0,
@@ -457,37 +457,42 @@ const Core = (() => {
   };
 
   /** Brutto-Bestandteile eines Monats */
-  const monthPay = (st, calc, m) => {
+  /** Vormonat als yyyy-mm */
+  const prevMonth = (m) => { const [y, mo] = m.split('-').map(Number); return mo === 1 ? `${y - 1}-12` : `${y}-${String(mo - 1).padStart(2, '0')}`; };
+  const MONATE = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+  /**
+   * Brutto-Bestandteile eines Monats.
+   * modus 'aktuell': Grundlohn + Mehrarbeit, Urlaubsgeld und Sonderzahlungen dieses Monats.
+   * modus 'auszahlung': Grundlohn dieses Monats + Mehrarbeit, Urlaubsgeld und einmalige Sonderzahlungen des Vormonats.
+   */
+  const monthPay = (st, calc, m, modus = 'aktuell') => {
     const S = st.settings;
     const g = Number(S.lohn.grundlohn) || 0;
-    const [y, mo] = m.split('-').map(Number);
+    const src = modus === 'auszahlung' ? prevMonth(m) : m;
+    const srcMo = Number(src.slice(5, 7));
+    const aus = src !== m ? ` (aus ${MONATE[srcMo - 1]})` : '';
     const lines = [{ k: 'Grundlohn', v: g, laufend: true }];
     for (const s of S.lohn.sonder || []) {
       const val = s.modus === 'faktor' ? g * (Number(s.wert) || 0) : Number(s.wert) || 0;
       if (!val) continue;
       if (s.art === 'monatlich') lines.push({ k: s.name || 'Sonderzahlung', v: val, laufend: true });
-      else if (Number(s.monat) === mo) lines.push({ k: s.name || 'Sonderzahlung', v: val, laufend: false });
+      else if (Number(s.monat) === srcMo) lines.push({ k: (s.name || 'Sonderzahlung') + aus, v: val, laufend: false });
     }
-    // Mehrarbeit
-    // Netto-Rechner rechnet immer mit der Mehrarbeit des Monats selbst (auch wenn sie später ausgezahlt wird)
-    const src = m;
-    void y;
     const mm = calc.months.get(src);
-    if (mm && mm.pay.total) lines.push({ k: 'Mehrarbeit', v: mm.pay.total, laufend: true, mehr: mm });
-    // Urlaubsgeld
+    if (mm && mm.pay.total) lines.push({ k: 'Mehrarbeit' + aus, v: mm.pay.total, laufend: true, mehr: mm });
     let tu = 0;
-    for (const [d, a] of calc.absMap) if (a.type === 'tarif' && ym(d) === m) tu += a.units;
+    for (const [d, a] of calc.absMap) if (a.type === 'tarif' && ym(d) === src) tu += a.units;
     const ugTag = (g / (Number(S.urlaub.ugTeiler) || 21.75)) * (Number(S.urlaub.ugFaktor) || 0);
-    if (tu && ugTag) lines.push({ k: `Urlaubsgeld (${String(tu).replace('.', ',')} Tage)`, v: tu * ugTag, laufend: false });
-    const laufend = lines.filter((l) => l.laufend).reduce((a, b) => a + b.v, 0);
-    const einmal = lines.filter((l) => !l.laufend).reduce((a, b) => a + b.v, 0);
-    return { lines, laufend, einmal, src, tu, ugTag };
+    if (tu && ugTag) lines.push({ k: `Urlaubsgeld (${String(tu).replace('.', ',')} Tage)${aus}`, v: tu * ugTag, laufend: false });
+    const laufend = lines.filter((l) => l.laufend).reduce((a2, b2) => a2 + b2.v, 0);
+    const einmal = lines.filter((l) => !l.laufend).reduce((a2, b2) => a2 + b2.v, 0);
+    return { lines, laufend, einmal, src, tu, ugTag, modus };
   };
 
   return {
     toMin, fmtClock, leaveAt, workedRaw, capDay, MAX_DAY, D, iso, addDays, dow, monday, isoWeek, ym, todayIso, range,
     LAENDER, easter, holidays, holidayName, isWorkday, workdaysBetween, defaults, merge, tagessoll, stundenlohn, holOpt,
-    TYPES, specialPause, presence, absenceDays, halfDay, dayNeed, yearCfg, dayTarget, zuschlag, compute, vacation, est, steuerJahr, netto, monthPay, P,
+    TYPES, specialPause, presence, absenceDays, halfDay, dayNeed, yearCfg, dayTarget, zuschlag, compute, vacation, est, steuerJahr, netto, monthPay, prevMonth, P,
   };
 })();
 if (typeof module !== 'undefined') module.exports = Core;
