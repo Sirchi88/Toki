@@ -172,4 +172,13 @@ test('Grundgehalt ist Basis für Stundenlohn; Einmalzahlung-Steuer ohne Mehrarbe
   assert.ok(Math.abs((a.lst - b.lst) - ezA) < 1e-9);
 });
 
+test('Im Voraus eingetragene Arbeitszeit zählt sofort ins Zeitkonto, künftige ZK-Tage nur als verplant', () => {
+  const S = base(); S.zk.stand = 10; S.zk.datum = '2026-11-01';
+  const st = { settings: S, entries: {}, absences: [{ id: 'z', from: '2026-11-30', to: '2026-11-30', type: 'zk' }], kontingent: { '2026-11': 2.5 }, nach: [] };
+  st.entries['2026-11-20'] = ent('07:00', '17:45'); // 3 h Mehrarbeit am Freitag (in der Zukunft)
+  const c = C.compute(st, '2026-11-18');
+  assert.ok(Math.abs(c.zk - 10.5) < 1e-9); // 2,5 h Kontingent, 0,5 h ins Zeitkonto
+  assert.ok(Math.abs(c.zkPlanned - 3.5) < 1e-9); // abzüglich verplantem ZK-Tag (7 h)
+});
+
 console.log(`\n${passed} Tests bestanden.`);

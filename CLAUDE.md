@@ -10,6 +10,7 @@
   - Samstag: keine Brotzeit, ab 6 h Anwesenheit 30 min Mittag (nie unter 6 h); alles Mehrarbeit; Samstag ins Zeitkonto +25 % (abschaltbar).
   - Reihenfolge: MEA-Kontingent des Monats → Rest ins Zeitkonto (±35 h, darüber Warnung + „Mehrarbeit nachbeantragen“). Monatswechsel in der Woche: jeder Tag zählt zum Kontingent seines Monats, Zuschläge und ZK-Verrechnung bleiben wochenweise.
   - Gehalt (früher Netto): Ansicht „Aktuell“ = Grundlohn + Mehrarbeit/Urlaubsgeld/Sonderzahlungen des Monats; „Auszahlung“ = Grundlohn des Monats + Mehrarbeit/Urlaubsgeld/einmalige Sonderzahlungen des Vormonats. Einstellungen fragen nur das Grundgehalt ab (inkl. fester Zulagen, keine eigenen Felder für Zulagen oder VL – vom Nutzer so gewünscht); Stundenlohn, Urlaubsgeld und Faktor-Sonderzahlungen kommen daraus.
+  - Im Voraus eingetragene Arbeitszeiten: KW erscheint im Reiter Mehrarbeit sofort und zählt sofort in den Zeitkonto-Stand (Kopfleiste, Urlaub); künftige ZK-Urlaubstage nur als „verplant“. Reine Urlaubswochen erst, wenn die KW begonnen hat.
   - God Mode: Gesamt-Mehrarbeit kleiner als 25 %-Stunden (z. B. 0) → 25 %-Stunden werden automatisch mitgesenkt.
   - Lohnsteuer auf Einmalzahlungen: Jahreslohn-Methode mit Basis = laufender Lohn ohne Mehrarbeit.
   - Option „freiwillig versichert“ (`steuer.freiwillig`): nur Anzeige Beitrag − AG-Zuschuss, Ergebnis gleich.

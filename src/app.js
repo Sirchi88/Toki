@@ -485,8 +485,8 @@
     const nachList = st.nach.slice().sort((a, b) => (a.month < b.month ? 1 : -1));
     let body = '';
     if (ui.view === 'woche') {
-      // Nur Wochen bis einschließlich der laufenden – geplanter Urlaub erscheint erst, wenn seine KW begonnen hat
-      const all = calc.weeks.filter((w) => w.monday <= today && w.days.some((d) => d.entry || (d.absence && !d.absence.fromEntry)));
+      // Wochen mit erfassten Zeiten immer (auch im Voraus eingetragene); reine Urlaubswochen erst, wenn ihre KW begonnen hat
+      const all = calc.weeks.filter((w) => w.days.some((d) => d.entry) || (w.monday <= today && w.days.some((d) => d.absence && !d.absence.fromEntry)));
       body = all.length ? all.map((w, i) => weekCard(w, all[i - 1] && all[i - 1].days.some((x) => x.entry) ? all[i - 1] : null)).reverse().join('') : '<p class="empty">Noch keine Tage gespeichert.</p>';
     } else if (ui.view === 'monat') {
       const ms = [...calc.months.values()].filter((x) => x.days || x.weeks.some((w) => w.mehr || w.zkChange)).sort((a, b) => (a.month < b.month ? 1 : -1));
