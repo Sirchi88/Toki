@@ -31,8 +31,8 @@ body[data-theme=xmas]{--onbg:#fff;--bg:oklch(28% .07 255);--card:oklch(99% .008 
 body[data-theme=fryer]{--bg:oklch(93% .06 80);--card:oklch(99.5% .012 85/.95);--fg:oklch(28% .06 50);--primary:oklch(56% .17 40);--on-primary:#fff;--secondary:oklch(94% .05 85);--accent:oklch(90% .1 90);--border:oklch(84% .08 70);--muted:oklch(48% .06 55)}
 
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;min-height:100dvh;background:var(--bg);color:var(--fg);font-family:var(--font-b);font-size:16px;line-height:1.4;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+html{-webkit-text-size-adjust:100%;overflow-x:hidden;overscroll-behavior-x:none}
+body{margin:0;min-height:100dvh;background:var(--bg);color:var(--fg);font-family:var(--font-b);font-size:16px;line-height:1.4;-webkit-tap-highlight-color:transparent;overflow-x:hidden;overflow-x:clip;max-width:100vw}
 button,input,select,textarea{font:inherit;color:inherit}
 #fx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 #app{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 14px) 14px calc(96px + env(safe-area-inset-bottom))}
@@ -252,7 +252,7 @@ body[data-theme=fryer] .card{background-image:radial-gradient(circle at 100% 0,c
 .pill.on{transform:translate(-50%,0)}
 .toast.ok{background:var(--success);color:#fff}
 .savebar{position:sticky;bottom:calc(84px + env(safe-area-inset-bottom));z-index:5;margin:6px 0 14px;box-shadow:0 8px 20px -6px rgb(0 0 0/.35)}
-.field.sm{height:40px;font-size:15px}
+.field.sm{height:40px;font-size:16px}
 select.field.sm{background-position:calc(100% - 18px) 17px,calc(100% - 13px) 17px}
 button.tile{border:0;cursor:pointer;font:inherit;color:inherit;width:100%}
 button.tile:active{transform:scale(.97)}
@@ -537,6 +537,189 @@ dl.money details.mline.hl25>summary dt,dl.money details.mline.hl25>summary dd{co
 dl.money .msub{margin:2px 0 6px 4px;padding:4px 0 4px 10px;border-left:2px solid var(--border);font-size:13px}
 dl.money .msub .mav{margin-top:4px;padding-top:6px;border-top:1px dashed var(--border)}
 /* Demo-Modus */
-.demobar{position:sticky;top:0;z-index:50;margin:0 -16px 8px;padding:8px 16px;background:repeating-linear-gradient(135deg,#f5b400 0 14px,#e0a200 14px 28px);color:#1b1500;font-weight:800;font-size:13px;letter-spacing:.04em;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.demobar{position:sticky;top:0;z-index:50;margin:0 -14px 8px;padding:8px 14px;background:repeating-linear-gradient(135deg,#f5b400 0 14px,#e0a200 14px 28px);color:#1b1500;font-weight:800;font-size:13px;letter-spacing:.04em;display:flex;align-items:center;justify-content:space-between;gap:8px}
 .demobar button{border:0;border-radius:8px;padding:5px 10px;background:#1b1500;color:#fff;font-weight:700;font-size:12px;cursor:pointer}
 .btn.big{min-height:56px;font-size:17px;width:100%}
+
+/* Seiten nie seitlich verschiebbar */
+#app,.page{max-width:100%}
+#app{overflow-x:clip}
+.sheet{overflow-x:hidden}
+/* Demo-Link & Release Notes */
+.demolink{border:0;background:none;color:var(--onbg,var(--muted));opacity:.45;font-size:11px;letter-spacing:.08em;cursor:pointer;padding:4px 10px}
+.rel{display:grid;gap:10px}
+.relv{border-left:3px solid var(--primary);padding:2px 0 2px 10px}
+.relh{display:flex;align-items:baseline;justify-content:space-between;gap:8px}.relh b{font-size:16px}.relh span{font-size:12px;color:var(--muted)}
+.relv ul{margin:4px 0 0;padding-left:18px;font-size:13.5px}
+
+/* =====================================================================
+   Eingebettete Schriften (SIL OFL, siehe src/fonts/LIZENZ.md)
+   ===================================================================== */
+@font-face{font-family:'Toki Archivo';src:url(__FONT_archivo-black__) format('woff');font-weight:400 900;font-display:swap}
+@font-face{font-family:'Toki Bricolage';src:url(__FONT_bricolage-600__) format('woff');font-weight:400 650;font-display:swap}
+@font-face{font-family:'Toki Bricolage';src:url(__FONT_bricolage-800__) format('woff');font-weight:651 900;font-display:swap}
+@font-face{font-family:'Toki Bricolage XB';src:url(__FONT_bricolage-800__) format('woff');font-weight:100 900;font-display:swap}
+@font-face{font-family:'Toki Patrick';src:url(__FONT_patrick-hand__) format('woff');font-weight:400 900;font-display:swap}
+@font-face{font-family:'Toki Gochi';src:url(__FONT_gochi-hand__) format('woff');font-weight:400 900;font-display:swap}
+
+/* =====================================================================
+   Design „Bold Pop“ – knallig, fett, geometrisch, asymmetrisch
+   ===================================================================== */
+body[data-theme=pop]{
+  --bg:#fff1cf;--card:#fff;--fg:#121212;--muted:#4a4656;--primary:#ff2e88;--on-primary:#fff;--secondary:#ffe36e;--accent:#b8f2e6;
+  --border:#121212;--success:#00a86b;--danger:#ff3b30;--warn:#ff9f1c;--c-zk:#2d5bff;--c-tarif:#ff7a00;--c-fza:#8b5cf6;--c-tzug:#00b3a4;--c-sonder:#ff2e88;
+  --radius:24px;--shadow:5px 5px 0 #121212;--onbg:#121212;
+  --font-d:'Toki Bricolage XB','Arial Black',sans-serif;--font-b:'Toki Bricolage',system-ui,sans-serif;--font-pop:'Toki Archivo','Arial Black',Impact,sans-serif;
+  font-weight:600;
+}
+body[data-theme=pop] h1{font-family:var(--font-pop);display:inline-block;font-size:clamp(28px,9vw,40px);line-height:.92;text-transform:uppercase;letter-spacing:-.02em;transform:rotate(-2deg);transform-origin:left;background:linear-gradient(transparent 58%,#ffe36e 58% 92%,transparent 92%);padding:0 6px 0 2px;margin-bottom:18px}
+body[data-theme=pop] .brand span{font-family:var(--font-pop);font-size:24px;letter-spacing:.06em;color:#121212}
+body[data-theme=pop] .brand img{border:3px solid #121212;border-radius:12px;box-shadow:3px 3px 0 #121212}
+body[data-theme=pop] .iconbtn{border:3px solid #121212;background:#fff;box-shadow:3px 3px 0 #121212}
+body[data-theme=pop] .card,body[data-theme=pop] details.fold{border:3px solid #121212;box-shadow:6px 6px 0 #121212;border-radius:28px 10px 28px 10px}
+body[data-theme=pop] .card:nth-of-type(even),body[data-theme=pop] details.fold:nth-of-type(even){border-radius:10px 28px 10px 28px;box-shadow:-6px 6px 0 #121212;margin-left:6px}
+body[data-theme=pop] .card:nth-of-type(odd){margin-right:6px}
+body[data-theme=pop] .card::after{content:'';position:absolute;top:-11px;right:22px;width:22px;height:22px;background:#2d5bff;border:3px solid #121212;border-radius:50%}
+body[data-theme=pop] .card:nth-of-type(3n)::after{border-radius:4px;background:#ffe36e;transform:rotate(45deg)}
+body[data-theme=pop] .card:nth-of-type(3n+1)::after{background:#ff2e88;border-radius:0;clip-path:polygon(50% 0,100% 100%,0 100%);border:0;width:26px;height:24px}
+body[data-theme=pop] .card h2{display:inline-block;background:#121212;color:#fff;font-family:var(--font-pop);font-weight:400;font-size:13px;letter-spacing:.06em;padding:5px 11px 4px;border-radius:999px;transform:rotate(-1.5deg)}
+body[data-theme=pop] .card h3,body[data-theme=pop] .sheet h3{font-family:var(--font-pop);font-size:clamp(20px,6.4vw,27px);text-transform:uppercase;letter-spacing:-.01em}
+body[data-theme=pop] .label{color:#121212;font-weight:800}
+body[data-theme=pop] .field,body[data-theme=pop] .datebtn{border:3px solid #121212;border-radius:14px;font-weight:700;background:#fff}
+body[data-theme=pop] .field:focus{border-color:#121212;box-shadow:4px 4px 0 var(--primary)}
+body[data-theme=pop] .btn{border:3px solid #121212;border-radius:16px;box-shadow:4px 4px 0 #121212;font-family:var(--font-pop);font-weight:400;text-transform:uppercase;letter-spacing:.03em;font-size:15px;transition:transform .08s,box-shadow .08s}
+body[data-theme=pop] .btn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 #121212}
+body[data-theme=pop] .btn.soft{background:#ffe36e;color:#121212}
+body[data-theme=pop] .btn.ghost{background:#fff;color:#121212;border-color:#121212}
+body[data-theme=pop] .btn.danger{background:#fff;color:#ff3b30;border-color:#121212}
+body[data-theme=pop] .seg{background:#121212;border-radius:18px;padding:5px}
+body[data-theme=pop] .seg button{color:#fff;font-family:var(--font-pop);font-weight:400;text-transform:uppercase;font-size:13px;letter-spacing:.03em}
+body[data-theme=pop] .seg button[aria-pressed=true]{background:#ffe36e;color:#121212;box-shadow:none;transform:rotate(-1deg)}
+body[data-theme=pop] .switch input{border:2.5px solid #121212;background:#fff}
+body[data-theme=pop] .switch input::after{top:1.5px;left:1.5px;background:#121212;box-shadow:none}
+body[data-theme=pop] .switch input:checked{background:#00d18b}body[data-theme=pop] .switch input:checked::after{left:19.5px;background:#fff;border:2px solid #121212}
+body[data-theme=pop] .amp{border:3px solid #121212;box-shadow:4px 4px 0 #121212;border-radius:18px 6px 18px 6px}
+body[data-theme=pop] .amp:nth-child(1){background:#ffb3d1;transform:rotate(-1.5deg)}
+body[data-theme=pop] .amp:nth-child(2){background:#a8c5ff;transform:rotate(1deg)}
+body[data-theme=pop] .amp:nth-child(3){background:#b8f2e6;transform:rotate(-.6deg)}
+body[data-theme=pop] .amp .k{color:#121212}
+body[data-theme=pop] .worked{background:#2d5bff;color:#fff;border:3px solid #121212;box-shadow:5px 5px 0 #121212;border-radius:22px 8px 22px 8px}
+body[data-theme=pop] .worked .v{color:#fff;font-size:52px;text-shadow:3px 3px 0 #121212}
+body[data-theme=pop] .worked .k{color:#fff}
+body[data-theme=pop] .tile{background:#ffe36e;border:2.5px solid #121212;border-radius:14px}
+body[data-theme=pop] .tile:nth-child(even){background:#b8f2e6}
+body[data-theme=pop] .tile .v{color:#121212}
+body[data-theme=pop] .kpi{border:2.5px solid #121212;background:#fff}
+body[data-theme=pop] .kpi.hl{background:#b8f2e6}
+body[data-theme=pop] .big-r,body[data-theme=pop] .hero .v{color:var(--primary);text-shadow:3px 3px 0 #121212}
+body[data-theme=pop] dl.money{background:#fff8e1;border:2.5px solid #121212;border-radius:16px}
+body[data-theme=pop] .progress{height:16px;border:2.5px solid #121212;background:#fff}
+body[data-theme=pop] .progress i{background:repeating-linear-gradient(-45deg,#ff2e88 0 8px,#ff5fa5 8px 16px);border-radius:0}
+body[data-theme=pop] .chart .c b{border:2px solid #121212;background:#ff2e88}
+body[data-theme=pop] .chart .c b.zk{background:#2d5bff}
+body[data-theme=pop] .bar{border:2px solid #121212;border-radius:8px}
+body[data-theme=pop] .bar .f{background:#b8f2e6}body[data-theme=pop] .bar .o{background:#ff2e88}
+body[data-theme=pop] .cd{border:2px solid #121212;border-radius:10px;font-weight:800}
+body[data-theme=pop] .cd.we,body[data-theme=pop] .cd.out{border-color:transparent}
+body[data-theme=pop] .cd.today{box-shadow:3px 3px 0 #121212}
+body[data-theme=pop] .bal .b{border:3px solid #121212;border-left-width:12px;box-shadow:4px 4px 0 #121212;border-radius:6px 18px 18px 6px}
+body[data-theme=pop] .typepick button{border:2.5px solid #121212}
+body[data-theme=pop] .typepick button[aria-pressed=true]{background:#ffe36e;box-shadow:3px 3px 0 #121212}
+body[data-theme=pop] .notice{border:2.5px solid #121212}
+body[data-theme=pop] .notice.warn{background:#ffe36e}body[data-theme=pop] .notice.info{background:#e9e4ff}
+body[data-theme=pop] .nsplit>div{border:2.5px solid #121212;background:#fff}
+body[data-theme=pop] .nsplit>div.m{background:#b8f2e6}
+body[data-theme=pop] .badge{border:2px solid #121212;background:#ffe36e;color:#121212}
+body[data-theme=pop] .th{border:3px solid #121212}
+body[data-theme=pop] .th[aria-pressed=true]{box-shadow:4px 4px 0 var(--primary)}
+body[data-theme=pop] nav.tabs .in{background:#121212;border:3px solid #121212;border-radius:26px;box-shadow:5px 5px 0 #ff2e88;backdrop-filter:none;-webkit-backdrop-filter:none}
+body[data-theme=pop] nav.tabs button{color:#e8e6ef;font-weight:800;font-size:11px;letter-spacing:.02em;text-transform:uppercase}
+body[data-theme=pop] nav.tabs button[aria-current=page]{background:#ffe36e;color:#121212;transform:rotate(-2deg)}
+body[data-theme=pop] .sheet{border:3px solid #121212;border-bottom:0;border-radius:30px 30px 0 0}
+body[data-theme=pop] .toast{background:#121212;color:#ffe36e;border:3px solid #ffe36e}
+body[data-theme=pop] .toast.ok{background:#00a86b;color:#fff;border-color:#121212}
+body[data-theme=pop] .empty{font-family:var(--font-pop);text-transform:uppercase}
+body[data-theme=pop] .hero .v{font-size:clamp(40px,13vw,58px)}
+body[data-theme=pop] .yearnav b{font-size:24px}
+
+/* =====================================================================
+   Design „Doodle“ – handgezeichnet, Comic-Figuren, mit Augenzwinkern
+   ===================================================================== */
+body[data-theme=doodle]{
+  --bg:#fbf8ef;--card:#fffef8;--fg:#2b2b2b;--muted:#696969;--primary:#2f5bd3;--on-primary:#fff;--secondary:#fff4c2;--accent:#ffe680;
+  --border:#2b2b2b;--success:#2e9d55;--danger:#e0453a;--warn:#f2a33a;--onbg:#2b2b2b;
+  --radius:18px;--shadow:2px 3px 0 #2b2b2b;
+  --font-d:'Toki Gochi','Comic Sans MS','Chalkboard SE',cursive;--font-b:'Toki Patrick','Comic Sans MS','Chalkboard SE',cursive;
+  font-size:17.5px;background-image:linear-gradient(90deg,transparent 0 22px,#f3b6b0 22px 24px,transparent 24px),repeating-linear-gradient(transparent 0 31px,#dbe6f5 31px 32px);background-attachment:fixed;
+}
+body[data-theme=doodle] h1{font-size:56px;font-weight:400;letter-spacing:.01em;padding-bottom:10px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 14'%3E%3Cpath d='M3 9c20-6 38 4 58-1s36-6 56 0 46 2 80-4' fill='none' stroke='%23f2a33a' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E") left bottom/min(220px,70%) 14px no-repeat}
+body[data-theme=doodle] .brand span{font-size:28px;letter-spacing:.08em;color:#2b2b2b}
+body[data-theme=doodle] .brand img{border-radius:40% 55% 45% 50%/55% 45% 55% 45%;border:2.5px solid #2b2b2b;transform:rotate(-4deg)}
+body[data-theme=doodle] .iconbtn{border:2.5px solid #2b2b2b;border-radius:55% 45% 50% 50%/50% 55% 45% 50%;background:#fffef8}
+body[data-theme=doodle] .card,body[data-theme=doodle] details.fold,body[data-theme=doodle] .amp,body[data-theme=doodle] .bal .b{border:2.5px solid #2b2b2b;border-radius:255px 18px 225px 18px/18px 225px 18px 255px;box-shadow:2px 3px 0 #2b2b2b}
+body[data-theme=doodle] .card:nth-of-type(even){transform:rotate(.3deg)}
+body[data-theme=doodle] .card:nth-of-type(odd){transform:rotate(-.25deg)}
+body[data-theme=doodle] .card::before{content:'';position:absolute;top:-12px;left:50%;width:64px;height:20px;margin-left:-32px;background:rgb(255 230 128/.75);transform:rotate(-3deg);border-left:2px dashed rgb(0 0 0/.08);border-right:2px dashed rgb(0 0 0/.08)}
+body[data-theme=doodle] .card h2{font-family:var(--font-d);font-size:23px;font-weight:400;letter-spacing:.02em;text-transform:none;color:#2b2b2b;display:inline-block;background:linear-gradient(transparent 55%,#ffe680 55% 90%,transparent 90%);padding:0 4px}
+body[data-theme=doodle] .card h3,body[data-theme=doodle] .sheet h3{font-size:32px}
+body[data-theme=doodle] .label{font-size:15px;letter-spacing:.02em;text-transform:none;color:#2b2b2b}
+body[data-theme=doodle] .field,body[data-theme=doodle] .datebtn{border:2px solid #2b2b2b;border-radius:14px 4px 12px 6px/6px 12px 4px 14px;background:#fffef8;font-size:19px}
+body[data-theme=doodle] .field:focus{box-shadow:0 0 0 3px #ffe680}
+body[data-theme=doodle] .btn{border:2.5px solid #2b2b2b;border-radius:15px 225px 15px 255px/255px 15px 225px 15px;box-shadow:2px 3px 0 #2b2b2b;font-family:var(--font-d);font-size:20px;font-weight:400;letter-spacing:.03em}
+body[data-theme=doodle] .btn:active{transform:translate(2px,2px) rotate(-.5deg);box-shadow:0 1px 0 #2b2b2b}
+body[data-theme=doodle] .btn.soft{background:#fff4c2}
+body[data-theme=doodle] .btn.ghost,body[data-theme=doodle] .btn.danger{background:#fffef8}
+body[data-theme=doodle] .seg{background:transparent;border:2.5px dashed #2b2b2b;border-radius:18px 8px 18px 8px}
+body[data-theme=doodle] .seg button{font-family:var(--font-d);font-size:19px;font-weight:400;color:#696969}
+body[data-theme=doodle] .seg button[aria-pressed=true]{background:#ffe680;color:#2b2b2b;box-shadow:none;border-radius:40% 60% 50% 50%/60% 40% 60% 40%}
+body[data-theme=doodle] .switch input{border:2px solid #2b2b2b;background:#fffef8}
+body[data-theme=doodle] .switch input::after{top:1px;left:2px;background:#2b2b2b;box-shadow:none}
+body[data-theme=doodle] .switch input:checked{background:#9fd8a8}
+body[data-theme=doodle] .amp .v,body[data-theme=doodle] .kpi .v,body[data-theme=doodle] .bal .v{font-weight:400}
+body[data-theme=doodle] .amp .k,body[data-theme=doodle] .kpi .k,body[data-theme=doodle] .bal .k{font-size:12px;letter-spacing:.02em}
+body[data-theme=doodle] .bal .b{border-left-width:7px}
+body[data-theme=doodle] .worked{background:#fff4c2;border:2.5px solid #2b2b2b;border-radius:30px 12px 26px 14px/14px 26px 12px 30px;position:relative}
+body[data-theme=doodle] .worked .v{color:#2b2b2b;font-size:50px}
+body[data-theme=doodle] .worked::after{content:'';position:absolute;right:10px;top:-14px;width:34px;height:34px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M20 3l5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z' fill='%23ffe680' stroke='%232b2b2b' stroke-width='2.2' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;transform:rotate(12deg)}
+body[data-theme=doodle] .tile{background:#fffef8;border:2px dashed #2b2b2b;border-radius:14px 6px 14px 6px}
+body[data-theme=doodle] .tile .v,body[data-theme=doodle] .big-r{color:var(--primary);font-weight:400}
+body[data-theme=doodle] .kpi{background:#fffef8;border:2px solid #2b2b2b;border-radius:12px 4px 12px 4px}
+body[data-theme=doodle] .kpi.hl{background:#e3f5e6}
+body[data-theme=doodle] .hero .v{color:var(--primary);font-weight:400;font-size:clamp(40px,13vw,60px)}
+body[data-theme=doodle] dl.money{background:#fffef8;border:2px dashed #2b2b2b;border-radius:14px 6px 14px 6px}
+body[data-theme=doodle] .progress{border:2px solid #2b2b2b;background:#fffef8;height:14px}
+body[data-theme=doodle] .progress i{background:repeating-linear-gradient(-60deg,#2f5bd3 0 3px,#7f9de8 3px 7px);border-radius:99px}
+body[data-theme=doodle] .chart .c b{border:2px solid #2b2b2b;background:#7f9de8;border-radius:8px 3px 6px 2px}
+body[data-theme=doodle] .chart .c b.zk{background:#ffe680}
+body[data-theme=doodle] .bar{border:2px solid #2b2b2b;border-radius:10px 4px 9px 4px}
+body[data-theme=doodle] .bar .f{background:#e3ebfb}body[data-theme=doodle] .bar .o{background:repeating-linear-gradient(-45deg,#2f5bd3 0 4px,#5f82e0 4px 8px)}
+body[data-theme=doodle] .cd{border:2px solid #2b2b2b;border-radius:45% 55% 50% 50%/55% 45% 55% 45%;background:#fffef8;font-size:16px}
+body[data-theme=doodle] .cd.we,body[data-theme=doodle] .cd.out{border-style:dashed;border-color:#b5b5b5}
+body[data-theme=doodle] .cd.today{box-shadow:0 0 0 3px #ffe680}
+body[data-theme=doodle] .typepick button{border:2px solid #2b2b2b;border-radius:14px 4px 12px 6px}
+body[data-theme=doodle] .typepick button[aria-pressed=true]{background:#ffe680}
+body[data-theme=doodle] .notice{border:2px dashed #2b2b2b;border-radius:16px 6px 14px 8px}
+body[data-theme=doodle] .notice.warn{background:#fff4c2}
+body[data-theme=doodle] .nsplit>div{border:2px solid #2b2b2b;background:#fffef8;border-radius:14px 4px 12px 6px}
+body[data-theme=doodle] .nsplit>div.m{background:#e3f5e6}
+body[data-theme=doodle] .nsplit b{font-weight:400}
+body[data-theme=doodle] .badge{border:1.5px solid #2b2b2b;background:#ffe680;color:#2b2b2b}
+body[data-theme=doodle] .th{border:2.5px solid #2b2b2b;border-radius:16px 6px 14px 8px}
+body[data-theme=doodle] nav.tabs .in{background:#fffef8;border:2.5px solid #2b2b2b;border-radius:28px 10px 26px 12px/12px 26px 10px 28px;box-shadow:2px 3px 0 #2b2b2b;backdrop-filter:none;-webkit-backdrop-filter:none}
+body[data-theme=doodle] nav.tabs button{font-size:14px;color:#2b2b2b}
+body[data-theme=doodle] nav.tabs button[aria-current=page]{background:#ffe680;border-radius:45% 55% 40% 60%/55% 45% 55% 45%}
+body[data-theme=doodle] nav.tabs button svg,body[data-theme=doodle] .iconbtn svg{filter:url(#tk-wobble);stroke-width:2.4}
+body[data-theme=doodle] .sheet{border:2.5px solid #2b2b2b;border-bottom:0;border-radius:40px 18px 0 0/24px 14px 0 0;background:#fffef8}
+body[data-theme=doodle] .toast{background:#fffef8;color:#2b2b2b;border:2.5px solid #2b2b2b;font-size:17px}
+body[data-theme=doodle] .toast.ok{background:#e3f5e6;color:#2b2b2b}
+body[data-theme=doodle] .empty::before{content:'¯\\_(ツ)_/¯';display:block;font-size:22px;margin-bottom:4px}
+body[data-theme=doodle] .xs{font-size:13px}body[data-theme=doodle] .small{font-size:15px}
+body[data-theme=pop] .tile .v,body[data-theme=doodle] .tile .v{font-size:clamp(17px,5.6vw,23px);white-space:nowrap}
+body[data-theme=pop] .field.big{font-size:clamp(26px,8vw,34px)}
+body[data-theme=doodle] .field.big{font-size:clamp(26px,8vw,36px)}
+.fx-say{animation:fx-say 6s ease forwards}
+@keyframes fx-say{0%{opacity:0;transform:scale(.6)}8%,70%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.9)}}
+body[data-theme=pop] .kpi .v,body[data-theme=doodle] .kpi .v{font-size:clamp(17px,5.4vw,22px);white-space:nowrap}
+body[data-theme=pop] .nsplit b,body[data-theme=doodle] .nsplit b{font-size:clamp(18px,5.8vw,24px);white-space:nowrap}
+body[data-theme=pop] .grid2 .btn,body[data-theme=pop] .btn.sm{font-size:12.5px;letter-spacing:0;padding:0 8px}
+body[data-theme=doodle] .grid2 .btn{font-size:18px;padding:0 8px}

@@ -10,5 +10,7 @@ for marker, name in [('/*CSS*/', 'style.css'), ('/*CORE*/', 'core.js'), ('/*FX*/
     html = html.replace(marker, (SRC / name).read_text(encoding='utf-8').replace('</script', '<\\/script'))
 logo = 'data:image/svg+xml;base64,' + base64.b64encode((SRC / 'logo-icon.svg').read_bytes()).decode()
 html = html.replace('__LOGO__', logo)
+for f in sorted((SRC / 'fonts').glob('*.woff')):
+    html = html.replace(f'__FONT_{f.stem}__', 'data:font/woff;base64,' + base64.b64encode(f.read_bytes()).decode())
 (ROOT / 'index.html').write_text(html, encoding='utf-8')
 print(f'index.html gebaut ({len(html) // 1024} KB)')

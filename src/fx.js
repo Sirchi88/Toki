@@ -37,6 +37,13 @@ const FX = (() => {
   const STEAM = `<svg viewBox="0 0 30 50" width="100%"><path d="M10 48c-8-10 8-14 0-24S8 6 14 2M20 48c-8-10 8-14 0-24" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" opacity=".8"/></svg>`;
 
   const css = `
+  .fx-pop{position:absolute;animation:fx-bob 7s ease-in-out infinite alternate}
+  @keyframes fx-bob{from{translate:0 0;rotate:0deg}to{translate:0 14px;rotate:var(--r,6deg)}}
+  .fx-buddy{animation:fx-hop 3.2s ease-in-out infinite}
+  @keyframes fx-hop{0%,70%,100%{transform:translateY(0) rotate(0)}80%{transform:translateY(-8px) rotate(-4deg)}90%{transform:translateY(0) rotate(3deg)}}
+  .fx-wave{transform-origin:18px 80px;animation:fx-wave 1.6s ease-in-out infinite alternate}
+  @keyframes fx-wave{from{transform:rotate(0)}to{transform:rotate(-18deg)}}
+  @media (prefers-reduced-motion:reduce){.fx-pop,.fx-buddy,.fx-wave{animation:none}}
   .fx-ball{position:absolute;width:var(--s);height:var(--s);left:-80px;top:var(--y);animation:fx-fly var(--d) linear var(--dl) infinite;filter:drop-shadow(0 6px 6px rgb(0 0 0/.35))}
   .fx-ball svg{width:100%;height:100%;animation:fx-spin calc(var(--d)/3) linear infinite}
   @keyframes fx-fly{0%{transform:translate(0,0)}25%{transform:translate(28vw,-14vh)}50%{transform:translate(56vw,-4vh)}75%{transform:translate(84vw,-16vh)}100%{transform:translate(calc(100vw + 160px),2vh)}}
@@ -293,6 +300,52 @@ const FX = (() => {
     </svg></div>`;
     back.innerHTML = html;
   }
+
+  // ---------- Bold Pop: knallige geometrische Formen ----------
+  function pop(back) {
+    back.style.background = '#fff1cf';
+    back.innerHTML = `
+      <div style="position:absolute;inset:0;background-image:radial-gradient(#121212 1.4px,transparent 1.6px);background-size:22px 22px;opacity:.13"></div>
+      <div class="fx-pop" style="right:-90px;top:-70px;width:260px;height:260px;border-radius:50%;background:#ff2e88;border:4px solid #121212;--r:8deg"></div>
+      <div class="fx-pop" style="left:-60px;top:38vh;width:150px;height:150px;background:#2d5bff;border:4px solid #121212;transform:rotate(18deg);--r:-10deg;animation-duration:9s"></div>
+      <div class="fx-pop" style="right:-30px;bottom:18vh;width:0;height:0;border-left:90px solid transparent;border-right:90px solid transparent;border-bottom:150px solid #ffe36e;filter:drop-shadow(4px 4px 0 #121212);--r:12deg;animation-duration:11s"></div>
+      <div class="fx-pop" style="left:8vw;bottom:-60px;width:180px;height:180px;border-radius:50%;background:#00d1a0;border:4px solid #121212;--r:-6deg;animation-duration:13s"></div>
+      <svg viewBox="0 0 300 60" style="position:absolute;left:-10px;top:22vh;width:min(70vw,360px);opacity:.9"><path d="M5 30 Q30 5 55 30 T105 30 T155 30 T205 30 T255 30 T305 30" fill="none" stroke="#121212" stroke-width="7" stroke-linecap="round"/></svg>
+      <svg viewBox="0 0 100 100" style="position:absolute;right:12vw;top:52vh;width:64px"><path d="M50 4l10 32 34 2-27 20 10 33-27-19-27 19 10-33L6 38l34-2z" fill="#ff7a00" stroke="#121212" stroke-width="5" stroke-linejoin="round"/></svg>`;
+  }
+
+  // ---------- Doodle: handgezeichnete Kritzeleien & Uhr-Figur ----------
+  const INK = 'fill="none" stroke="#2b2b2b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"';
+  const DOODLES = {
+    cup: `<svg viewBox="0 0 80 80"><path ${INK} d="M14 32h40l-4 34c0 4-4 6-8 6H26c-4 0-8-2-8-6z"/><path ${INK} d="M54 40c10-2 14 4 12 10s-8 8-14 7"/><path ${INK} d="M26 22c-4-5 4-8 0-14M38 22c-4-5 4-8 0-14"/></svg>`,
+    sun: `<svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="14" fill="#ffe680" stroke="#2b2b2b" stroke-width="3"/><path ${INK} d="M40 8v10M40 62v10M8 40h10M62 40h10M17 17l7 7M56 56l7 7M63 17l-7 7M24 56l-7 7"/><path ${INK} d="M34 38h1M46 38h1M35 45c3 3 7 3 10 0"/></svg>`,
+    plane: `<svg viewBox="0 0 90 60"><path ${INK} d="M4 30L84 6 60 54 44 38z"/><path ${INK} d="M44 38L84 6M44 38l-4 16 10-10"/></svg>`,
+    arrow: `<svg viewBox="0 0 120 60"><path ${INK} d="M6 44c20-30 50-38 80-22"/><path ${INK} d="M76 10l12 13-16 6"/></svg>`,
+    star: `<svg viewBox="0 0 60 60"><path d="M30 4l7 16 17 2-13 11 4 17-15-9-15 9 4-17L6 22l17-2z" fill="#ffe680" stroke="#2b2b2b" stroke-width="3" stroke-linejoin="round"/></svg>`,
+    swirl: `<svg viewBox="0 0 80 80"><path ${INK} d="M40 40c0-4 6-4 6 0 0 8-12 8-12 0 0-12 18-12 18 0 0 16-24 16-24 0 0-20 30-20 30 0"/></svg>`,
+  };
+  const BUDDY = `<svg viewBox="0 0 120 150">
+    <path d="M30 128l-8 16h16M78 128l8 16H70" fill="none" stroke="#2b2b2b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M18 80c-12-6-16-20-8-26" fill="none" stroke="#2b2b2b" stroke-width="4" stroke-linecap="round" class="fx-wave"/>
+    <path d="M92 84c10 6 18 0 20-8" fill="none" stroke="#2b2b2b" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="54" cy="84" r="44" fill="#fffef8" stroke="#2b2b2b" stroke-width="4"/>
+    <circle cx="54" cy="84" r="36" fill="#fff4c2" stroke="#2b2b2b" stroke-width="2" stroke-dasharray="3 7"/>
+    <path d="M38 22h32M54 22v18" stroke="#2b2b2b" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="42" cy="78" r="5" fill="#2b2b2b"/><circle cx="66" cy="78" r="5" fill="#2b2b2b"/><circle cx="44" cy="76" r="1.6" fill="#fff"/><circle cx="68" cy="76" r="1.6" fill="#fff"/>
+    <path d="M42 96c6 8 18 8 24 0" fill="#e0453a" stroke="#2b2b2b" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="33" cy="92" r="5" fill="#f3b6b0" opacity=".8"/><circle cx="75" cy="92" r="5" fill="#f3b6b0" opacity=".8"/>
+    <path d="M54 58v10M54 58l8 -6" stroke="#2f5bd3" stroke-width="3" stroke-linecap="round"/>
+  </svg>`;
+  const SPRUECHE = ['Kaffee? ☕', 'Gleich Feierabend!', 'Läuft bei dir!', 'Stempeln nicht vergessen!', 'Pause ist auch Arbeit 😉'];
+  function doodle(back, front) {
+    back.style.background = '#fbf8ef';
+    const pos = [['cup', 'left:4vw;top:16vh;width:56px;transform:rotate(-8deg)'], ['sun', 'right:5vw;top:24vh;width:62px'], ['plane', 'left:6vw;top:58vh;width:70px;transform:rotate(-12deg)'], ['arrow', 'right:8vw;top:72vh;width:90px;transform:rotate(10deg)'], ['star', 'left:46vw;top:8vh;width:30px'], ['swirl', 'right:20vw;top:44vh;width:44px'], ['star', 'left:30vw;top:86vh;width:24px']];
+    back.innerHTML = `<svg width="0" height="0" style="position:absolute"><filter id="tk-wobble"><feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="2.2"/></filter></svg>` +
+      pos.map(([k, st]) => `<div style="position:absolute;opacity:.32;${st}">${DOODLES[k]}</div>`).join('');
+    const say = SPRUECHE[Math.floor(Math.random() * SPRUECHE.length)];
+    front.innerHTML = `<div class="fx-buddy" style="position:absolute;right:max(6px,calc(50vw - 250px));bottom:calc(env(safe-area-inset-bottom) + 74px);width:50px">
+      <div class="fx-say" style="position:absolute;right:40px;bottom:58px;transform-origin:right bottom;white-space:nowrap;background:#fffef8;border:2px solid #2b2b2b;border-radius:16px 16px 4px 16px;padding:3px 9px;font:16px 'Toki Patrick','Comic Sans MS',cursive;color:#2b2b2b;box-shadow:1px 2px 0 #2b2b2b">${say}</div>${BUDDY}</div>`;
+  }
   function set(theme) {
     ensureStyle();
     stop();
@@ -302,6 +355,8 @@ const FX = (() => {
     else if (theme === 'xmas') xmas(back, front);
     else if (theme === 'fryer') fryer(back);
     else if (theme === 'neon') neon(back);
+    else if (theme === 'pop') pop(back);
+    else if (theme === 'doodle') doodle(back, front);
     else if (theme === 'werk') werkhalle(back);
     else if (theme === 'schrank') schaltschrank(back);
     else if (theme === 'dorf') { dorf(back); front.innerHTML = `<div style="position:absolute;right:max(14px,calc(50vw - 230px));bottom:calc(env(safe-area-inset-bottom) + 70px);width:150px">${BENCH}</div>`; }
@@ -314,6 +369,8 @@ const FX = (() => {
     dorf: `<div style="position:absolute;right:6px;bottom:2px;width:64px">${BENCH}</div>`,
     werk: '<div style="position:absolute;left:0;right:0;top:0;height:6px;background:repeating-linear-gradient(90deg,#f2c200 0 8px,#1b1b1b 8px 16px)"></div><div style="position:absolute;left:10px;bottom:6px;width:46px;height:30px;border-radius:4px;background:#d9dde2"><div style="margin:5px;width:22px;height:16px;border-radius:2px;background:#0d141c;box-shadow:inset 0 -6px 10px #ffd36b88"></div></div>',
     schrank: '<div style="position:absolute;inset:6px 8px auto;height:8px;background:#b9bdb8;border-radius:2px"></div><div style="position:absolute;left:10px;top:20px;display:flex;gap:2px">' + ['#8c9196', '#8c9196', '#3c6fd1', '#e6c229', '#8c9196'].map((c) => `<i style="display:block;width:7px;height:22px;border-radius:1px;background:${c}"></i>`).join('') + '</div><div style="position:absolute;right:10px;bottom:6px;width:22px;height:22px;border-radius:50%;background:#f2c200;display:grid;place-items:center"><i style="display:block;width:14px;height:14px;border-radius:50%;background:#c4161c"></i></div>',
+    pop: '<div style="position:absolute;right:-14px;top:-14px;width:46px;height:46px;border-radius:50%;background:#ff2e88;border:3px solid #121212"></div><div style="position:absolute;left:10px;bottom:-8px;width:30px;height:30px;background:#2d5bff;border:3px solid #121212;transform:rotate(18deg)"></div><div style="position:absolute;left:12px;top:10px;font:22px \'Toki Archivo\',Impact,sans-serif;color:#121212;background:linear-gradient(transparent 55%,#ffe36e 55%)">POP!</div>',
+    doodle: `<div style="position:absolute;right:6px;bottom:-6px;width:40px">${BUDDY}</div><div style="position:absolute;left:10px;top:8px;width:26px;opacity:.7">${DOODLES.sun}</div>`,
     dark: '<div style="position:absolute;left:10px;top:12px;right:40%;height:8px;border-radius:4px;background:#3a3c42"></div><div style="position:absolute;left:10px;top:26px;right:55%;height:8px;border-radius:4px;background:#8fd1c1"></div>',
   }[id] || '');
   return { set, preview };
