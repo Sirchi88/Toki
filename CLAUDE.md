@@ -9,7 +9,8 @@
   - Zuschläge je Woche: erste 6 Überstunden +25 %, ab der 7. +50 %.
   - Samstag: keine Brotzeit, ab 6 h Anwesenheit 30 min Mittag (nie unter 6 h); alles Mehrarbeit; Samstag ins Zeitkonto +25 % (abschaltbar).
   - Reihenfolge: MEA-Kontingent des Monats → Rest ins Zeitkonto (±35 h, darüber Warnung + „Mehrarbeit nachbeantragen“). Monatswechsel in der Woche: jeder Tag zählt zum Kontingent seines Monats, Zuschläge und ZK-Verrechnung bleiben wochenweise.
-  - Netto-Rechner rechnet mit der Mehrarbeit des angezeigten Monats (nicht des Vormonats).
+  - Gehalt (früher Netto): Ansicht „Aktuell“ = Grundlohn + Mehrarbeit/Urlaubsgeld/Sonderzahlungen des Monats; „Auszahlung“ = Grundlohn des Monats + Mehrarbeit/Urlaubsgeld/einmalige Sonderzahlungen des Vormonats. Stundenlohn kommt automatisch aus dem Grundlohn.
+  - Handy-Darstellung nicht verändern; PC-Optimierungen nur in `@media (min-width: 1000px)`.
   - Eingaben werden sofort gespeichert, ohne Speichern-Knopf und ohne Hinweis.
   - ZK-Urlaubstag senkt das Wochensoll um 7 h; Plus derselben Woche wird zuerst damit verrechnet.
   - Tarifurlaub gilt bis 31.03. des Folgejahres; T-Zug nur im Kalenderjahr; halbe Tage nur bei Tarifurlaub oder Zeitkonto.

@@ -435,3 +435,59 @@ dl.money .hl25 dt,dl.money .hl25 dd{color:var(--fg);font-weight:700}
 .kmini b{font-family:var(--font-d);font-size:22px;font-weight:400;color:var(--fg);margin-left:4px}
 .kmini b.acc{color:var(--primary)}
 .progress.thin{height:6px;margin-top:6px}
+
+/* v1.7 – Kopf mit Zahnrad, Abschnitte schließen, Gehalt-Umschalter */
+.gearbtn svg{width:20px;height:20px}
+.gearbtn.on{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+nav.tabs .in{grid-template-columns:repeat(4,1fr)}
+.secfoot{display:flex;justify-content:flex-end;margin-top:12px}
+.secclose{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border);background:var(--secondary);color:var(--muted);cursor:pointer}
+.set-sec summary h2{display:flex;align-items:center;gap:6px}
+.gmode{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:-2px 0 10px}
+.gmode>span{flex:1;line-height:1.25}
+.seg.mini{flex:none;padding:3px;border-radius:10px}
+.seg.mini button{height:30px;padding:0 10px;font-size:13px}
+/* Jahresüberblick: Mini-Kalender */
+.ymonths{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.ymon{border:1px solid var(--border);border-radius:10px;padding:6px 6px 7px;background:var(--card);text-align:left;cursor:pointer;font:inherit;color:inherit}
+.ymon.has{border-color:color-mix(in oklch,var(--primary) 45%,var(--border))}
+.ymh{display:flex;justify-content:space-between;align-items:baseline;margin:0 2px 4px}
+.ymh b{font-size:12px;text-transform:uppercase;letter-spacing:.04em}.ymh span{font-size:11px;font-weight:800;color:var(--primary)}
+.ydays{display:grid;grid-template-columns:repeat(7,1fr);gap:1px}
+.ydays i{font-style:normal;font-size:8.5px;line-height:13px;height:13px;text-align:center;border-radius:3px;color:var(--muted);font-variant-numeric:tabular-nums}
+.ydays i.we{opacity:.45}.ydays i.hol{background:var(--accent);color:var(--fg)}
+.ydays i[class*="t-"]{color:#fff;font-weight:800}
+.ydays i.t-tarif{background:var(--c-tarif)}.ydays i.t-zk{background:var(--c-zk)}.ydays i.t-fza{background:var(--c-fza)}.ydays i.t-tzug{background:var(--c-tzug)}.ydays i.t-sonder{background:var(--c-sonder)}.ydays i.t-krank{background:var(--c-krank)}
+.ydays i.half{background-image:linear-gradient(135deg,transparent 50%,rgb(255 255 255/.5) 50%)}
+.ydays i.td{outline:1.5px solid var(--fg);outline-offset:-1px;color:var(--fg);font-weight:800}
+.ymonths .ysep{grid-column:1/-1}
+
+/* ===== PC / großer Bildschirm (Handy-Ansicht bleibt unverändert) ===== */
+@media (min-width: 1000px) {
+  body { padding-left: 120px; }
+  #app { max-width: 1120px; padding: 28px 28px 60px; }
+  .top { margin-bottom: 18px; }
+  .brand img { width: 40px; height: 40px; }
+  h1 { font-size: 56px; }
+  .page { column-count: 2; column-gap: 22px; }
+  .page > * { break-inside: avoid; }
+  .page > .between, .page > h1, .page > .seg, .page > .ampel, .page > .gmode, .page > .bal, .page > .notice, .page > p { column-span: all; }
+  .page > .card, .page > details.fold { display: inline-block; width: 100%; }
+  .ampel { grid-template-columns: repeat(3, minmax(0, 260px)); }
+  .bal { grid-template-columns: repeat(6, 1fr); }
+  .ymonths { grid-template-columns: repeat(4, 1fr); }
+  .ydays i { font-size: 9.5px; line-height: 15px; height: 15px; }
+  .seg { max-width: 520px; }
+  /* Navigation als Leiste links */
+  nav.tabs { top: 50%; bottom: auto; left: 22px; right: auto; transform: translateY(-50%); padding: 0; justify-content: flex-start; }
+  nav.tabs .in { grid-template-columns: 1fr; width: 92px; gap: 6px; padding: 8px; border-radius: 22px; }
+  nav.tabs button { padding: 12px 0; font-size: 11.5px; }
+  nav.tabs button svg { width: 24px; height: 24px; }
+  .toast { bottom: 32px; }
+  .savebar { bottom: 20px; }
+  body[data-theme=schrank] #app, body[data-theme=dorf] #app { padding-bottom: 200px; }
+}
+@media (min-width: 1400px) {
+  #app { max-width: 1240px; }
+}
+.anal svg{max-width:560px;display:block;margin:0 auto}

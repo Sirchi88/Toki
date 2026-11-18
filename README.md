@@ -12,8 +12,8 @@ Läuft im Browser am Handy (hochkant) und am PC, ohne Installation, ohne Login.
 | **Feierabend** | Beginn eintragen → Gehzeiten für 7/8/9/10 h, Antippen übernimmt die Zeit. Pausen & halber Urlaubstag zuklappbar. Warnung bei > 10 h (gezählt wird max. 10 h). Konto-Ampel: Zeitkonto, offene MEA, Resturlaub. |
 | **Mehrarbeit** | MEA-Kontingent je Monat, Wochen (KW) / Monate / Jahr, Zuschläge je Woche (erste 6 h +25 %, danach +50 %), Diagramme „Kommen & Gehen“ und „Stunden pro Tag“, Mehrarbeit nachbeantragen. |
 | **Urlaub** | Kalender mit KW, Tarifurlaub, Zeitkonto, FZA, T-Zug, Sonderurlaub, Krank. Jahresüberblick, Urlaubsgeld, Resturlaub bis 31.03. des Folgejahres. |
-| **Netto** | Netto des Monats mit der Mehrarbeit desselben Monats (Lohnsteuer-Tarif & SV-Werte 2026), aufgeteilt in Grundgehalt und Mehrarbeit, mit allen Sätzen und Rechenweg. **God Mode** zum freien Durchspielen. |
-| **Mehr** | Einstellungen (Design, Arbeitszeit, Verdienst, Zeitkonto, Urlaub pro Jahr, Steuer) und Datentransport (Export/Import). |
+| **Gehalt** | Netto des Monats – Ansicht **Aktuell** (alles aus dem Monat) oder **Auszahlung** (Mehrarbeit, Urlaubsgeld & Sonderzahlungen aus dem Vormonat) (Lohnsteuer-Tarif & SV-Werte 2026), aufgeteilt in Grundgehalt und Mehrarbeit, mit allen Sätzen und Rechenweg. **God Mode** zum freien Durchspielen. Export als **PDF-Bericht** und **Excel** mit Statistiken. |
+| **⚙ (oben rechts)** | Einstellungen (Design, Arbeitszeit, Verdienst, Zeitkonto, Urlaub pro Jahr, Steuer) und Datentransport (Export/Import). |
 
 **Designs:** Dark, Standard, Schwarz/Weiß, Blau, Grün, Rot-Weiß Arena, Neon City, Auswechselspieler, Werkhalle, Schaltschrank, Weihnachten, Airfryer.
 
@@ -35,6 +35,7 @@ src/
   app.js        Oberfläche, alle Reiter
   fx.js         animierte Design-Hintergründe
   sync.js       Sync per persönlichem Code (Supabase-RPC)
+  report.js     PDF-Bericht und Excel-Export (xlsx ohne Bibliothek)
   style.css     Layout und Designs
   index.html    HTML-Vorlage
   logo*.svg     Logo
