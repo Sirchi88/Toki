@@ -93,13 +93,13 @@ const Core = (() => {
     theme: 'dark',
     arbeit: { wochenstunden: 35, brotzeit: 15, mittag: 30, land: 'BY', mariae: true, halb24: false, halb31: false },
     lohn: {
-      grundlohn: 0, stundenlohn: 0, zeigen: true, auszahlung: 'folgemonat', nettoAbzug: 0,
+      grundlohn: 0, zulagen: 0, stundenlohn: 0, zeigen: true, auszahlung: 'folgemonat', nettoAbzug: 0, vlAG: 0, vlSpar: 0,
       sonder: [{ id: 'weihnachtsgeld', name: 'Weihnachtsgeld', art: 'einmalig', monat: 11, modus: 'betrag', wert: 0 }],
     },
     zk: { stand: 0, datum: '', samstagBonus: true, max: 35, min: -35 },
     urlaub: { tarifTage: 30, ugFaktor: 0.5, ugTeiler: 21.75, fzaStand: 0, fzaDatum: '', tzugTage: 8, jahre: {} },
     mail: { anrede: '', an: '', name: '' },
-    steuer: { klasse: 1, kirche: true, kinderFB: 0, kinderPV: 0, geburtsjahr: 0, kasse: '', kvZusatz: 2.9, geprueft: false },
+    steuer: { klasse: 1, kirche: true, kinderFB: 0, kinderPV: 0, geburtsjahr: 0, kasse: '', kvZusatz: 2.9, freiwillig: false, geprueft: false },
   });
   const merge = (base, over) => {
     if (Array.isArray(base)) return Array.isArray(over) ? over : base;
@@ -111,10 +111,12 @@ const Core = (() => {
     return over === undefined || over === null ? base : over;
   };
   const tagessoll = (S) => (Number(S.arbeit.wochenstunden) || 35) / 5;
+  /** Monatsentgelt = Grundentgelt + feste monatliche Zulagen (Basis für Stundenlohn, Urlaubsgeld, Faktor-Sonderzahlungen) */
+  const monatsentgelt = (S) => (Number(S.lohn.grundlohn) || 0) + (Number(S.lohn.zulagen) || 0);
   const stundenlohn = (S) => {
     const h = Number(S.lohn.stundenlohn);
     if (h > 0) return h;
-    const g = Number(S.lohn.grundlohn) || 0;
+    const g = monatsentgelt(S);
     return g > 0 ? g / ((Number(S.arbeit.wochenstunden) || 35) * 4.35) : 0;
   };
   const holOpt = (S) => ({ land: S.arbeit.land, mariae: S.arbeit.mariae, halb24: S.arbeit.halb24, halb31: S.arbeit.halb31 });
@@ -533,7 +535,7 @@ const Core = (() => {
     return { lst, soli, kist, zve, vors, kistSatz, grenz, soliFrei: frei, lstKfb, pausch: k !== 6 ? P.anPausch + P.saPausch : 0, entl: k === 2 ? P.entlastung2 : 0 };
   };
   /** Monatsabrechnung: laufend = regelmäßiger Lohn dieses Monats, einmal = sonstige Bezüge */
-  const netto = (laufend, einmal, S, mo = 12, extraAbzug = 0) => {
+  const netto = (laufend, einmal, S, mo = 12, extraAbzug = 0, basisLaufend = laufend) => {
     const r = svRates(S.steuer, S.arbeit.land);
     const gross = laufend + einmal;
     // Einmalzahlungen: anteilige Jahres-BBG bis zum Auszahlungsmonat (bei gleichbleibendem laufendem Lohn)
@@ -543,8 +545,9 @@ const Core = (() => {
     const yL = steuerJahr(laufend * 12, S);
     let lst = yL.lst / 12, soli = yL.soli / 12, kist = yL.kist / 12;
     if (einmal > 0) {
-      const yE = steuerJahr(laufend * 12 + einmal, S);
-      lst += yE.lst - yL.lst; soli += yE.soli - yL.soli; kist += yE.kist - yL.kist;
+      // Einmalzahlung nach Jahreslohn-Methode; Basis = regelmäßiger Lohn ohne Mehrarbeit (trifft die Abrechnung besser)
+      const yB = steuerJahr(basisLaufend * 12, S), yE = steuerJahr(basisLaufend * 12 + einmal, S);
+      lst += yE.lst - yB.lst; soli += yE.soli - yB.soli; kist += yE.kist - yB.kist;
     }
     const svSum = sv.kv + sv.pv + sv.rv + sv.av;
     const taxSum = lst + soli + kist;
@@ -572,11 +575,13 @@ const Core = (() => {
    */
   const monthPay = (st, calc, m, modus = 'aktuell') => {
     const S = st.settings;
-    const g = Number(S.lohn.grundlohn) || 0;
+    const g = monatsentgelt(S);
     const src = modus === 'auszahlung' ? prevMonth(m) : m;
     const mo = Number(m.slice(5, 7)), srcMo = Number(src.slice(5, 7));
     const aus = src !== m ? ` (aus ${MONATE[srcMo - 1]})` : '';
-    const lines = [{ k: 'Grundlohn', v: g, laufend: true, extra: false }];
+    const lines = [{ k: 'Grundentgelt', v: Number(S.lohn.grundlohn) || 0, laufend: true, extra: false }];
+    if (Number(S.lohn.zulagen)) lines.push({ k: 'Feste Zulagen', v: Number(S.lohn.zulagen), laufend: true, extra: false });
+    if (Number(S.lohn.vlAG)) lines.push({ k: 'Vermögenswirksame Leistungen (AG-Anteil)', v: Number(S.lohn.vlAG), laufend: true, extra: false });
     for (const s of S.lohn.sonder || []) {
       const val = s.modus === 'faktor' ? g * (Number(s.wert) || 0) : Number(s.wert) || 0;
       if (!val) continue;
@@ -593,13 +598,14 @@ const Core = (() => {
     const sum = (f) => lines.filter(f).reduce((a2, b2) => a2 + b2.v, 0);
     const laufend = sum((l) => l.laufend), einmal = sum((l) => !l.laufend);
     const extraL = sum((l) => l.laufend && l.extra), extraE = sum((l) => !l.laufend && l.extra);
-    return { lines, laufend, einmal, extraL, extraE, extra: extraL + extraE, src, tu, ugTag, modus };
+    const mehrL = sum((l) => l.mehr);
+    return { lines, laufend, einmal, extraL, extraE, extra: extraL + extraE, basis: laufend - mehrL, vlSpar: Number(S.lohn.vlSpar) || 0, src, tu, ugTag, modus };
   };
 
   return {
     toMin, fmtClock, leaveAt, workedRaw, capDay, MAX_DAY, D, iso, addDays, dow, monday, isoWeek, ym, todayIso, range,
     LAENDER, easter, holidays, holidayName, isWorkday, workdaysBetween, defaults, merge, tagessoll, stundenlohn, holOpt,
-    TYPES, specialPause, presence, absenceDays, halfDay, dayNeed, yearCfg, dayTarget, zuschlag, compute, vacation, est, steuerJahr, netto, monthPay, sonderGruppe, prevMonth, KASSEN, P,
+    TYPES, specialPause, presence, absenceDays, halfDay, dayNeed, yearCfg, dayTarget, zuschlag, compute, vacation, est, steuerJahr, netto, monthPay, monatsentgelt, sonderGruppe, prevMonth, KASSEN, P,
   };
 })();
 if (typeof module !== 'undefined') module.exports = Core;

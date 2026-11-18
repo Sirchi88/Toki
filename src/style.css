@@ -402,7 +402,7 @@ dl.money .hl25 dt,dl.money .hl25 dd{color:var(--fg);font-weight:700}
 .grid3>div>.label{flex:1;display:flex;align-items:flex-end}
 
 /* Splash */
-#splash{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:#f6f4ef;animation:sp-out .32s ease-in 1.18s forwards;pointer-events:none}
+#splash{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:#17181c;animation:sp-out .32s ease-in 1.18s forwards;pointer-events:none}
 #splash.dark{background:#141519}
 #splash .sp-in{display:flex;flex-direction:column;align-items:center;gap:14px}
 .sp-logo{overflow:visible;filter:drop-shadow(0 10px 22px rgb(29 118 80/.35));animation:sp-pop .5s cubic-bezier(.2,1.4,.4,1) both}
