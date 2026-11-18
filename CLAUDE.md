@@ -20,6 +20,8 @@
   - Demo-Modus: unauffälliger Link „Demo“ ganz unten in den Einstellungen (Name Dani / Passwort 8989, nur Sperre, kein Schutz). Erfundene Daten aus `Core.demoState()` unter Schlüssel `toki-demo`, echte Daten unberührt, kein Sync, Hinweisleiste oben, großer Knopf zum Verlassen.
   - God Mode: Haken „Mehrarbeit zur Verrechnung auszahlen“ rechnet den aktuellen Kontostand als Einmalzahlung (Block Mehrarbeit) mit ein.
   - Release Notes (`RELEASES` oben in `src/app.js`, neueste zuerst) unter Einstellungen → Datentransport – bei jedem Release kurz ergänzen, Version erscheint im Fuß.
+  - Jedes Fenster (`sheet()`) hat oben rechts ein ✕. Zahlenfelder: eine stehende 0 verschwindet beim Antippen, sonst wird der Inhalt markiert (direkt überschreiben).
+  - Kontingent-Karte (Reiter Mehrarbeit): Geleistet | MEA-Kontingent groß in der Mitte (antippen = korrigieren) | Offen.
   - Seiten dürfen nie seitlich verschiebbar sein: Eingabefelder ≥ 16 px (sonst zoomt iOS), nichts breiter als der Bildschirm.
   - Designs „Bold Pop“ (`pop`) und „Doodle“ (`doodle`) mit eigenen Schriften aus `src/fonts/` (SIL OFL, als WOFF-Untergruppe von `build.py` eingebettet).
   - God Mode: Gesamt-Mehrarbeit kleiner als 25 %-Stunden (z. B. 0) → 25 %-Stunden werden automatisch mitgesenkt.
