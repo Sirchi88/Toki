@@ -17,7 +17,11 @@
   - Urlaub: T-Zug darf nie ins Minus (Sperre). Tarifurlaub ins Minus nur nach Rückfrage – der Vorgriff wird vom Anspruch des Folgejahres einbehalten (`vacation().vorgriff/einbehalten`).
   - Konto „Mehrarbeit zur Verrechnung“ (`settings.mav`): Stunden × Stundenlohn; optional einmalige Auszahlung in einem Monat (zählt zum Block Mehrarbeit). Ist der Monat vorbei und der Haken noch gesetzt → gilt als ausbezahlt, Konto 0, Verlauf in `mav.ausgezahlt` (`Core.mavRollover`).
   - Kurzarbeit (`settings.kurz`, Typ `kurz`): nur wählbar, wenn eingeschaltet, und nur im eingestellten Monat. Je Tag zuerst 7 volle Stunden vom MAV-Konto (wenn ≥ 7 h), sonst Ausfall des Tagesgehalts (Stundenlohn × 7) und Kurzarbeitergeld 67 % (Kinderfreibetrag ≥ 0,5) bzw. 60 %, steuer- und SV-frei aufs Netto.
-  - Demo-Modus: Einstellungen → Demobereich (Name Dani / Passwort 8989, nur Sperre, kein Schutz). Erfundene Daten aus `Core.demoState()` unter Schlüssel `toki-demo`, echte Daten unberührt, kein Sync, Hinweisleiste oben, großer Knopf zum Verlassen.
+  - Demo-Modus: unauffälliger Link „Demo“ ganz unten in den Einstellungen (Name Dani / Passwort 8989, nur Sperre, kein Schutz). Erfundene Daten aus `Core.demoState()` unter Schlüssel `toki-demo`, echte Daten unberührt, kein Sync, Hinweisleiste oben, großer Knopf zum Verlassen.
+  - God Mode: Haken „Mehrarbeit zur Verrechnung auszahlen“ rechnet den aktuellen Kontostand als Einmalzahlung (Block Mehrarbeit) mit ein.
+  - Release Notes (`RELEASES` oben in `src/app.js`, neueste zuerst) unter Einstellungen → Datentransport – bei jedem Release kurz ergänzen, Version erscheint im Fuß.
+  - Seiten dürfen nie seitlich verschiebbar sein: Eingabefelder ≥ 16 px (sonst zoomt iOS), nichts breiter als der Bildschirm.
+  - Designs „Bold Pop“ (`pop`) und „Doodle“ (`doodle`) mit eigenen Schriften aus `src/fonts/` (SIL OFL, als WOFF-Untergruppe von `build.py` eingebettet).
   - God Mode: Gesamt-Mehrarbeit kleiner als 25 %-Stunden (z. B. 0) → 25 %-Stunden werden automatisch mitgesenkt.
   - Lohnsteuer auf Einmalzahlungen: Jahreslohn-Methode mit Basis = laufender Lohn ohne Mehrarbeit.
   - Option „freiwillig versichert“ (`steuer.freiwillig`): nur Anzeige Beitrag − AG-Zuschuss, Ergebnis gleich.

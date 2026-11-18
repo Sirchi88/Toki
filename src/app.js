@@ -4,6 +4,16 @@
   const C = Core;
   const KEY = 'takt-v1';
   const LOGO = '__LOGO__';
+  /** Release Notes – neueste zuerst: [Version, Datum, Themen] */
+  const RELEASES = [
+    ['2.0', '19.11.2026', ['Neue Designs „Bold Pop“ und „Doodle“ mit eigenen Schriften', 'God Mode: Mehrarbeit zur Verrechnung auszahlen', 'Release Notes', 'Seiten wackeln nicht mehr seitlich']],
+    ['1.9', '18.11.2026', ['Kurzarbeit (60/67 %)', 'Konto Mehrarbeit zur Verrechnung', 'Urlaubs-Vorgriff aufs nächste Jahr, T-Zug-Sperre', 'Demo-Modus', 'Gehalt: Mehrarbeit zum Aufklappen']],
+    ['1.8', '18.11.2026', ['Zeitnachweis-PDF einlesen & abgleichen', 'Vorab eingetragene Zeiten zählen sofort', 'God Mode: 0 h Mehrarbeit leert 25/50 %']],
+    ['1.7', '18.11.2026', ['Gehalt: Aktuell / Auszahlung', 'PDF- & Excel-Export', 'Sync per QR-Code', 'Krankenkassen-Auswahl', 'Sonderzahlungen zur Mehrarbeit', 'PC-Ansicht']],
+    ['1.6', '17.11.2026', ['Startbildschirm mit Logo', 'Kompakte Kontingent-Karte']],
+    ['1.5', '17.11.2026', ['Sync-Code statt Login', 'Monatswechsel in der Woche', 'Urlaubsmail an den Chef', 'Netto im Detail', 'Neue Designs']],
+    ['1.0', '17.11.2026', ['Erste Version: Feierabend, Mehrarbeit, Zeitkonto, Urlaub, Netto', 'Cloud-Sync', 'App-Symbol']],
+  ];
   let storageOk = true;
 
   // ---------- Speicher ----------
@@ -26,6 +36,8 @@
     ['schrank', 'Schaltschrank', 'linear-gradient(#d6d9d5,#cfd2cf)'],
     ['xmas', 'Weihnachten', 'linear-gradient(#0e1a3d,#3c5a8f)'],
     ['fryer', 'Airfryer', 'repeating-linear-gradient(0deg,#f8e2b5 0 14px,#f1d49c 14px 16px)'],
+    ['pop', 'Bold Pop', 'linear-gradient(135deg,#fff1cf 0 60%,#ffe36e 60%)'],
+    ['doodle', 'Doodle', 'repeating-linear-gradient(#fbf8ef 0 9px,#dbe6f5 9px 10px)'],
   ];
   const THEME_IDS = THEMES.map((t) => t[0]);
   // Demo-Modus: erfundene Daten unter eigenem Schlüssel, echte Daten bleiben unberührt, kein Sync
@@ -865,9 +877,11 @@
       if (Number(g.zulage)) lines.push({ k: 'Zulagen (monatlich)', v: Number(g.zulage) });
       if (ug) lines.push({ k: `Urlaubsgeld (${D1(g.utage)} Tage)`, v: ug });
       if (Number(g.einmal)) lines.push({ k: 'Einmalzahlung', v: Number(g.einmal) });
+      const mavH = C.kurzPlan(st, calc.absMap).rest, mavE = g.mav ? mavH * rate : 0;
+      if (mavE) lines.push({ k: `Mehrarbeit zur Verrechnung (${H(mavH)})`, v: mavE, cls: 'hl25' });
       const manual = g.manuell !== undefined && g.manuell !== '' && g.manuell !== null && Number(g.manuell) > 0;
-      if (manual) { lines.length = 0; lines.push({ k: 'Grundlohn + Mehrarbeit (manuell)', v: Number(g.manuell) }); if (Number(g.zulage)) lines.push({ k: 'Zulagen (monatlich)', v: Number(g.zulage) }); if (ug) lines.push({ k: `Urlaubsgeld (${D1(g.utage)} Tage)`, v: ug }); if (Number(g.einmal)) lines.push({ k: 'Einmalzahlung', v: Number(g.einmal) }); }
-      const laufend = (manual ? Number(g.manuell) : Number(g.grundlohn) + mea) + Number(g.zulage), einmal = ug + Number(g.einmal);
+      if (manual) { lines.length = 0; lines.push({ k: 'Grundlohn + Mehrarbeit (manuell)', v: Number(g.manuell) }); if (Number(g.zulage)) lines.push({ k: 'Zulagen (monatlich)', v: Number(g.zulage) }); if (ug) lines.push({ k: `Urlaubsgeld (${D1(g.utage)} Tage)`, v: ug }); if (Number(g.einmal)) lines.push({ k: 'Einmalzahlung', v: Number(g.einmal) }); if (mavE) lines.push({ k: `Mehrarbeit zur Verrechnung (${H(mavH)})`, v: mavE, cls: 'hl25' }); }
+      const laufend = (manual ? Number(g.manuell) : Number(g.grundlohn) + mea) + Number(g.zulage), einmal = ug + Number(g.einmal) + mavE;
       const gf = (k, l, attrs = 'inputmode="decimal"', hint = '') => `<div class="${manual && ['grundlohn', 'mea', 'h25'].includes(k) ? 'dim' : ''}"><label class="label">${l}</label><input class="field" data-god="${k}" value="${esc(deNum(g[k]))}" ${attrs}>${hint ? `<div class="hint">${hint}</div>` : ''}</div>`;
       return `${head}<section class="card"><h2>Spielwiese – alles frei eingeben</h2>
         <div class="grid2">${gf('grundlohn', 'Grundlohn (€ brutto)')}<div><span class="label">Stundenlohn</span><div class="field num" style="display:flex;align-items:center;background:var(--secondary)">${nf(rate)} €</div></div></div>
@@ -885,10 +899,11 @@
         ${gf('alter', `Alter ${info('alter')}`, 'inputmode="numeric" placeholder="z. B. 35"')}
         ${gf('kinderPV', 'Kinder (PV)', 'inputmode="numeric"')}${gf('kinderFB', 'Kinderfreibeträge')}</div>
         <label class="switch"><span>Kirchensteuer</span><input type="checkbox" data-god="kirche" ${g.kirche ? 'checked' : ''}></label>
+        <label class="switch"><span>Mehrarbeit zur Verrechnung auszahlen<br><span class="xs muted">aktueller Stand ${H(mavH)} × ${nf(rate)} € = ${nf(mavH * rate)} € brutto (einmalig)</span></span><input type="checkbox" data-god="mav" ${g.mav ? 'checked' : ''} ${mavH > 0 ? '' : 'disabled'}></label>
         <details class="fold" style="margin:6px 0 0;box-shadow:none" ${ui.godSZ ? 'open' : ''} data-fold="godSZ"><summary><span>Sonderzulagen ${Number(g.zulage) || Number(g.einmal) || Number(g.utage) ? '· aktiv' : ''}</span>${I.chev}</summary><div class="body"><div class="grid2 even">${gf('zulage', 'Zulagen / Monat (€)')}${gf('einmal', 'Einmalzahlung (€)', 'inputmode="decimal" placeholder="z. B. Weihnachtsgeld"')}${gf('utage', 'Urlaubstage (für Urlaubsgeld)')}<div></div></div></div></details>
         <div class="grid2 mt"><button class="btn soft" data-act="godReset">Aus meinen Daten</button><button class="btn" data-act="godCalc">Berechnen</button></div>
       </section>
-      ${nettoResult(lines, laufend, einmal, S2, 6, 0, rate, '', '', manual ? 0 : mea)}
+      ${nettoResult(lines, laufend, einmal, S2, 6, 0, rate, '', '', { l: manual ? 0 : mea, e: mavE, inkl: !!mavE, basis: laufend - (manual ? 0 : mea) })}
       ${foot(S2)}`;
     }
     const m = ui.nmonth;
@@ -1069,10 +1084,12 @@
     ${sec('daten', 'Datentransport', `<p class="small muted">Deine Daten liegen nur in diesem Browser auf diesem Gerät. Für Handy ↔ PC: hier exportieren und am anderen Gerät importieren.</p>
       <div class="grid2"><button class="btn" data-act="export">Exportieren</button><label class="btn soft" style="position:relative">Importieren<input type="file" accept=".json,application/json" data-act="importFile" style="position:absolute;inset:0;opacity:0"></label></div>
       <button class="btn ghost mt-s" data-act="importPaste">Aus Text einfügen</button>
+      <button class="btn ghost mt-s" data-act="releases">📝 Release Notes</button>
       <label class="btn soft mt-s" style="position:relative;width:100%">📄 Zeitnachweis (PDF) einlesen<input type="file" accept=".pdf,application/pdf" data-act="pdfFile" style="position:absolute;inset:0;opacity:0"></label>
       <button class="btn danger mt" data-act="reset">Alle Daten löschen</button>`)}
-    ${sec('admin', 'Demobereich (Admin)', demo ? '<p class="small">Du bist im <b>Demo-Modus</b> – alles hier ist erfunden. Deine echten Daten sind sicher und kommen beim Verlassen zurück.</p><button class="btn danger big" data-act="demoExit">Demo-Modus verlassen</button>' : '<p class="small muted">Zum Vorzeigen: Toki mit erfundenen Daten (Gehalt, Mehrarbeit, Urlaub, Kurzarbeit) für das ganze Jahr. Deine echten Daten bleiben unberührt und werden in der Demo nicht synchronisiert.</p><button class="btn" data-act="demoLogin">Demo starten</button>')}
-    <p class="xs muted onbg" style="text-align:center">Toki · Feierabend, Mehrarbeit & Urlaub · v1.8</p>`;
+    ${demo ? '<button class="btn danger big mt" data-act="demoExit">🎬 Demo-Modus verlassen</button>' : ''}
+    <p class="xs muted onbg" style="text-align:center">Toki · Feierabend, Mehrarbeit & Urlaub · v${RELEASES[0][0]}</p>
+    ${demo ? '' : '<p style="text-align:center;margin:-4px 0 0"><button class="demolink" data-act="demoLogin">Demo</button></p>'}`;
   }
 
   // ---------- Render ----------
@@ -1124,8 +1141,8 @@
     kDone: () => { ui.kEdit = false; render(); },
     demoLogin: () => {
       sheet(`<h3>Demobereich</h3><p class="small muted">Anmelden, um die Demo zu starten.</p>
-        <label class="label">Name</label><input class="field" id="dName" autocomplete="off">
-        <label class="label mt-s">Passwort</label><input class="field" id="dPw" type="password" inputmode="numeric" autocomplete="off">
+        <label class="label" for="dName">Name</label><input class="field" id="dName" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="next">
+        <label class="label mt-s" for="dPw">Passwort</label><input class="field" id="dPw" type="password" inputmode="numeric" autocomplete="current-password" enterkeyhint="go">
         <div id="dErr"></div>
         <div class="grid2 mt"><button class="btn ghost" data-act="close">Abbrechen</button><button class="btn" id="dOk">Anmelden</button></div>`, (el) => {
         const go = () => {
@@ -1134,9 +1151,12 @@
         };
         el.querySelector('#dOk').addEventListener('click', go);
         el.querySelector('#dPw').addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
+        el.querySelector('#dName').addEventListener('keydown', (e) => { if (e.key === 'Enter') el.querySelector('#dPw').focus(); });
+        setTimeout(() => el.querySelector('#dName').focus(), 60);
       });
     },
     demoExit: () => setDemo(false),
+    releases: () => sheet(`<h3>Release Notes</h3><div class="rel">${RELEASES.map(([v, d, items]) => `<div class="relv"><div class="relh"><b>v${v}</b><span>${d}</span></div><ul>${items.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>`).join('')}</div><button class="btn mt" data-act="close">Schließen</button>`),
     vacMail: () => {
       const s = S();
       const list = st.absences.filter((a) => a.to >= today && a.type !== 'krank' && a.type !== 'kurz').sort((a, b) => (a.from < b.from ? -1 : 1));
