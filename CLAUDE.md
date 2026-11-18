@@ -9,8 +9,8 @@
   - Zuschläge je Woche: erste 6 Überstunden +25 %, ab der 7. +50 %.
   - Samstag: keine Brotzeit, ab 6 h Anwesenheit 30 min Mittag (nie unter 6 h); alles Mehrarbeit; Samstag ins Zeitkonto +25 % (abschaltbar).
   - Reihenfolge: MEA-Kontingent des Monats → Rest ins Zeitkonto (±35 h, darüber Warnung + „Mehrarbeit nachbeantragen“). Monatswechsel in der Woche: jeder Tag zählt zum Kontingent seines Monats, Zuschläge und ZK-Verrechnung bleiben wochenweise.
-  - Gehalt (früher Netto): Ansicht „Aktuell“ = Grundlohn + Mehrarbeit/Urlaubsgeld/Sonderzahlungen des Monats; „Auszahlung“ = Grundlohn des Monats + Mehrarbeit/Urlaubsgeld/einmalige Sonderzahlungen des Vormonats. Stundenlohn kommt automatisch aus dem Monatsentgelt (= Grundentgelt + feste Zulagen); davon hängen auch Urlaubsgeld und Faktor-Sonderzahlungen ab.
-  - Vermögenswirksame Leistungen: AG-Anteil (`lohn.vlAG`) erhöht das Brutto (steuer-/SV-pflichtig), Sparrate (`lohn.vlSpar`) wird vom Netto abgezogen → „Aufs Konto“.
+  - Gehalt (früher Netto): Ansicht „Aktuell“ = Grundlohn + Mehrarbeit/Urlaubsgeld/Sonderzahlungen des Monats; „Auszahlung“ = Grundlohn des Monats + Mehrarbeit/Urlaubsgeld/einmalige Sonderzahlungen des Vormonats. Einstellungen fragen nur das Grundgehalt ab (inkl. fester Zulagen, keine eigenen Felder für Zulagen oder VL – vom Nutzer so gewünscht); Stundenlohn, Urlaubsgeld und Faktor-Sonderzahlungen kommen daraus.
+  - God Mode: Gesamt-Mehrarbeit kleiner als 25 %-Stunden (z. B. 0) → 25 %-Stunden werden automatisch mitgesenkt.
   - Lohnsteuer auf Einmalzahlungen: Jahreslohn-Methode mit Basis = laufender Lohn ohne Mehrarbeit.
   - Option „freiwillig versichert“ (`steuer.freiwillig`): nur Anzeige Beitrag − AG-Zuschuss, Ergebnis gleich.
   - Splash-Screen: Hintergrund immer im App-Grau `#17181c`, unabhängig vom Design.

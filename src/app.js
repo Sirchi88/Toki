@@ -930,7 +930,7 @@
       <div class="grid2"><select class="field sm" data-sonder="${i}.modus" data-struct="1"><option value="betrag" ${x.modus === 'betrag' ? 'selected' : ''}>Betrag in € (brutto)</option><option value="faktor" ${x.modus === 'faktor' ? 'selected' : ''}>Faktor × Grundlohn</option></select>
       <input class="field sm" inputmode="decimal" data-sonder="${i}.wert" value="${esc(deNum(x.wert))}" placeholder="${x.modus === 'faktor' ? 'z. B. 0,55' : 'z. B. 2.300'}"></div>
       <div><label class="label">Gezahlt mit</label><select class="field sm" data-sonder="${i}.gruppe" data-struct="1"><option value="mehr" ${C.sonderGruppe(x) === 'mehr' ? 'selected' : ''}>der Mehrarbeit (Netto Mehrarbeit)</option><option value="grund" ${C.sonderGruppe(x) === 'grund' ? 'selected' : ''}>dem Grundlohn (Netto Grundgehalt)</option></select></div>
-      <div class="hint">${x.modus === 'faktor' ? `Faktor × Monatsentgelt${C.monatsentgelt(s) ? ` = ${EUR(num(x.wert) * C.monatsentgelt(s))} brutto` : ''}` : 'Bruttobetrag in Euro'}</div>
+      <div class="hint">${x.modus === 'faktor' ? `Faktor × Grundgehalt${C.monatsentgelt(s) ? ` = ${EUR(num(x.wert) * C.monatsentgelt(s))} brutto` : ''}` : 'Bruttobetrag in Euro'}</div>
     </div>`).join('');
     const Y = ui.setYear;
     const jc = (s.urlaub.jahre || {})[Y] || {};
@@ -945,15 +945,10 @@
       ${sw('Heiligabend = halber Arbeitstag', 'arbeit.halb24', s.arbeit.halb24, 'für den freien Tag ist nur ½ Urlaubstag nötig')}${sw('Silvester = halber Arbeitstag', 'arbeit.halb31', s.arbeit.halb31, 'für den freien Tag ist nur ½ Urlaubstag nötig')}`)}
     ${sec('verdienst', 'Verdienst', `
       <div class="subh">💶 Lohn</div>
-      <div class="grid2">${fld('Grundentgelt / Monat (€)', 'lohn.grundlohn', deNum(s.lohn.grundlohn || ''), 'inputmode="decimal" placeholder="z. B. 4.991"')}${fld('Feste Zulagen / Monat (€)', 'lohn.zulagen', deNum(s.lohn.zulagen || ''), 'inputmode="decimal" placeholder="z. B. 922,78"')}</div>
-      <div class="hint">Feste Zulagen = z. B. tarifliche Zulage + Funktionszulage. Zusammen ergibt das dein Monatsentgelt (auf der Abrechnung „Entgelt gesamt“) – davon hängen Stundenlohn, Urlaubsgeld und Weihnachtsgeld ab.</div>
-      <div class="grid2 mt-s"><div><span class="label">Monatsentgelt</span><div class="field calc num" id="meAuto">${nf(C.monatsentgelt(s))} €</div></div>
-        <div><span class="label">Stundenlohn</span><div class="field calc num" id="slAuto">${nf(C.stundenlohn(s))} €</div><div class="hint" id="slHint">${Number(s.lohn.stundenlohn) ? 'eigener Wert' : `= Monatsentgelt ÷ (${D1(s.arbeit.wochenstunden)} h × 4,35)`}</div></div></div>
+      <div class="grid2">${fld('Grundgehalt / Monat (€ brutto)', 'lohn.grundlohn', deNum(s.lohn.grundlohn || ''), 'inputmode="decimal" placeholder="z. B. 4.200"', 'inkl. fester Zulagen')}
+        <div><span class="label">Stundenlohn</span><div class="field calc num" id="slAuto">${nf(C.stundenlohn(s))} €</div><div class="hint" id="slHint">${Number(s.lohn.stundenlohn) ? 'eigener Wert' : `= Grundgehalt ÷ (${D1(s.arbeit.wochenstunden)} h × 4,35)`}</div></div></div>
       <details class="mini"><summary>Anderen Stundenlohn verwenden</summary>${fld('Eigener Stundenlohn (€) – leer = automatisch', 'lohn.stundenlohn', deNum(s.lohn.stundenlohn || ''), 'inputmode="decimal" placeholder="automatisch"')}</details>
       ${sw('€-Beträge in der App anzeigen', 'lohn.zeigen', s.lohn.zeigen, 'aus = alle Beträge versteckt, z. B. wenn du Kollegen die App zeigst')}
-      <div class="subh">🏦 Vermögenswirksame Leistungen</div>
-      <div class="grid2">${fld('Zuschuss Arbeitgeber (€/Monat)', 'lohn.vlAG', deNum(s.lohn.vlAG || ''), 'inputmode="decimal" placeholder="z. B. 26,59"')}${fld('Sparrate an Vertrag (€/Monat)', 'lohn.vlSpar', deNum(s.lohn.vlSpar || ''), 'inputmode="decimal" placeholder="z. B. 26,59"')}</div>
-      <div class="hint">Der Zuschuss erhöht dein Brutto (steuer- und SV-pflichtig), die Sparrate wird vom Netto direkt an deinen VL-Vertrag überwiesen – Toki zeigt dir dann, was wirklich aufs Konto kommt.</div>
       <div class="subh">🎁 Sonderzahlungen</div>${sonder}<button class="btn soft sm" data-act="addSonder">+ Sonderzahlung</button>
       <div class="subh">🌴 Urlaubsgeld je Tarifurlaubstag</div>
       <div class="grid3">${fld('Faktor', 'urlaub.ugFaktor', deNum(s.urlaub.ugFaktor), 'inputmode="decimal"')}${fld('Teiler', 'urlaub.ugTeiler', deNum(s.urlaub.ugTeiler), 'inputmode="decimal"')}<div><span class="label">pro Tag</span><div class="field calc num" id="ugTag">${nf((C.monatsentgelt(s) / (Number(s.urlaub.ugTeiler) || 21.75)) * (Number(s.urlaub.ugFaktor) || 0))} €</div></div></div>
@@ -980,7 +975,7 @@
     ${sec('steuer', 'Steuer (für Gehalt)', `<div class="grid2"><div><label class="label">Steuerklasse ${info('stkl')}</label><select class="field" data-set="steuer.klasse" data-type="num">${[1, 2, 3, 4, 5, 6].map((k) => `<option value="${k}" ${Number(s.steuer.klasse) === k ? 'selected' : ''}>${['I', 'II', 'III', 'IV', 'V', 'VI'][k - 1]}</option>`).join('')}</select></div>
       <div style="grid-column:1/-1"><label class="label">Krankenkasse ${info('kv')}</label>${kasseSelect('data-kasse="s"', s.steuer.kasse)}<div class="hint">${kasseHint(s.steuer.kasse, s.steuer.kvZusatz)}</div></div>
       ${s.steuer.kasse === '__andere' ? fld('KV-Zusatzbeitrag (%)', 'steuer.kvZusatz', deNum(s.steuer.kvZusatz), 'inputmode="decimal" placeholder="z. B. 2,9"') : ''}
-      ${fld('Kinderfreibeträge', 'steuer.kinderFB', deNum(s.steuer.kinderFB), 'inputmode="decimal"', 'laut Abrechnung, z. B. 0,5 / 1')}${fld('Kinder (Pflegevers.)', 'steuer.kinderPV', s.steuer.kinderPV, 'inputmode="numeric"', 'Anzahl Kinder')}</div>
+      ${fld('Kinderfreibeträge', 'steuer.kinderFB', deNum(s.steuer.kinderFB), 'inputmode="decimal"', 'laut Abrechnung, z. B. 0,5 / 1')}${fld('Kinder (Pflegevers.)', 'steuer.kinderPV', s.steuer.kinderPV, 'inputmode="numeric"', Number(s.steuer.kinderFB) > 0 && !Number(s.steuer.kinderPV) ? '⚠️ Kinder hier eintragen – sonst rechnet Toki den Kinderlosen-Zuschlag' : 'Anzahl Kinder – senkt den Pflegebeitrag')}</div>
       <div class="grid2">${fld(`Geburtsjahr ${info('alter')}`, 'steuer.geburtsjahr', s.steuer.geburtsjahr || '', 'inputmode="numeric" placeholder="z. B. 1990"')}<div></div></div>
       ${sw('Kirchensteuer', 'steuer.kirche', s.steuer.kirche)}${sw('Freiwillig gesetzlich versichert', 'steuer.freiwillig', s.steuer.freiwillig, 'Einkommen über der Versicherungspflichtgrenze: Beitrag wird abgeführt, Arbeitgeber zahlt Zuschuss – unterm Strich gleich, Anzeige wie auf deiner Abrechnung')}
       ${!s.steuer.geprueft ? '<button class="btn soft sm" data-act="steuerOk">✓ Angaben stimmen so</button>' : '<p class="xs muted">✓ Steuerdaten geprüft</p>'}`)}
@@ -1210,6 +1205,8 @@
     if (t.dataset.god !== undefined && t.dataset.god !== '') {
       const g = { ...godDefaults(), ...(st.pref.god || {}) };
       g[t.dataset.god] = t.type === 'checkbox' ? t.checked : t.dataset.str ? t.value : t.tagName === 'SELECT' ? Number(t.value) : t.dataset.god === 'manuell' && t.value.trim() === '' ? '' : num(t.value);
+      // Gesamt-Mehrarbeit gesenkt (z. B. auf 0) → 25 %-Stunden gleich mitziehen, 50 % ergibt sich daraus
+      if (t.dataset.god === 'mea' && Number(g.h25) > Math.max(0, Number(g.mea) || 0)) g.h25 = Math.max(0, Number(g.mea) || 0);
       st.pref.god = g; save(); return true;
     }
     if (t.dataset.sonder) {
@@ -1238,8 +1235,7 @@
   function liveHints() {
     const s = S();
     const sl = document.getElementById('slAuto'); if (sl) sl.textContent = `${nf(C.stundenlohn(s))} €`;
-    const slh = document.getElementById('slHint'); if (slh) slh.textContent = Number(s.lohn.stundenlohn) ? 'eigener Wert' : `= Monatsentgelt ÷ (${D1(s.arbeit.wochenstunden)} h × 4,35)`;
-    const me = document.getElementById('meAuto'); if (me) me.textContent = `${nf(C.monatsentgelt(s))} €`;
+    const slh = document.getElementById('slHint'); if (slh) slh.textContent = Number(s.lohn.stundenlohn) ? 'eigener Wert' : `= Grundgehalt ÷ (${D1(s.arbeit.wochenstunden)} h × 4,35)`;
     const ug = document.getElementById('ugTag'); if (ug) ug.textContent = `${nf((C.monatsentgelt(s) / (Number(s.urlaub.ugTeiler) || 21.75)) * (Number(s.urlaub.ugFaktor) || 0))} €`;
     const ts = document.getElementById('tsoll'); if (ts) ts.textContent = `= ${D1(C.tagessoll(s))} Std./Tag`;
   }

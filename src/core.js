@@ -93,7 +93,7 @@ const Core = (() => {
     theme: 'dark',
     arbeit: { wochenstunden: 35, brotzeit: 15, mittag: 30, land: 'BY', mariae: true, halb24: false, halb31: false },
     lohn: {
-      grundlohn: 0, zulagen: 0, stundenlohn: 0, zeigen: true, auszahlung: 'folgemonat', nettoAbzug: 0, vlAG: 0, vlSpar: 0,
+      grundlohn: 0, stundenlohn: 0, zeigen: true, auszahlung: 'folgemonat', nettoAbzug: 0,
       sonder: [{ id: 'weihnachtsgeld', name: 'Weihnachtsgeld', art: 'einmalig', monat: 11, modus: 'betrag', wert: 0 }],
     },
     zk: { stand: 0, datum: '', samstagBonus: true, max: 35, min: -35 },
@@ -111,8 +111,8 @@ const Core = (() => {
     return over === undefined || over === null ? base : over;
   };
   const tagessoll = (S) => (Number(S.arbeit.wochenstunden) || 35) / 5;
-  /** Monatsentgelt = Grundentgelt + feste monatliche Zulagen (Basis für Stundenlohn, Urlaubsgeld, Faktor-Sonderzahlungen) */
-  const monatsentgelt = (S) => (Number(S.lohn.grundlohn) || 0) + (Number(S.lohn.zulagen) || 0);
+  /** Grundgehalt (inkl. fester Zulagen) – Basis für Stundenlohn, Urlaubsgeld, Faktor-Sonderzahlungen */
+  const monatsentgelt = (S) => Number(S.lohn.grundlohn) || 0;
   const stundenlohn = (S) => {
     const h = Number(S.lohn.stundenlohn);
     if (h > 0) return h;
@@ -579,9 +579,7 @@ const Core = (() => {
     const src = modus === 'auszahlung' ? prevMonth(m) : m;
     const mo = Number(m.slice(5, 7)), srcMo = Number(src.slice(5, 7));
     const aus = src !== m ? ` (aus ${MONATE[srcMo - 1]})` : '';
-    const lines = [{ k: 'Grundentgelt', v: Number(S.lohn.grundlohn) || 0, laufend: true, extra: false }];
-    if (Number(S.lohn.zulagen)) lines.push({ k: 'Feste Zulagen', v: Number(S.lohn.zulagen), laufend: true, extra: false });
-    if (Number(S.lohn.vlAG)) lines.push({ k: 'Vermögenswirksame Leistungen (AG-Anteil)', v: Number(S.lohn.vlAG), laufend: true, extra: false });
+    const lines = [{ k: 'Grundgehalt', v: Number(S.lohn.grundlohn) || 0, laufend: true, extra: false }];
     for (const s of S.lohn.sonder || []) {
       const val = s.modus === 'faktor' ? g * (Number(s.wert) || 0) : Number(s.wert) || 0;
       if (!val) continue;
@@ -599,7 +597,7 @@ const Core = (() => {
     const laufend = sum((l) => l.laufend), einmal = sum((l) => !l.laufend);
     const extraL = sum((l) => l.laufend && l.extra), extraE = sum((l) => !l.laufend && l.extra);
     const mehrL = sum((l) => l.mehr);
-    return { lines, laufend, einmal, extraL, extraE, extra: extraL + extraE, basis: laufend - mehrL, vlSpar: Number(S.lohn.vlSpar) || 0, src, tu, ugTag, modus };
+    return { lines, laufend, einmal, extraL, extraE, extra: extraL + extraE, basis: laufend - mehrL, vlSpar: 0, src, tu, ugTag, modus };
   };
 
   return {

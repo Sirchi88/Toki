@@ -163,20 +163,12 @@ test('Sonderzahlungen & Urlaubsgeld zählen zur Mehrarbeit, Weihnachtsgeld zum G
   assert.ok(Math.abs(dez.extra - (125 + 300 + ug)) < 1e-6);
 });
 
-test('Feste Zulagen, VL und Einmalzahlung-Basis ohne Mehrarbeit', () => {
-  const S = base(); S.lohn.grundlohn = 3000; S.lohn.zulagen = 500; S.lohn.vlAG = 20; S.lohn.vlSpar = 40; S.lohn.stundenlohn = 0;
+test('Grundgehalt ist Basis für Stundenlohn; Einmalzahlung-Steuer ohne Mehrarbeit in der Basis', () => {
+  const S = base(); S.lohn.grundlohn = 3500; S.lohn.stundenlohn = 0;
   assert.strictEqual(C.monatsentgelt(S), 3500);
   assert.ok(Math.abs(C.stundenlohn(S) - 3500 / (35 * 4.35)) < 1e-9);
-  const st = { settings: S, entries: {}, absences: [], kontingent: {}, nach: [] };
-  const c = C.compute(st, '2026-05-31');
-  const mp = C.monthPay(st, c, '2026-05', 'aktuell');
-  assert.strictEqual(mp.laufend, 3520);
-  assert.strictEqual(mp.vlSpar, 40);
-  const n = C.netto(mp.laufend, 0, S, 5, mp.vlSpar);
-  assert.ok(Math.abs(n.gross - n.svSum - n.taxSum - 40 - n.net) < 1e-9);
-  // Einmalzahlung: Steuer hängt von der Basis ab, nicht von der laufenden Mehrarbeit
-  const a = C.netto(3800, 1000, S, 5, 0, 3520), b = C.netto(3800, 0, S, 5, 0, 3520);
-  const ezA = C.steuerJahr(3520 * 12 + 1000, S).lst - C.steuerJahr(3520 * 12, S).lst;
+  const a = C.netto(3800, 1000, S, 5, 0, 3500), b = C.netto(3800, 0, S, 5, 0, 3500);
+  const ezA = C.steuerJahr(3500 * 12 + 1000, S).lst - C.steuerJahr(3500 * 12, S).lst;
   assert.ok(Math.abs((a.lst - b.lst) - ezA) < 1e-9);
 });
 
