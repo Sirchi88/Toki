@@ -133,4 +133,17 @@ test('Gehalt "Auszahlung": Mehrarbeit und Sonderzahlung kommen aus dem Vormonat'
   assert.ok(aus.lines.some((l) => l.k.startsWith('Weihnachtsgeld') && l.v === 2000));
 });
 
+test('QR-Code für den Sync-Link: Version 4, Ruhezone und Suchmuster stimmen', () => {
+  const QR = require('../src/qr.js');
+  const m = QR.matrix('https://sirchi88.github.io/Toki/#sync=ABCDEFGHJKLMNP23');
+  assert.strictEqual(m.length, 33);
+  for (const [x, y] of [[0, 0], [26, 0], [0, 26]]) { assert.ok(m[y][x] && m[y + 6][x + 6] && !m[y + 1][x + 1] && m[y + 3][x + 3]); }
+});
+
+test('Krankenkassen-Liste 2026 ist vollständig hinterlegt', () => {
+  assert.ok(C.KASSEN.length >= 90);
+  assert.deepStrictEqual(C.KASSEN.find(([n]) => n.startsWith('Techniker')), ['Techniker Krankenkasse (TK)', 2.69]);
+  assert.ok(C.KASSEN.every(([, v]) => v > 2 && v < 5));
+});
+
 console.log(`\n${passed} Tests bestanden.`);

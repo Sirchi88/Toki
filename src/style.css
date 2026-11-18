@@ -464,7 +464,6 @@ nav.tabs .in{grid-template-columns:repeat(4,1fr)}
 
 /* ===== PC / großer Bildschirm (Handy-Ansicht bleibt unverändert) ===== */
 @media (min-width: 1000px) {
-  body { padding-left: 120px; }
   #app { max-width: 1120px; padding: 28px 28px 60px; }
   .top { margin-bottom: 18px; }
   .brand img { width: 40px; height: 40px; }
@@ -478,16 +477,49 @@ nav.tabs .in{grid-template-columns:repeat(4,1fr)}
   .ymonths { grid-template-columns: repeat(4, 1fr); }
   .ydays i { font-size: 9.5px; line-height: 15px; height: 15px; }
   .seg { max-width: 520px; }
-  /* Navigation als Leiste links */
-  nav.tabs { top: 50%; bottom: auto; left: 22px; right: auto; transform: translateY(-50%); padding: 0; justify-content: flex-start; }
-  nav.tabs .in { grid-template-columns: 1fr; width: 92px; gap: 6px; padding: 8px; border-radius: 22px; }
-  nav.tabs button { padding: 12px 0; font-size: 11.5px; }
-  nav.tabs button svg { width: 24px; height: 24px; }
-  .toast { bottom: 32px; }
-  .savebar { bottom: 20px; }
+  /* Navigation bleibt unten, etwas breiter */
+  nav.tabs .in { max-width: 560px; }
   body[data-theme=schrank] #app, body[data-theme=dorf] #app { padding-bottom: 200px; }
 }
 @media (min-width: 1400px) {
   #app { max-width: 1240px; }
 }
 .anal svg{max-width:560px;display:block;margin:0 auto}
+
+/* Sync: QR-Code */
+.qrbox{margin-top:10px;text-align:center}
+.qrbox .qr{display:inline-block;padding:10px;background:#fff;border-radius:14px;box-shadow:var(--shadow);line-height:0}
+.qrbox .qr svg{width:200px;height:200px}
+
+/* ===== PC: Reiter Feierabend ===== */
+@media (min-width: 1000px) {
+  .page-feierabend { column-count: 1 !important; max-width: 1040px; margin: 0 auto; }
+  .page-feierabend .ampel { grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+  .page-feierabend .amp { padding: 14px 18px; border-radius: 16px; }
+  .page-feierabend .amp .k { font-size: 11px; }
+  .page-feierabend .amp .v { font-size: 36px; }
+  .fa-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 22px; align-items: stretch; }
+  .fa-l, .fa-r { display: flex; flex-direction: column; gap: 18px; }
+  .fa-l .card, .fa-r .card { margin: 0; padding: 24px; border-radius: 20px; }
+  .fa-l .card { flex: 1; }
+  .page-feierabend .datebtn { height: 54px; font-size: 18px; }
+  .page-feierabend .field.big { height: 92px; font-size: 56px; border-radius: 14px; }
+  .page-feierabend .worked { margin-top: 18px; padding: 18px; border-radius: 16px; }
+  .page-feierabend .worked .v { font-size: 72px; }
+  .page-feierabend #fa-live .btn { height: 54px; font-size: 17px; border-radius: 14px; }
+  .fa-r .card { flex: 1; }
+  .fa-r h2 { font-size: 14px; margin-bottom: 14px; }
+  .fa-r .tiles { grid-template-columns: 1fr 1fr; gap: 14px; }
+  .fa-r .tile { padding: 20px 10px; border-radius: 16px; }
+  .fa-r .tile .k { font-size: 14px; }
+  .fa-r .tile .v { font-size: 52px; }
+  .fa-r .tile.single { grid-column: 1 / -1; }
+  .fa-r details.fold { margin: 0; border-radius: 16px; }
+  .fa-r details.fold summary { padding: 16px 20px; font-size: 15px; }
+}
+@media (min-width: 1000px) {
+  #app { padding-bottom: 130px; }
+  .fa-r .card { display: flex; flex-direction: column; }
+  .fa-r .tiles { flex: 1; align-content: center; }
+}
+@media (min-width: 1000px) { #app:has(.page-feierabend) .top { max-width: 1040px; margin-left: auto; margin-right: auto; } }
