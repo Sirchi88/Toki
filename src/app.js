@@ -244,7 +244,7 @@
     const ud = ut <= 0 ? 'r' : ut <= 3 ? 'y' : '';
     return `<div class="ampel">
       <button class="amp" data-act="tab" data-tab="urlaub"><div class="k"><span class="dot ${zd}"></span>Zeitkonto</div><div class="v num">${z < -0.004 ? '-' : ''}${H(Math.abs(z))}</div></button>
-      <button class="amp" data-act="tab" data-tab="mehrarbeit"><div class="k"><span class="dot ${kd}"></span>offene MEA</div><div class="v num">${k.has ? H(Math.max(0, k.open), 1) : '–'}</div></button>
+      <button class="amp" data-act="tab" data-tab="mehrarbeit"><div class="k"><span class="dot ${kd}"></span>offene MEA</div><div class="v num">${k.has ? H(Math.max(0, k.open)) : '–'}</div></button>
       <button class="amp" data-act="tab" data-tab="urlaub"><div class="k"><span class="dot ${ud}"></span>Resturlaub</div><div class="v num">${D1(ut)} T</div></button>
     </div>`;
   }
@@ -333,7 +333,7 @@
     if (!(mehr > 0)) return '';
     const show = S().lohn.zeigen;
     return `<div class="zus">
-      <div class="zr"><span>Mehrarbeit${nach > 0 ? ` <span class="badge nach">${H(nach, 1)} nachbeantragt</span>` : ''}</span><b class="num">${H(mehr)}</b>${show ? `<span class="num">${EUR(p.base)}</span>` : ''}</div>
+      <div class="zr"><span>Mehrarbeit${nach > 0 ? ` <span class="badge nach">${H(nach)} nachbeantragt</span>` : ''}</span><b class="num">${H(mehr)}</b>${show ? `<span class="num">${EUR(p.base)}</span>` : ''}</div>
       <div class="zr sub"><span>Zuschlag 25 %</span><b class="num">${H(p.h25)}</b>${show ? `<span class="num">${EUR(p.z25)}</span>` : ''}</div>
       ${p.h50 > 0 ? `<div class="zr sub"><span>Zuschlag 50 %</span><b class="num">${H(p.h50)}</b>${show ? `<span class="num">${EUR(p.z50)}</span>` : ''}</div>` : ''}
       ${show ? `<div class="zr tot"><span>Gesamt brutto</span><b></b><span class="num">${EUR(p.total)}</span></div>` : ''}
@@ -399,7 +399,7 @@
       const d = day.date, wd = C.dow(d), e = day.entry, ab = day.absence;
       if ((wd === 0 || wd === 6) && !e) return '';
       let bar, dv = '<span class="dv"></span>';
-      if (ab && ab.full && !ab.fromEntry) bar = `<div class="bar abs" style="background:var(--c-${ab.type})">${C.TYPES[ab.type].label}${ab.type === 'zk' ? ` · −${H(ab.units * C.tagessoll(s), 1)}` : ''}</div>`;
+      if (ab && ab.full && !ab.fromEntry) bar = `<div class="bar abs" style="background:var(--c-${ab.type})">${C.TYPES[ab.type].label}${ab.type === 'zk' ? ` · −${H(ab.units * C.tagessoll(s))}` : ''}</div>`;
       else if (e) {
         const t = day.target, over = e.hours - t;
         bar = `<div class="bar"><div class="f" style="width:${pct(Math.min(e.hours, t || e.hours))}"></div>${t > 0 && over > 0 ? `<div class="o" style="left:${pct(t)};width:${pct(over)}"></div>` : ''}${t === 0 ? `<div class="o" style="left:0;width:${pct(e.hours)};border-radius:7px"></div>` : ''}${t > 0 && over < 0 ? `<div class="u" style="left:${pct(e.hours)};width:${pct(-over)}"></div>` : ''}${t > 0 ? `<div class="s" style="left:${pct(t)}"></div>` : ''}<div class="t">${esc(e.start)}–${esc(e.end)}${e.half ? ' · ½U' : ''}${e.capped ? ' · ⚠' : ''}</div></div>`;
@@ -440,12 +440,12 @@
     return `<section class="card">
       <div class="between"><h3>${monthName(m.month)}</h3><span class="big-r num">${show ? EUR(p.total) : H(m.mehr)}</span></div>
       <div class="kpis">
-        <div class="kpi"><div class="k">Gearbeitet</div><div class="v num">${H(m.worked, 1)}</div></div>
+        <div class="kpi"><div class="k">Gearbeitet</div><div class="v num">${H(m.worked)}</div></div>
         <div class="kpi"><div class="k">Mehrarbeit</div><div class="v num acc">${H(m.mehr)}</div></div>
         <div class="kpi"><div class="k">Zeitkonto</div><div class="v num">${sH(m.zkChange)}</div></div>
       </div>
       ${zusTable(p, m.mehr, m.mehrNach)}
-      ${K ? `<div class="mt"><div class="xs muted">MEA-Kontingent ${H(m.used, 1)} von ${H(K, 1)}${m.nach ? ` · inkl. <span class="badge nach">${H(m.nach, 1)} nachbeantragt</span>` : ''}</div><div class="progress mt-s"><i style="width:${usedPct}%"></i></div></div>` : ''}
+      ${K ? `<div class="mt"><div class="xs muted">MEA-Kontingent ${H(m.used)} von ${H(K)}${m.nach ? ` · inkl. <span class="badge nach">${H(m.nach)} nachbeantragt</span>` : ''}</div><div class="progress mt-s"><i style="width:${usedPct}%"></i></div></div>` : ''}
       <p class="xs muted mt-s">${m.days} Tage erfasst · Zuschläge werden je Woche berechnet</p>
     </section>`;
   }
@@ -457,8 +457,8 @@
     return `<section class="card">
       <div class="between"><button class="iconbtn" data-act="year" data-d="-1">${I.left}</button><h3>Jahr ${y}</h3><button class="iconbtn" data-act="year" data-d="1">${I.right}</button></div>
       <div class="kpis">
-        <div class="kpi"><div class="k">Gearbeitet</div><div class="v num">${H(tot.worked, 0)}</div></div>
-        <div class="kpi"><div class="k">Mehrarbeit</div><div class="v num acc">${H(tot.mehr, 1)}</div></div>
+        <div class="kpi"><div class="k">Gearbeitet</div><div class="v num">${H(tot.worked)}</div></div>
+        <div class="kpi"><div class="k">Mehrarbeit</div><div class="v num acc">${H(tot.mehr)}</div></div>
         <div class="kpi"><div class="k">Ins Zeitkonto</div><div class="v num">${sH(tot.zk)}</div></div>
       </div>
       <div class="chart">${ms.map((m, i) => `<div class="c" title="${MON[i]}"><b style="height:${m ? (m.mehr / max) * 100 : 0}%"></b><b class="zk" style="height:${m && m.zkChange > 0 ? (m.zkChange / max) * 100 : 0}%;opacity:.7"></b><span>${MON[i].slice(0, 1)}</span></div>`).join('')}</div>
@@ -502,9 +502,9 @@
     <section class="card kcard">
       <div class="krow"><button class="iconbtn sm" data-act="kmonth" data-d="-1">${I.left}</button><b>${monthName(m)}</b><button class="iconbtn sm" data-act="kmonth" data-d="1">${I.right}</button></div>
       ${st.kontingent[m] !== undefined && !ui.kEdit
-        ? `<div class="kline"><span>MEA-Kontingent</span><b class="num">${H(Number(st.kontingent[m]) || 0, 1)}</b><button class="kedit" data-act="kEdit" title="Korrigieren" aria-label="Kontingent korrigieren">✎</button></div>`
+        ? `<div class="kline"><span>MEA-Kontingent</span><b class="num">${H(Number(st.kontingent[m]) || 0)}</b><button class="kedit" data-act="kEdit" title="Korrigieren" aria-label="Kontingent korrigieren">✎</button></div>`
         : `<div class="kline"><label for="kont">MEA-Kontingent (h)</label><input id="kont" class="field sm" inputmode="decimal" placeholder="z. B. 20" value="${deNum(st.kontingent[m] ?? '')}" data-kont="${m}"><button class="btn sm" data-act="kDone">OK</button></div>`}
-      <div class="kmini"><span>Geleistet <b class="num">${H(mm ? mm.mehr : 0, 1)}</b></span><span>Offen <b class="num acc">${k.has ? H(Math.max(0, k.open), 1) : '–'}</b></span></div>
+      <div class="kmini"><span>Geleistet <b class="num">${H(mm ? mm.mehr : 0)}</b></span><span>Offen <b class="num acc">${k.has ? H(Math.max(0, k.open)) : '–'}</b></span></div>
       ${k.has ? `<div class="progress thin"><i style="width:${Math.min(100, (k.used / k.k) * 100)}%"></i></div>` : '<p class="hint" style="margin:6px 0 0">Ohne Kontingent laufen alle Überstunden ins Zeitkonto.</p>'}
       ${avg}
       ${z > s.zk.max ? `<div class="notice danger">⚠ <div><b>Vorsicht, Stundenkonto voll!</b> Zeitkonto ${sH(z)} – es wird weiter mitgezählt.</div></div>` : ''}
@@ -514,7 +514,7 @@
       <p class="small">MEA-Kontingent für ${monthName(C.ym(today))} ist ${curK.has ? 'erschöpft' : 'nicht vorhanden'} und das Zeitkonto ist über ${s.zk.max} h. Trag die genehmigten Stunden ein – sie fließen ins Kontingent und zählen als Mehrarbeit (hervorgehoben).</p>
       <div class="grid2 mt"><input class="field" id="nachH" inputmode="decimal" placeholder="Stunden"><button class="btn" data-act="addNach">Eintragen</button></div>
     </section>` : ''}
-    ${nachList.length ? `<section class="card"><h2>Nachbeantragt</h2><div class="list">${nachList.map((n) => `<div class="li"><span class="badge nach">${H(num(n.hours), 1)}</span><span class="grow">${monthName(n.month)}<br><span class="xs muted">eingetragen ${dShort(n.date)}${n.date.slice(0, 4)}</span></span><button class="btn sm danger" data-act="delNach" data-id="${n.id}">Löschen</button></div>`).join('')}</div></section>` : ''}
+    ${nachList.length ? `<section class="card"><h2>Nachbeantragt</h2><div class="list">${nachList.map((n) => `<div class="li"><span class="badge nach">${H(num(n.hours))}</span><span class="grow">${monthName(n.month)}<br><span class="xs muted">eingetragen ${dShort(n.date)}${n.date.slice(0, 4)}</span></span><button class="btn sm danger" data-act="delNach" data-id="${n.id}">Löschen</button></div>`).join('')}</div></section>` : ''}
     <div class="seg" style="margin-bottom:14px">${[['woche', 'Wochen'], ['monat', 'Monate'], ['jahr', 'Jahr']].map(([kk, l]) => `<button aria-pressed="${ui.view === kk}" data-act="view" data-v="${kk}">${l}</button>`).join('')}</div>
     ${body}
     <p class="xs muted onbg" style="text-align:center">Mehrarbeit ab ${D1(C.tagessoll(s))} Std./Tag · Samstag komplett · Zuschläge je Woche: erste 6 h +25 %, danach +50 % · Tag antippen zum Löschen</p>`;
@@ -707,7 +707,11 @@
   }
   function nettoResult(lines, laufend, einmal, S2, mo, abzug, rate, cls, note = '', mehrG = 0) {
     const n = C.netto(laufend, einmal, S2, mo, abzug);
-    const nOhne = mehrG > 0 ? C.netto(laufend - mehrG, einmal, S2, mo, abzug) : n;
+    // Block „Mehrarbeit“ = Mehrarbeit + Urlaubsgeld + Sonderzahlungen (außer Zahlungen mit dem Grundlohn, z. B. Weihnachtsgeld)
+    const xl = typeof mehrG === 'object' ? mehrG.l : mehrG, xe = typeof mehrG === 'object' ? mehrG.e : 0;
+    const inkl = typeof mehrG === 'object' && mehrG.inkl;
+    mehrG = xl + xe;
+    const nOhne = mehrG > 0 ? C.netto(laufend - xl, einmal - xe, S2, mo, abzug) : n;
     const netMehr = n.net - nOhne.net;
     const n25 = C.netto(laufend + rate * 1.25, einmal, S2, mo, abzug), n50 = C.netto(laufend + rate * 1.5, einmal, S2, mo, abzug);
     const net25 = n25.net - n.net, net50 = n50.net - n.net;
@@ -722,7 +726,7 @@
     if (n.abzug) parts.push([n.abzug, 'var(--muted)', 'Sonstiges']);
     return `<section class="card">
       <div class="hero"><div class="s">Netto (ca.)</div><div class="v num ${cls}">${nf(n.net)} €</div><div class="s ${cls}">Brutto ${nf(n.gross)} €</div></div>
-      <div class="nsplit ${cls}"><div><span>Netto (Grundgehalt)</span><b class="num">${nf(nOhne.net)} €</b><small>aus ${nf(n.gross - mehrG)} € brutto</small></div><div class="m"><span>Netto (Mehrarbeit)</span><b class="num">${mehrG > 0 ? nf(netMehr) + ' €' : '–'}</b><small>${mehrG > 0 ? `aus ${nf(mehrG)} € brutto · ${nf((netMehr / mehrG) * 100, 0)} % bleiben` : 'keine Mehrarbeit'}</small></div></div>
+      <div class="nsplit ${cls}"><div><span>Netto (Grundgehalt)</span><b class="num">${nf(nOhne.net)} €</b><small>aus ${nf(n.gross - mehrG)} € brutto</small></div><div class="m"><span>Netto (Mehrarbeit)</span><b class="num">${mehrG > 0 ? nf(netMehr) + ' €' : '–'}</b><small>${mehrG > 0 ? `aus ${nf(mehrG)} € brutto · ${nf((netMehr / mehrG) * 100, 0)} % bleiben${inkl ? '<br>inkl. Urlaubsgeld & Sonderzahlungen' : ''}` : 'keine Mehrarbeit'}</small></div></div>
       <div class="split ${cls}">${parts.map(([v, c]) => `<i style="width:${n.gross ? (v / n.gross) * 100 : 0}%;background:${c}"></i>`).join('')}</div>
       <div class="legend">${parts.map(([v, c, l]) => `<span><i style="background:${c}"></i>${l} ${nf(n.gross ? (v / n.gross) * 100 : 0, 0)} %</span>`).join('')}</div>
       ${note}
@@ -824,7 +828,7 @@
     const modus = ui.gmode || 'aktuell';
     const mp = C.monthPay(st, calc, m, modus);
     const mo = Number(m.slice(5, 7));
-    const lines = mp.lines.map((l) => ({ k: `${esc(l.k)}${l.mehr ? ` <span class="xs">(${H(l.mehr.mehr, 1)}: ${H(l.mehr.pay.h25, 1)} à 25 %, ${H(l.mehr.pay.h50, 1)} à 50 %)</span>` : ''}`, v: l.v, cls: l.mehr ? 'hl25' : '' }));
+    const lines = mp.lines.map((l) => ({ k: `${esc(l.k)}${l.mehr ? ` <span class="xs">(${H(l.mehr.mehr)}: ${H(l.mehr.pay.h25)} à 25 %, ${H(l.mehr.pay.h50)} à 50 %)</span>` : ''}`, v: l.v, cls: l.extra ? 'hl25' : '' }));
     // fehlende Angaben
     const miss = [];
     if (!s.steuer.geprueft) miss.push(`Steuerdaten noch nicht geprüft – gerechnet wird mit StKl ${['I', 'II', 'III', 'IV', 'V', 'VI'][s.steuer.klasse - 1]}, KV-Zusatz ${nf(s.steuer.kvZusatz, 2)} %, ${s.steuer.kirche ? 'mit' : 'ohne'} Kirchensteuer.`);
@@ -849,7 +853,7 @@
     return `${head}
     <div class="between" style="margin-bottom:10px"><button class="iconbtn" data-act="nmonth" data-d="-1">${I.left}</button><b class="onbg" style="font-family:var(--font-d);font-size:26px">${monthName(m)}</b><button class="iconbtn" data-act="nmonth" data-d="1">${I.right}</button></div>
     <div class="gmode"><span class="xs onbg">${modus === 'aktuell' ? `Grundlohn + alles, was im ${MON[mo - 1]} anfällt` : `Grundlohn ${MON[mo - 1]} + Mehrarbeit, Urlaubsgeld & Sonderzahlungen aus ${MON[Number(C.prevMonth(m).slice(5, 7)) - 1]}`}</span><div class="seg mini"><button aria-pressed="${modus === 'aktuell'}" data-act="gmode" data-v="aktuell">Aktuell</button><button aria-pressed="${modus === 'auszahlung'}" data-act="gmode" data-v="auszahlung">Auszahlung</button></div></div>
-    ${nettoResult(lines, mp.laufend, mp.einmal, s, mo, 0, calc.rate, cls, note, (mp.lines.find((l) => l.mehr) || { v: 0 }).v)}
+    ${nettoResult(lines, mp.laufend, mp.einmal, s, mo, 0, calc.rate, cls, note, { l: mp.extraL, e: mp.extraE, inkl: mp.lines.some((l) => l.extra && !l.mehr) })}
     <section class="card"><h2>Bericht exportieren</h2><p class="small muted">Alle Werte von ${monthName(m)} (${modus === 'aktuell' ? 'Aktuell' : 'Auszahlung'}) mit Statistiken zu Mehrarbeit und Arbeitszeit.</p>
       <div class="grid2"><button class="btn" data-act="exportPdf">📄 PDF</button><button class="btn soft" data-act="exportXlsx">📊 Excel</button></div></section>
     ${yG > 0 ? `<section class="card"><h2>Mehrarbeit ${y}</h2><dl class="money ${cls}" style="margin-top:0"><div><dt>Mehrarbeit brutto</dt><dd>${nf(yG)} €</dd></div><div class="sum"><dt>davon netto ca.</dt><dd>${nf(yN)} €</dd></div></dl></section>` : ''}
@@ -861,8 +865,8 @@
     const s = S(), m = ui.nmonth, modus = ui.gmode || 'aktuell', mo = Number(m.slice(5, 7));
     const mp = C.monthPay(st, calc, m, modus);
     const n = C.netto(mp.laufend, mp.einmal, s, mo);
-    const mehrG = (mp.lines.find((l) => l.mehr) || { v: 0 }).v;
-    const nOhne = mehrG ? C.netto(mp.laufend - mehrG, mp.einmal, s, mo) : n;
+    const mehrG = mp.extra;
+    const nOhne = mehrG ? C.netto(mp.laufend - mp.extraL, mp.einmal - mp.extraE, s, mo) : n;
     const mm = calc.months.get(m);
     const keys = Object.keys(st.entries).filter((d) => d.startsWith(m)).sort();
     const days = keys.map((d) => {
@@ -923,6 +927,7 @@
       ${x.art === 'einmalig' ? `<select class="field sm" data-sonder="${i}.monat">${MON.map((mm, j) => `<option value="${j + 1}" ${Number(x.monat) === j + 1 ? 'selected' : ''}>im ${mm}</option>`).join('')}</select>` : '<span></span>'}</div>
       <div class="grid2"><select class="field sm" data-sonder="${i}.modus" data-struct="1"><option value="betrag" ${x.modus === 'betrag' ? 'selected' : ''}>Betrag in € (brutto)</option><option value="faktor" ${x.modus === 'faktor' ? 'selected' : ''}>Faktor × Grundlohn</option></select>
       <input class="field sm" inputmode="decimal" data-sonder="${i}.wert" value="${esc(deNum(x.wert))}" placeholder="${x.modus === 'faktor' ? 'z. B. 0,55' : 'z. B. 2.300'}"></div>
+      <div><label class="label">Gezahlt mit</label><select class="field sm" data-sonder="${i}.gruppe" data-struct="1"><option value="mehr" ${C.sonderGruppe(x) === 'mehr' ? 'selected' : ''}>der Mehrarbeit (Netto Mehrarbeit)</option><option value="grund" ${C.sonderGruppe(x) === 'grund' ? 'selected' : ''}>dem Grundlohn (Netto Grundgehalt)</option></select></div>
       <div class="hint">${x.modus === 'faktor' ? `Faktor × Grundlohn${s.lohn.grundlohn ? ` = ${EUR(num(x.wert) * s.lohn.grundlohn)} brutto` : ''}` : 'Bruttobetrag in Euro'}</div>
     </div>`).join('');
     const Y = ui.setYear;

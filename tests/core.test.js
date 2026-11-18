@@ -121,7 +121,7 @@ test('Netto-Monat nutzt die Mehrarbeit desselben Monats', () => {
   assert.ok(mp.lines.some((l) => l.mehr && Math.abs(l.v - 4 * 25 * 1.25) < 1e-9));
 });
 
-test('Gehalt "Auszahlung": Mehrarbeit und Sonderzahlung kommen aus dem Vormonat', () => {
+test('Gehalt "Auszahlung": Mehrarbeit kommt aus dem Vormonat, Weihnachtsgeld mit dem Grundlohn', () => {
   const S = base(); S.lohn.stundenlohn = 25; S.lohn.sonder = [{ name: 'Weihnachtsgeld', art: 'einmalig', monat: 11, modus: 'betrag', wert: 2000 }];
   const st = { settings: S, entries: {}, absences: [], kontingent: { '2026-11': 10 }, nach: [] };
   for (const d of ['2026-11-16', '2026-11-17']) st.entries[d] = ent('07:00', '16:45');
@@ -130,7 +130,9 @@ test('Gehalt "Auszahlung": Mehrarbeit und Sonderzahlung kommen aus dem Vormonat'
   const aus = C.monthPay(st, c, '2026-12', 'auszahlung');
   assert.ok(!akt.lines.some((l) => l.mehr) && !akt.lines.some((l) => l.k.startsWith('Weihnachtsgeld')));
   assert.ok(aus.lines.some((l) => l.mehr && Math.abs(l.v - 125) < 1e-9));
-  assert.ok(aus.lines.some((l) => l.k.startsWith('Weihnachtsgeld') && l.v === 2000));
+  // Weihnachtsgeld wird mit dem Grundlohn gezahlt: bleibt im eigenen Monat (November), auch bei „Auszahlung“
+  assert.ok(!aus.lines.some((l) => l.k.startsWith('Weihnachtsgeld')));
+  assert.ok(C.monthPay(st, c, '2026-11', 'auszahlung').lines.some((l) => l.k === 'Weihnachtsgeld' && l.v === 2000));
 });
 
 test('QR-Code für den Sync-Link: Version 4, Ruhezone und Suchmuster stimmen', () => {
@@ -144,6 +146,21 @@ test('Krankenkassen-Liste 2026 ist vollständig hinterlegt', () => {
   assert.ok(C.KASSEN.length >= 90);
   assert.deepStrictEqual(C.KASSEN.find(([n]) => n.startsWith('Techniker')), ['Techniker Krankenkasse (TK)', 2.69]);
   assert.ok(C.KASSEN.every(([, v]) => v > 2 && v < 5));
+});
+
+test('Sonderzahlungen & Urlaubsgeld zählen zur Mehrarbeit, Weihnachtsgeld zum Grundgehalt', () => {
+  const S = base(); S.lohn.stundenlohn = 25;
+  S.lohn.sonder = [{ name: 'Weihnachtsgeld', art: 'einmalig', monat: 12, modus: 'betrag', wert: 2000 }, { name: 'Prämie', art: 'einmalig', monat: 11, modus: 'betrag', wert: 300 }];
+  const st = { settings: S, entries: {}, absences: [{ id: 'u', from: '2026-11-23', to: '2026-11-24', type: 'tarif' }], kontingent: { '2026-11': 10 }, nach: [] };
+  for (const d of ['2026-11-16', '2026-11-17']) st.entries[d] = ent('07:00', '16:45');
+  const c = C.compute(st, '2026-12-05');
+  const nov = C.monthPay(st, c, '2026-11', 'aktuell');
+  const ug = 2 * (4000 / 21.75) * 0.5;
+  assert.ok(Math.abs(nov.extra - (125 + 300 + ug)) < 1e-6);
+  // Auszahlung Dezember: Weihnachtsgeld (Dez, mit Grundlohn) + Mehrarbeit/Prämie/Urlaubsgeld aus November
+  const dez = C.monthPay(st, c, '2026-12', 'auszahlung');
+  assert.ok(dez.lines.some((l) => l.k === 'Weihnachtsgeld' && !l.extra));
+  assert.ok(Math.abs(dez.extra - (125 + 300 + ug)) < 1e-6);
 });
 
 console.log(`\n${passed} Tests bestanden.`);
