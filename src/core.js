@@ -97,6 +97,9 @@ const Core = (() => {
       sonder: [{ id: 'weihnachtsgeld', name: 'Weihnachtsgeld', art: 'einmalig', monat: 11, modus: 'betrag', wert: 0 }],
     },
     zk: { stand: 0, datum: '', samstagBonus: true, max: 35, min: -35 },
+    // Konto „Mehrarbeit zur Verrechnung“ (Stunden), optional als einmalige Sonderzahlung in einem Monat
+    mav: { stunden: 0, datum: '', auszahlen: false, monat: '', ausgezahlt: [] },
+    kurz: { aktiv: false, monat: '' },
     urlaub: { tarifTage: 30, ugFaktor: 0.5, ugTeiler: 21.75, fzaStand: 0, fzaDatum: '', tzugTage: 8, jahre: {} },
     mail: { anrede: '', an: '', name: '' },
     steuer: { klasse: 1, kirche: true, kinderFB: 0, kinderPV: 0, geburtsjahr: 0, kasse: '', kvZusatz: 2.9, freiwillig: false, geprueft: false },
@@ -134,6 +137,7 @@ const Core = (() => {
     tzug: { label: 'T-Zug', short: 'TZ' },
     sonder: { label: 'Sonderurlaub', short: 'SU' },
     krank: { label: 'Krank', short: 'K' },
+    kurz: { label: 'Kurzarbeit', short: 'KA' },
   };
   /** Samstag/Sonn-/Feiertag: keine Brotzeit, ab 6 Std. Anwesenheit 30 min Mittag (nie unter 6 Std.) */
   const specialPause = (presenceMin) => (presenceMin > 360 ? Math.min(30, presenceMin - 360) : 0);
@@ -345,7 +349,7 @@ const Core = (() => {
     const S = st.settings;
     const absMap = absenceDays(st);
     const byYear = {};
-    const yr = (y) => (byYear[y] ||= { tarif: [], tzug: [], sonder: 0, zk: 0, fza: 0, krank: 0 });
+    const yr = (y) => (byYear[y] ||= { tarif: [], tzug: [], sonder: 0, zk: 0, fza: 0, krank: 0, kurz: 0 });
     for (const [d, a] of [...absMap.entries()].sort((x, y) => (x[0] < y[0] ? -1 : 1))) {
       const y = Number(d.slice(0, 4));
       if (a.type === 'tarif' || a.type === 'tzug') yr(y)[a.type].push([d, a.units]);
@@ -356,13 +360,16 @@ const Core = (() => {
     const startY = Math.min(curY, ...cfgYears, ...Object.keys(byYear).map(Number));
     const endY = Math.max(curY + 1, ...cfgYears, ...Object.keys(byYear).map(Number));
     const res = {};
-    let carryIn = 0;
+    let carryIn = 0, debt = 0;
     for (let y = startY; y <= endY; y++) {
       const c = yearCfg(S, y), o = yr(y);
       const hasStand = c.rest !== undefined && c.rest !== null && c.rest !== '';
       const anspruch = Number(c.tarif) || 0;
       let carry = hasStand ? 0 : carryIn;
       let pool = hasStand ? Number(c.rest) : anspruch;
+      // Vorgriff aus dem Vorjahr (Tarifurlaub ins Minus geplant) wird direkt einbehalten
+      const einbehalten = hasStand ? 0 : debt;
+      pool -= einbehalten;
       let fromCarry = 0, fromPool = 0, taken = 0, takenUntilToday = 0, vorStand = 0;
       for (const [d, u] of o.tarif) {
         taken += u;
@@ -380,9 +387,10 @@ const Core = (() => {
         carryIn: hasStand ? 0 : carryIn, fromCarry, carryLeft: carry, verfallen: carry, // Rest nach 31.03. verfällt
         taken, takenUntilToday, vorStand, rest,
         tzug: tzugTaken, tzugMax: Number(c.tzug) || 0, tzugRest: (tzugHasStand ? Number(c.tzugRest) : Number(c.tzug) || 0) - tzugAfter,
-        sonder: o.sonder, krank: o.krank, zkDays: o.zk, fzaDays: o.fza,
+        sonder: o.sonder, krank: o.krank, kurz: o.kurz, zkDays: o.zk, fzaDays: o.fza,
+        einbehalten, vorgriff: Math.max(0, -rest),
       };
-      carryIn = Math.max(0, rest);
+      carryIn = Math.max(0, rest); debt = Math.max(0, -rest);
     }
     return res;
   };
@@ -593,12 +601,97 @@ const Core = (() => {
     let tu = 0;
     for (const [d, a] of calc.absMap) if (a.type === 'tarif' && ym(d) === src) tu += a.units;
     const ugTag = (g / (Number(S.urlaub.ugTeiler) || 21.75)) * (Number(S.urlaub.ugFaktor) || 0);
-    if (tu && ugTag) lines.push({ k: `Urlaubsgeld (${String(tu).replace('.', ',')} Tage)${aus}`, v: tu * ugTag, laufend: false, extra: true });
+    if (tu && ugTag) lines.push({ k: `Urlaubsgeld (${String(tu).replace('.', ',')} ${tu === 1 ? 'Tag' : 'Tage'})`, v: tu * ugTag, laufend: false, extra: true });
+    // Konto „Mehrarbeit zur Verrechnung“ als einmalige Sonderzahlung (zählt zum Block Mehrarbeit)
+    const rate = stundenlohn(S);
+    const kp = kurzPlan(st, calc.absMap);
+    const paid = ((S.mav && S.mav.ausgezahlt) || []).find((x) => x.monat === src);
+    const mavH = paid ? Number(paid.stunden) || 0 : S.mav && S.mav.auszahlen && S.mav.monat === src ? kp.rest : 0;
+    if (mavH > 0 && rate) lines.push({ k: `Mehrarbeit zur Verrechnung (${String(Math.round(mavH * 100) / 100).replace('.', ',')} h)${aus}`, v: mavH * rate, laufend: false, extra: true, mav: mavH });
+    // Kurzarbeit im Monat m: Tage über das MAV-Konto (7 h) sind normal bezahlt, sonst Ausfall + Kurzarbeitergeld 60/67 %
+    const tag = rate * tagessoll(S);
+    const pct = (Number(S.steuer.kinderFB) || 0) >= 0.5 ? 0.67 : 0.6;
+    let ku = 0, kc = 0;
+    for (const [d, cov] of kp.days) if (ym(d) === m) { if (cov) kc++; else ku++; }
+    if (ku || kc) lines.push({ k: `Kurzarbeit – Ausfall (${ku} ${ku === 1 ? 'Tag' : 'Tage'}${kc ? `; ${kc} ${kc === 1 ? 'Tag' : 'Tage'} über Mehrarbeits-Konto ausgeglichen` : ''})`, v: -ku * tag, laufend: true, extra: false, kurz: true });
+    const kug = ku * tag * pct;
     const sum = (f) => lines.filter(f).reduce((a2, b2) => a2 + b2.v, 0);
     const laufend = sum((l) => l.laufend), einmal = sum((l) => !l.laufend);
     const extraL = sum((l) => l.laufend && l.extra), extraE = sum((l) => !l.laufend && l.extra);
     const mehrL = sum((l) => l.mehr);
-    return { lines, laufend, einmal, extraL, extraE, extra: extraL + extraE, basis: laufend - mehrL, vlSpar: 0, src, tu, ugTag, modus };
+    return { lines, laufend, einmal, extraL, extraE, extra: extraL + extraE, basis: laufend - mehrL, abzug: -kug, kug, kurz: { tage: ku, konto: kc, pct, tag }, mavH, src, tu, ugTag, modus };
+  };
+
+  /** Kurzarbeitstage chronologisch: solange das Konto „Mehrarbeit zur Verrechnung“ ≥ 7 h hat, werden je Tag 7 volle Stunden genommen */
+  const kurzPlan = (st, absMap = absenceDays(st)) => {
+    const S = st.settings, M = S.mav || {};
+    let rest = Number(M.stunden) || 0;
+    const days = new Map();
+    for (const [d, a] of [...absMap.entries()].sort((x, y) => (x[0] < y[0] ? -1 : 1))) {
+      if (a.type !== 'kurz') continue;
+      const cov = (!M.datum || d > M.datum) && rest >= 7;
+      if (cov) rest -= 7;
+      days.set(d, cov);
+    }
+    return { days, rest };
+  };
+  /** Auszahlungsmonat des MAV-Kontos vorbei und Haken noch gesetzt → gilt als ausbezahlt: Konto auf 0. Verändert st. */
+  const mavRollover = (st, today = todayIso()) => {
+    const M = st.settings.mav;
+    if (!M || !M.auszahlen || !M.monat || M.monat >= ym(today)) return false;
+    const rest = kurzPlan(st).rest;
+    M.ausgezahlt = [...(M.ausgezahlt || []).filter((x) => x.monat !== M.monat), { monat: M.monat, stunden: Math.round(rest * 100) / 100 }];
+    Object.assign(M, { stunden: 0, datum: today, auszahlen: false, monat: '' });
+    return true;
+  };
+
+  /** Demo-Daten (erfunden) für das ganze Jahr – zum Vorzeigen ohne echte Daten */
+  const demoState = (year = 2026) => {
+    let seed = 20260815;
+    const rnd = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; };
+    const S = merge(defaults(), {
+      theme: 'dark',
+      arbeit: { land: 'BY', mariae: true },
+      lohn: { grundlohn: 3600, sonder: [{ id: 'weihnachtsgeld', name: 'Weihnachtsgeld', art: 'einmalig', monat: 11, modus: 'faktor', wert: 0.55, gruppe: 'grund' }] },
+      zk: { stand: 6, datum: `${year - 1}-12-31` },
+      urlaub: { fzaStand: 14, fzaDatum: `${year - 1}-12-31` },
+      mav: { stunden: 24, datum: `${year - 1}-12-31`, auszahlen: false, monat: '', ausgezahlt: [] },
+      kurz: { aktiv: true, monat: `${year}-08` },
+      mail: { anrede: 'Hallo Chef', an: '', name: 'Demo' },
+      steuer: { klasse: 1, kirche: false, kinderFB: 1, kinderPV: 1, geburtsjahr: 1990, kasse: 'Techniker Krankenkasse (TK)', kvZusatz: 2.69, geprueft: true },
+    });
+    const A = (from, to, type, note = '') => ({ id: `demo-${from}-${type}`, created: 0, from, to, type, half: false, note });
+    const y = String(year);
+    const absences = [
+      A(`${y}-01-02`, `${y}-01-02`, 'tzug'), A(`${y}-02-16`, `${y}-02-20`, 'tarif', 'Fasching'), A(`${y}-03-10`, `${y}-03-11`, 'krank'),
+      A(`${y}-04-07`, `${y}-04-07`, 'zk'), A(`${y}-06-01`, `${y}-06-05`, 'tarif', 'Pfingsten'), A(`${y}-07-03`, `${y}-07-03`, 'zk'),
+      A(`${y}-07-17`, `${y}-07-17`, 'sonder', 'Hochzeit'), A(`${y}-08-10`, `${y}-08-17`, 'kurz'), A(`${y}-08-24`, `${y}-09-04`, 'tarif', 'Sommerurlaub'),
+      A(`${y}-09-18`, `${y}-09-18`, 'tzug'), A(`${y}-10-02`, `${y}-10-02`, 'fza'), A(`${y}-10-26`, `${y}-10-30`, 'tarif', 'Herbstferien'),
+      A(`${y}-11-03`, `${y}-11-03`, 'krank'), A(`${y}-12-23`, `${y}-12-23`, 'tzug'), A(`${y}-12-28`, `${y}-12-31`, 'tarif'),
+    ];
+    const st = { settings: S, entries: {}, absences, kontingent: {}, nach: [], pref: {}, meta: { demo: true } };
+    const kont = [15, 10, 0, 15, 15, 10, 0, 0, 10, 0, 20, 10];
+    kont.forEach((k, i) => { if (k) st.kontingent[`${y}-${String(i + 1).padStart(2, '0')}`] = k; });
+    const ruhig = [3, 7, 8, 10]; // Monate ohne Mehrarbeit
+    const abs = absenceDays(st), opt = holOpt(S);
+    const clock = (m) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+    for (const d of range(`${y}-01-01`, `${y}-12-31`)) {
+      const mo = Number(d.slice(5, 7)), w = dow(d), a = abs.get(d);
+      if (a && a.full) continue;
+      let start, dur, pause;
+      if (isWorkday(d, opt)) {
+        start = 375 + Math.round(rnd() * 60);
+        dur = ruhig.includes(mo) ? 405 + Math.round(rnd() * 25) : 415 + Math.round(rnd() * (mo % 2 ? 80 : 60));
+        pause = 45;
+      } else if (w === 6 && !ruhig.includes(mo) && rnd() < 0.15) {
+        start = 330 + Math.round(rnd() * 30); dur = 300 + Math.round(rnd() * 120);
+        pause = specialPause(dur); dur = Math.max(dur - pause, 0);
+      } else continue;
+      const end = start + dur + pause;
+      const raw = workedRaw(clock(start), clock(end), pause), c = capDay(raw);
+      st.entries[d] = { start: clock(start), end: clock(end), pause, hours: c.hours, raw, capped: c.capped, half: false };
+    }
+    return st;
   };
 
   // ---------- Zeitnachweis (PDF des Arbeitgebers) ----------
@@ -609,6 +702,7 @@ const Core = (() => {
     const d = String(desc || '').toLowerCase();
     if (!d || /anwesend|dienstgang|dienstreise|homeoffice|mobil/.test(d)) return null;
     if (/sonderurlaub/.test(d)) return { type: 'sonder', note: desc };
+    if (/kurzarbeit/.test(d)) return { type: 'kurz', note: '' };
     if (/\bkur\b|reha/.test(d)) return { type: 'sonder', note: desc };
     if (/krank/.test(d)) return { type: 'krank', note: /^krank(heit)?$/i.test(desc.trim()) ? '' : desc };
     if (/t-?zug|tarifl.*zusatz/.test(d)) return { type: 'tzug', note: '' };
@@ -758,7 +852,7 @@ const Core = (() => {
   return {
     toMin, fmtClock, leaveAt, workedRaw, capDay, MAX_DAY, D, iso, addDays, dow, monday, isoWeek, ym, todayIso, range,
     LAENDER, easter, holidays, holidayName, isWorkday, workdaysBetween, defaults, merge, tagessoll, stundenlohn, holOpt,
-    TYPES, specialPause, presence, absenceDays, halfDay, dayNeed, yearCfg, dayTarget, zuschlag, compute, vacation, est, steuerJahr, netto, monthPay, monatsentgelt, sonderGruppe, prevMonth, KASSEN, P, parseZeitnachweis, importPlan, applyImport, kontenAm,
+    TYPES, specialPause, presence, absenceDays, halfDay, dayNeed, yearCfg, dayTarget, zuschlag, compute, vacation, est, steuerJahr, netto, monthPay, monatsentgelt, sonderGruppe, prevMonth, KASSEN, P, parseZeitnachweis, importPlan, applyImport, kontenAm, kurzPlan, mavRollover, demoState,
   };
 })();
 if (typeof module !== 'undefined') module.exports = Core;
