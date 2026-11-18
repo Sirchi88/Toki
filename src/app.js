@@ -6,6 +6,7 @@
   const LOGO = '__LOGO__';
   /** Release Notes – neueste zuerst: [Version, Datum, Themen] */
   const RELEASES = [
+    ['2.1', '19.11.2026', ['Kontingent-Karte neu: Zahl groß in der Mitte', 'Jedes Fenster mit ✕ zum Schließen', 'Zahlenfelder: 0 verschwindet beim Antippen']],
     ['2.0', '19.11.2026', ['Neue Designs „Bold Pop“ und „Doodle“ mit eigenen Schriften', 'God Mode: Mehrarbeit zur Verrechnung auszahlen', 'Release Notes', 'Seiten wackeln nicht mehr seitlich']],
     ['1.9', '18.11.2026', ['Kurzarbeit (60/67 %)', 'Konto Mehrarbeit zur Verrechnung', 'Urlaubs-Vorgriff aufs nächste Jahr, T-Zug-Sperre', 'Demo-Modus', 'Gehalt: Mehrarbeit zum Aufklappen']],
     ['1.8', '18.11.2026', ['Zeitnachweis-PDF einlesen & abgleichen', 'Vorab eingetragene Zeiten zählen sofort', 'God Mode: 0 h Mehrarbeit leert 25/50 %']],
@@ -242,7 +243,7 @@
   function sheet(html, onMount) {
     const old = document.getElementById('scrim'); if (old) old.remove();
     const s = document.createElement('div'); s.className = 'scrim'; s.id = 'scrim';
-    s.innerHTML = `<div class="sheet" role="dialog" aria-modal="true">${html}</div>`;
+    s.innerHTML = `<div class="sheet" role="dialog" aria-modal="true"><button class="sheetx" data-act="close" aria-label="Schließen" title="Schließen">✕</button>${html}</div>`;
     s.addEventListener('click', (e) => { if (e.target === s) closeSheet(); });
     document.body.appendChild(s);
     onMount && onMount(s.firstElementChild);
@@ -569,9 +570,9 @@
     <section class="card kcard">
       <div class="krow"><button class="iconbtn sm" data-act="kmonth" data-d="-1">${I.left}</button><b>${monthName(m)}</b><button class="iconbtn sm" data-act="kmonth" data-d="1">${I.right}</button></div>
       ${st.kontingent[m] !== undefined && !ui.kEdit
-        ? `<div class="kline"><span>MEA-Kontingent</span><b class="num">${H(Number(st.kontingent[m]) || 0)}</b><button class="kedit" data-act="kEdit" title="Korrigieren" aria-label="Kontingent korrigieren">✎</button></div>`
-        : `<div class="kline"><label for="kont">MEA-Kontingent (h)</label><input id="kont" class="field sm" inputmode="decimal" placeholder="z. B. 20" value="${deNum(st.kontingent[m] ?? '')}" data-kont="${m}"><button class="btn sm" data-act="kDone">OK</button></div>`}
-      <div class="kmini"><span>Geleistet <b class="num">${H(mm ? mm.mehr : 0)}</b></span><span>Offen <b class="num acc">${k.has ? H(Math.max(0, k.open)) : '–'}</b></span></div>
+        ? `<div class="ktrio"><div><span>Geleistet</span><b class="num">${H(mm ? mm.mehr : 0)}</b></div><button class="mid" data-act="kEdit" title="Kontingent korrigieren"><span>MEA-Kontingent ✎</span><b class="num">${H(Number(st.kontingent[m]) || 0)}</b></button><div><span>Offen</span><b class="num acc">${k.has ? H(Math.max(0, k.open)) : '–'}</b></div></div>`
+        : `<div class="kline"><label for="kont">MEA-Kontingent (h)</label><input id="kont" class="field sm" inputmode="decimal" placeholder="z. B. 20" value="${deNum(st.kontingent[m] ?? '')}" data-kont="${m}"><button class="btn sm" data-act="kDone">OK</button></div>
+      <div class="kmini"><span>Geleistet <b class="num">${H(mm ? mm.mehr : 0)}</b></span><span>Offen <b class="num acc">${k.has ? H(Math.max(0, k.open)) : '–'}</b></span></div>`}
       ${k.has ? `<div class="progress thin"><i style="width:${Math.min(100, (k.used / k.k) * 100)}%"></i></div>` : '<p class="hint" style="margin:6px 0 0">Ohne Kontingent laufen alle Überstunden ins Zeitkonto.</p>'}
       ${avg}
       ${z > s.zk.max ? `<div class="notice danger">⚠ <div><b>Vorsicht, Stundenkonto voll!</b> Zeitkonto ${sH(z)} – es wird weiter mitgezählt.</div></div>` : ''}
@@ -1365,6 +1366,14 @@
   }
   const isText = (t) => t.tagName === 'INPUT' && !['checkbox', 'date', 'file', 'time'].includes(t.type);
   document.addEventListener('input', (e) => { const t = e.target; if (isText(t) && applyField(t)) liveHints(); });
+  // Zahlenfelder: eine stehende 0 verschwindet beim Antippen, sonst wird der Inhalt markiert – einfach drüberschreiben
+  document.addEventListener('focusin', (e) => {
+    const t = e.target;
+    if (t.tagName !== 'INPUT' || !/decimal|numeric/.test(t.inputMode || t.getAttribute('inputmode') || '')) return;
+    if (/^[-+]?0([.,]0*)?$/.test(t.value.trim())) { t.dataset.zero = t.value; t.value = ''; return; }
+    setTimeout(() => { try { if (document.activeElement === t) t.select(); } catch { /* */ } }, 0);
+  });
+  document.addEventListener('focusout', (e) => { const t = e.target; if (t.dataset && t.dataset.zero !== undefined) { if (t.value.trim() === '') t.value = t.dataset.zero; delete t.dataset.zero; } });
   document.addEventListener('change', (e) => {
     const t = e.target;
     if (t.dataset.bind === 'date') { if (t.value) { loadDate(t.value); render(); } return; }
