@@ -1165,10 +1165,164 @@ const Core = (() => {
     return { lines, laufend, einmal, extraL, extraE, extra: extraL + extraE, basis: laufend - mehrL, vlSpar: 0, src, tu, ugTag, modus };
   };
 
+  // ---------- Zeitnachweis (PDF des Arbeitgebers) ----------
+  const deZahl = (s) => { const t = String(s || '').trim().replace(/\./g, '').replace(',', '.'); return /^-?\d+(\.\d+)?$/.test(t) ? Number(t) : null; };
+  const deDatum = (s) => { const m = /(\d{2})\.(\d{2})\.(\d{4})/.exec(s || ''); return m ? `${m[3]}-${m[2]}-${m[1]}` : null; };
+  /** Art eines Tages aus der Beschreibung → Toki-Abwesenheit (oder null) */
+  const nachweisArt = (desc) => {
+    const d = String(desc || '').toLowerCase();
+    if (!d || /anwesend|dienstgang|dienstreise|homeoffice|mobil/.test(d)) return null;
+    if (/sonderurlaub/.test(d)) return { type: 'sonder', note: desc };
+    if (/\bkur\b|reha/.test(d)) return { type: 'sonder', note: desc };
+    if (/krank/.test(d)) return { type: 'krank', note: /^krank(heit)?$/i.test(desc.trim()) ? '' : desc };
+    if (/t-?zug|tarifl.*zusatz/.test(d)) return { type: 'tzug', note: '' };
+    if (/fza|freizeitausgleich/.test(d)) return { type: 'fza', note: '' };
+    if (/zeitkonto|zeitausgleich|gleit|zk\b/.test(d)) return { type: 'zk', note: '' };
+    if (/urlaub/.test(d)) return { type: 'tarif', note: '' };
+    return { type: '?', note: desc };
+  };
+  /**
+   * Zeitnachweis-PDF (als Zeilen mit Textstücken {x, s}) → Monatsdaten.
+   * Spalten werden über die Kopfzeile (Dat, Tag, Beschreibung, von, bis, Istz., …) zugeordnet.
+   */
+  const parseZeitnachweis = (rows) => {
+    const txt = (r) => r.items.map((i) => i.s).join(' ');
+    let from = null, to = null, head = null; const days = []; let summary = false;
+    const out = { from: null, to: null, month: null, days, zk: null, fza: null, kontingent: null, verbraucht: null, ist: null };
+    for (const r of rows) {
+      const line = txt(r);
+      if (!from && /Zeitraum/.test(line)) { const ds = line.match(/\d{2}\.\d{2}\.\d{4}/g) || []; from = deDatum(ds[0]); to = deDatum(ds[1]); continue; }
+      if (!head && r.items.some((i) => i.s.trim() === 'Dat') && /Beschreibung/.test(line)) { head = r.items.map((i) => ({ k: i.s.trim(), x: i.x })); continue; }
+      if (/Monats(ü|ue)bersicht/.test(line)) { summary = true; continue; }
+      if (summary) {
+        for (let k = 0; k < r.items.length; k++) {
+          const lab = r.items[k].s.trim(), val = r.items[k + 1] ? deZahl(r.items[k + 1].s) : null;
+          if (val === null) continue;
+          if (/^monatliches Kontingent/i.test(lab)) out.kontingent = val;
+          else if (/^verbrauchtes Kontingent/i.test(lab)) out.verbraucht = val;
+          else if (/^Ist-Zeit/i.test(lab)) out.ist = val;
+        }
+        continue;
+      }
+      if (!head || !from) continue;
+      const col = (x) => head.reduce((b, h) => (Math.abs(h.x - x) < Math.abs(b.x - x) ? h : b)).k;
+      const cells = {};
+      for (const i of r.items) { const k = col(i.x); cells[k] = cells[k] ? `${cells[k]} ${i.s.trim()}` : i.s.trim(); }
+      if (/^Woche/.test((r.items[0] || {}).s || '')) continue;
+      const dn = /^\d{1,2}$/.test(cells.Dat || '') ? Number(cells.Dat) : null;
+      const seg = { desc: cells.Beschreibung || '', von: /^\d{1,2}:\d{2}$/.test(cells.von || '') ? cells.von.padStart(5, '0') : null, bis: /^\d{1,2}:\d{2}$/.test(cells.bis || '') ? cells.bis.padStart(5, '0') : null };
+      if (dn !== null) {
+        const date = `${from.slice(0, 8)}${String(dn).padStart(2, '0')}`;
+        if (date < from || date > to) continue;
+        days.push({ date, segs: seg.desc || seg.von ? [seg] : [], ist: deZahl(cells['Istz.']), soll: deZahl(cells.Sollz), zkt: deZahl(cells.ZKT), zktK: deZahl(cells['ZKT K']), ma: deZahl(cells.MA), fzaK: deZahl(cells['FZA K']), holiday: '' });
+      } else if (days.length && (seg.desc || seg.von)) {
+        const d = days[days.length - 1];
+        if (!seg.von && !seg.bis && !d.segs.length) d.holiday = seg.desc; else d.segs.push(seg);
+      }
+    }
+    if (!from || !head || !days.length) throw new Error('Das sieht nicht nach einem Zeitnachweis aus – ich finde keine Tagesliste.');
+    Object.assign(out, { from, to, month: ym(from) });
+    const last = days.filter((d) => d.zktK !== null).pop(); if (last) out.zk = { date: to, value: last.zktK };
+    const lastF = days.filter((d) => d.fzaK !== null).pop(); if (lastF) out.fza = { date: to, value: lastF.fzaK };
+    // Tage auswerten
+    for (const d of days) {
+      const work = d.segs.filter((s) => s.von && s.bis);
+      const abs = d.segs.map((s) => nachweisArt(s.desc)).find((a) => a);
+      d.abs = work.length ? null : abs || null;
+      d.half = !!(work.length && abs && abs.type === 'tarif');
+      if (work.length && d.ist !== null) {
+        const start = work[0].von, end = work[work.length - 1].bis;
+        let span = toMin(end) - toMin(start); if (span < 0) span += 1440;
+        d.work = { start, end, pause: Math.max(0, Math.round(span - d.ist * 60)), hours: d.ist };
+      } else d.work = null;
+      d.desc = d.segs.map((s) => s.desc).filter(Boolean)[0] || '';
+    }
+    return out;
+  };
+
+  /** Zeitkonto/FZA, wie Toki sie am Ende eines Tages sieht (null, wenn der Startstand später liegt) */
+  const kontenAm = (st, date) => {
+    const S = st.settings;
+    const entries = {}; for (const [d, e] of Object.entries(st.entries || {})) if (d <= date) entries[d] = e;
+    const absences = (st.absences || []).filter((a) => a.from <= date).map((a) => ({ ...a, to: (a.to || a.from) > date ? date : a.to || a.from }));
+    const c = compute({ ...st, entries, absences }, date);
+    return { zk: S.zk.datum && S.zk.datum > date ? null : c.zkPlanned, fza: S.urlaub.fzaDatum && S.urlaub.fzaDatum > date ? null : c.fzaPlanned, mehr: (c.months.get(ym(date)) || {}).mehr || 0 };
+  };
+
+  /** Vergleich Toki ↔ Zeitnachweis: Tagesabweichungen, Konten, Kontingent */
+  const importPlan = (st, pdf) => {
+    const absMap = absenceDays(st);
+    const diffs = [];
+    const fmtW = (w) => `${w.start}–${w.end} (${w.hours.toFixed(2).replace('.', ',')} h)`;
+    const tokiTxt = (d) => {
+      const e = st.entries[d], a = absMap.get(d);
+      const parts = [];
+      if (a && !a.fromEntry) parts.push(TYPES[a.type] ? TYPES[a.type].label + (a.note ? ` (${a.note})` : '') : a.type);
+      if (e) parts.push(fmtW(e) + (e.half ? ' + ½ Urlaub' : ''));
+      return parts.join(' + ') || '–';
+    };
+    const pdfTxt = (p) => p.work ? fmtW(p.work) + (p.half ? ' + ½ Urlaub' : '') : p.abs ? (p.abs.type === '?' ? `„${p.abs.note}“ (nicht erkannt)` : TYPES[p.abs.type].label + (p.abs.note ? ` (${p.abs.note})` : '')) : '–';
+    let cnt = { work: 0, abs: {}, unbekannt: 0 };
+    for (const p of pdf.days) {
+      if (p.work) cnt.work++;
+      else if (p.abs) { if (p.abs.type === '?') cnt.unbekannt++; else cnt.abs[p.abs.type] = (cnt.abs[p.abs.type] || 0) + 1; }
+      const e = st.entries[p.date], a = absMap.get(p.date);
+      const tA = a && !a.fromEntry ? a.type : null;
+      let same;
+      if (p.work) same = !!e && e.start === p.work.start && e.end === p.work.end && Math.abs(e.hours - Math.min(MAX_DAY, p.work.hours)) < 0.01 && !!e.half === p.half && !tA;
+      else if (p.abs) same = !e && tA === p.abs.type;
+      else same = !e && !tA;
+      if (!same && !(p.abs && p.abs.type === '?' && !e && !tA)) diffs.push({ date: p.date, toki: tokiTxt(p.date), pdf: pdfTxt(p) });
+    }
+    const k = kontenAm(st, pdf.to);
+    const konten = [];
+    if (pdf.zk) konten.push({ k: 'Zeitkonto', toki: k.zk, pdf: pdf.zk.value, uebernehmen: !st.settings.zk.datum || pdf.to >= st.settings.zk.datum });
+    if (pdf.fza) konten.push({ k: 'FZA-Konto', toki: k.fza, pdf: pdf.fza.value, uebernehmen: !st.settings.urlaub.fzaDatum || pdf.to >= st.settings.urlaub.fzaDatum });
+    if (pdf.kontingent !== null) konten.push({ k: 'MEA-Kontingent', toki: st.kontingent && st.kontingent[pdf.month] !== undefined ? Number(st.kontingent[pdf.month]) : null, pdf: pdf.kontingent, uebernehmen: true });
+    if (pdf.verbraucht !== null) konten.push({ k: 'Mehrarbeit (verbraucht)', toki: k.mehr, pdf: pdf.verbraucht, info: true });
+    return { pdf, diffs, konten, cnt };
+  };
+
+  /** Zeitnachweis übernehmen: der Nachweis gilt für seinen Zeitraum (Zeiten, Abwesenheiten, Konten). Verändert st. */
+  const applyImport = (st, plan, now = Date.now(), newId = () => Math.random().toString(36).slice(2, 10)) => {
+    const { pdf } = plan; const S = st.settings;
+    for (const p of pdf.days) {
+      if (p.work) { const c = capDay(p.work.hours); st.entries[p.date] = { start: p.work.start, end: p.work.end, pause: p.work.pause, hours: c.hours, raw: p.work.hours, capped: c.capped, half: p.half, src: 'pdf' }; }
+      else if (!(p.abs && p.abs.type === '?')) delete st.entries[p.date];
+    }
+    // Abwesenheiten im Zeitraum durch die aus dem Nachweis ersetzen (nicht erkannte Tage bleiben unangetastet)
+    const keep = new Set(pdf.days.filter((p) => p.abs && p.abs.type === '?').map((p) => p.date));
+    const list = [];
+    for (const a of st.absences || []) {
+      const aTo = a.to || a.from;
+      if (aTo < pdf.from || a.from > pdf.to) { list.push(a); continue; }
+      if (a.from < pdf.from) list.push({ ...a, id: newId(), to: addDays(pdf.from, -1) });
+      if (aTo > pdf.to) list.push({ ...a, id: newId(), from: addDays(pdf.to, 1) });
+      for (const d of keep) if (d >= a.from && d <= aTo) list.push({ ...a, id: newId(), from: d, to: d });
+    }
+    let run = null;
+    const flush = () => { if (run) list.push({ id: newId(), created: 0, from: run.from, to: run.to, type: run.type, half: false, note: run.note, src: 'pdf' }); run = null; };
+    for (const p of pdf.days) {
+      const a = p.abs && p.abs.type !== '?' ? p.abs : null;
+      if (a && run && run.type === a.type && run.note === a.note) run.to = p.date;
+      else if (a) { flush(); run = { from: p.date, to: p.date, type: a.type, note: a.note }; }
+      else if (p.work || p.desc) flush(); // freie Tage (Wochenende/Feiertag) unterbrechen einen Block nicht
+    }
+    flush();
+    st.absences = list;
+    for (const k of plan.konten) {
+      if (!k.uebernehmen || k.info) continue;
+      if (k.k === 'Zeitkonto') Object.assign(S.zk, { stand: k.pdf, datum: pdf.to, setAt: now });
+      if (k.k === 'FZA-Konto') Object.assign(S.urlaub, { fzaStand: k.pdf, fzaDatum: pdf.to, fzaSetAt: now });
+      if (k.k === 'MEA-Kontingent') st.kontingent[pdf.month] = k.pdf;
+    }
+    return st;
+  };
+
   return {
     toMin, fmtClock, leaveAt, workedRaw, capDay, MAX_DAY, D, iso, addDays, dow, monday, isoWeek, ym, todayIso, range,
     LAENDER, easter, holidays, holidayName, isWorkday, workdaysBetween, defaults, merge, tagessoll, stundenlohn, holOpt,
-    TYPES, specialPause, presence, absenceDays, halfDay, dayNeed, yearCfg, dayTarget, zuschlag, compute, vacation, est, steuerJahr, netto, monthPay, monatsentgelt, sonderGruppe, prevMonth, KASSEN, P,
+    TYPES, specialPause, presence, absenceDays, halfDay, dayNeed, yearCfg, dayTarget, zuschlag, compute, vacation, est, steuerJahr, netto, monthPay, monatsentgelt, sonderGruppe, prevMonth, KASSEN, P, parseZeitnachweis, importPlan, applyImport, kontenAm,
   };
 })();
 if (typeof module !== 'undefined') module.exports = Core;
@@ -1843,6 +1997,150 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
   return { html, pdf, xlsx };
 })();
 </script>
+<script>/* Toki – minimaler PDF-Textleser (ohne Fremd-Bibliotheken).
+   Liest Text-PDFs mit Standardschriften (z. B. Zeitnachweise) und liefert Textstücke mit Position.
+   Läuft komplett lokal im Browser: das PDF verlässt das Gerät nicht. */
+(function (root) {
+  'use strict';
+
+  const latin1 = (u8) => { let s = ''; for (let i = 0; i < u8.length; i += 8192) s += String.fromCharCode.apply(null, u8.subarray(i, i + 8192)); return s; };
+  // WinAnsi-Sonderzeichen 0x80–0x9F
+  const WIN = { 128: '€', 130: '‚', 132: '„', 133: '…', 145: '‘', 146: '’', 147: '“', 148: '”', 150: '–', 151: '—', 153: '™' };
+  const decodeChars = (s) => s.replace(/[\x80-\x9f]/g, (c) => WIN[c.charCodeAt(0)] || '');
+
+  /** Entpackt einen Flate-Stream; Datenmüll am Ende wird ignoriert */
+  async function inflate(u8) {
+    if (typeof DecompressionStream === 'undefined') throw new Error('Dein Browser kann keine PDFs entpacken.');
+    const ds = new DecompressionStream('deflate');
+    const w = ds.writable.getWriter();
+    w.write(u8).catch(() => {}); w.close().catch(() => {});
+    const r = ds.readable.getReader(); const parts = []; let n = 0;
+    try { for (;;) { const { done, value } = await r.read(); if (done) break; parts.push(value); n += value.length; } } catch (e) { if (!n) throw e; }
+    const out = new Uint8Array(n); let o = 0; for (const p of parts) { out.set(p, o); o += p.length; }
+    return out;
+  }
+
+  /** Alle Inhalts-Streams mit Textbefehlen */
+  async function contentStreams(bytes) {
+    const txt = latin1(bytes); const res = [];
+    const re = /stream\r?\n/g; let m;
+    while ((m = re.exec(txt))) {
+      if (txt.slice(m.index - 3, m.index) === 'end') continue;
+      const dictStart = txt.lastIndexOf('<<', m.index);
+      const dict = dictStart >= 0 ? txt.slice(dictStart, m.index) : '';
+      const start = m.index + m[0].length;
+      let end = txt.indexOf('endstream', start); if (end < 0) break;
+      const lm = /\/Length\s+(\d+)(?!\s+\d+\s+R)/.exec(dict);
+      if (lm && start + Number(lm[1]) <= end) end = start + Number(lm[1]);
+      re.lastIndex = Math.max(end, txt.indexOf('endstream', start) + 9);
+      if (/\/Type\s*\/(ObjStm|XRef|Metadata)/.test(dict) || /\/Subtype\s*\/(Image|XML)/.test(dict)) continue;
+      let data = bytes.subarray(start, end);
+      if (/FlateDecode/.test(dict)) { try { data = await inflate(data); } catch (e) { continue; } } else if (/\/Filter/.test(dict)) continue;
+      const s = latin1(data);
+      if (/\bBT\b/.test(s) && /(Tj|TJ|')/.test(s)) res.push(s);
+    }
+    return res;
+  }
+
+  const mul = (a, b) => [a[0] * b[0] + a[1] * b[2], a[0] * b[1] + a[1] * b[3], a[2] * b[0] + a[3] * b[2], a[2] * b[1] + a[3] * b[3], a[4] * b[0] + a[5] * b[2] + b[4], a[4] * b[1] + a[5] * b[3] + b[5]];
+
+  /** Content-Stream ausführen (nur Text- und Matrix-Befehle) → Textstücke {x, y, s, size} */
+  function runContent(src) {
+    const items = []; const stack = []; let ctm = [1, 0, 0, 1, 0, 0];
+    let tm = [1, 0, 0, 1, 0, 0], tlm = tm, lead = 0, size = 1;
+    const ops = []; let i = 0; const n = src.length;
+    const isWs = (c) => c === ' ' || c === '\n' || c === '\r' || c === '\t' || c === '\f' || c === '\0';
+    const readStr = () => { // nach '('
+      let depth = 1, out = ''; i++;
+      while (i < n && depth) {
+        const c = src[i];
+        if (c === '\\') {
+          const d = src[i + 1]; i += 2;
+          if (/[0-7]/.test(d)) { let o = d; while (o.length < 3 && /[0-7]/.test(src[i])) o += src[i++]; out += String.fromCharCode(parseInt(o, 8) & 255); }
+          else if (d === 'n') out += '\n'; else if (d === 'r') out += '\r'; else if (d === 't') out += '\t'; else if (d === 'b' || d === 'f') { /* ignorieren */ }
+          else if (d === '\r') { if (src[i] === '\n') i++; } else if (d === '\n') { /* Zeilenfortsetzung */ } else out += d;
+          continue;
+        }
+        if (c === '(') depth++; else if (c === ')') { depth--; if (!depth) { i++; break; } }
+        out += c; i++;
+      }
+      return { str: out };
+    };
+    const readHex = () => { const e = src.indexOf('>', i); const h = src.slice(i + 1, e).replace(/\s/g, ''); i = e + 1; let out = ''; for (let k = 0; k < h.length; k += 2) out += String.fromCharCode(parseInt((h[k] + (h[k + 1] || '0')), 16)); return { str: out }; };
+    let operands = [];
+    const show = (s) => {
+      const m = mul(tm, ctm);
+      const sz = Math.hypot(m[2], m[3]) * size || size;
+      const t = decodeChars(s);
+      if (t.trim()) items.push({ x: m[4], y: m[5], s: t, size: sz });
+      // grobe Breite (Helvetica ~0,5 em je Zeichen) – reicht, damit Folgeteile weiter rechts liegen
+      tm = mul([1, 0, 0, 1, t.length * 0.5 * size, 0], tm);
+    };
+    const nextLine = (tx, ty) => { tlm = mul([1, 0, 0, 1, tx, ty], tlm); tm = tlm; };
+    while (i < n) {
+      const c = src[i];
+      if (isWs(c)) { i++; continue; }
+      if (c === '%') { while (i < n && src[i] !== '\n' && src[i] !== '\r') i++; continue; }
+      if (c === '(') { operands.push(readStr()); continue; }
+      if (c === '<') {
+        if (src[i + 1] === '<') { // Dictionary überspringen
+          let d = 0; while (i < n) { if (src[i] === '<' && src[i + 1] === '<') { d++; i += 2; } else if (src[i] === '>' && src[i + 1] === '>') { d--; i += 2; if (!d) break; } else if (src[i] === '(') readStr(); else i++; }
+          operands.push({ dict: true }); continue;
+        }
+        operands.push(readHex()); continue;
+      }
+      if (c === '[') { operands.push('['); i++; continue; }
+      if (c === ']') { const k = operands.lastIndexOf('['); const arr = operands.slice(k + 1); operands = operands.slice(0, k); operands.push({ arr }); i++; continue; }
+      if (c === '/') { let j = i + 1; while (j < n && !isWs(src[j]) && !'/[]()<>{}%'.includes(src[j])) j++; operands.push({ name: src.slice(i + 1, j) }); i = j; continue; }
+      let j = i; while (j < n && !isWs(src[j]) && !'/[]()<>{}%'.includes(src[j])) j++;
+      if (j === i) { i++; continue; }
+      const tok = src.slice(i, j); i = j;
+      if (/^[+-]?(\d+\.?\d*|\.\d+)$/.test(tok)) { operands.push(Number(tok)); continue; }
+      if (tok === 'BI') { const e = src.indexOf('EI', i); i = e < 0 ? n : e + 2; operands = []; continue; }
+      const a = operands; operands = [];
+      switch (tok) {
+        case 'q': stack.push(ctm); break;
+        case 'Q': ctm = stack.pop() || [1, 0, 0, 1, 0, 0]; break;
+        case 'cm': ctm = mul(a.slice(-6), ctm); break;
+        case 'BT': tm = tlm = [1, 0, 0, 1, 0, 0]; break;
+        case 'Tf': size = Number(a[a.length - 1]) || size; break;
+        case 'TL': lead = Number(a[0]) || 0; break;
+        case 'Tm': tm = tlm = a.slice(-6).map(Number); break;
+        case 'Td': nextLine(a[0], a[1]); break;
+        case 'TD': lead = -a[1]; nextLine(a[0], a[1]); break;
+        case 'T*': nextLine(0, -lead); break;
+        case 'Tj': if (a[0] && a[0].str !== undefined) show(a[0].str); break;
+        case "'": nextLine(0, -lead); if (a[0] && a[0].str !== undefined) show(a[0].str); break;
+        case '"': nextLine(0, -lead); if (a[2] && a[2].str !== undefined) show(a[2].str); break;
+        case 'TJ': { const arr = (a[0] && a[0].arr) || []; let s = ''; for (const p of arr) { if (p && p.str !== undefined) s += p.str; else if (typeof p === 'number' && p < -200) s += ' '; } show(s); break; }
+        default: break;
+      }
+    }
+    return items;
+  }
+
+  /** Text-PDF → Zeilen (oben nach unten), jede Zeile = Textstücke links nach rechts */
+  async function lines(buf) {
+    const bytes = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
+    if (latin1(bytes.subarray(0, 5)) !== '%PDF-') throw new Error('Das ist keine PDF-Datei.');
+    const items = [];
+    for (const s of await contentStreams(bytes)) items.push(...runContent(s));
+    if (!items.length) throw new Error('In dieser PDF steht kein lesbarer Text (eingescannt?).');
+    items.sort((a, b) => b.y - a.y || a.x - b.x);
+    const rows = [];
+    for (const it of items) {
+      const r = rows.find((x) => Math.abs(x.y - it.y) < 1.6);
+      if (r) r.items.push(it); else rows.push({ y: it.y, items: [it] });
+    }
+    rows.sort((a, b) => b.y - a.y);
+    for (const r of rows) r.items.sort((a, b) => a.x - b.x);
+    return rows;
+  }
+
+  const api = { lines, runContent };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.PdfText = api;
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
 <script>/* Toki – Oberfläche */
 (() => {
   'use strict';
@@ -2062,6 +2360,37 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
   function confirmBox(title, text, okLabel, onOk, danger = true) {
     sheet(`<h3>${esc(title)}</h3><p class="muted">${text}</p><div class="grid2 mt"><button class="btn ghost" data-act="close">Abbrechen</button><button class="btn ${danger ? 'danger' : ''}" id="okb">${esc(okLabel)}</button></div>`,
       (el) => el.querySelector('#okb').addEventListener('click', () => { closeSheet(); onOk(); }));
+  }
+
+  // ---------- Zeitnachweis-PDF einlesen (nur lokal, nichts wird hochgeladen) ----------
+  async function pdfImport(buf) {
+    let plan;
+    try {
+      const rows = await PdfText.lines(buf);
+      plan = C.importPlan(st, C.parseZeitnachweis(rows));
+    } catch (e) { sheet(`<h3>PDF nicht lesbar</h3><p class="muted">${esc(e.message || String(e))}</p><button class="btn mt" data-act="close">OK</button>`); return; }
+    const { pdf, diffs, konten, cnt } = plan;
+    const wd = (d) => `${WD[C.dow(d)]} ${dShort(d)}`;
+    const absTxt = Object.entries(cnt.abs).map(([k, v]) => `${v} × ${C.TYPES[k].label}`).join(' · ');
+    const kv = (v) => (v === null || v === undefined ? '–' : H(v));
+    const kRows = konten.map((k) => {
+      const diff = k.toki === null || k.toki === undefined ? null : k.pdf - k.toki;
+      const ok = diff !== null && Math.abs(diff) < 0.005;
+      return `<div class="li"><span class="grow">${k.k}${k.info ? ' <span class="xs muted">(nur Kontrolle)</span>' : !k.uebernehmen ? ' <span class="xs muted">(dein Stand ist neuer – bleibt)</span>' : ''}<br><span class="xs muted">Toki ${kv(k.toki)} · Nachweis ${kv(k.pdf)}</span></span><b class="num ${ok ? 'pos' : 'neg'}">${ok ? '✓' : diff === null ? '' : `${diff > 0 ? '+' : ''}${nf(diff)} h`}</b></div>`;
+    }).join('');
+    const dRows = diffs.map((x) => `<div class="li"><span class="badge">${wd(x.date)}</span><span class="grow xs">Toki: ${esc(x.toki)}<br><b>Nachweis: ${esc(x.pdf)}</b></span></div>`).join('');
+    sheet(`<h3>Zeitnachweis ${monthName(pdf.month)}</h3>
+      <p class="small muted">${cnt.work} Arbeitstage${absTxt ? ` · ${absTxt}` : ''}${cnt.unbekannt ? ` · ${cnt.unbekannt} nicht erkannt` : ''}${pdf.ist !== null ? ` · Ist ${H(pdf.ist)}` : ''}</p>
+      <h4 style="margin:12px 0 6px">${diffs.length ? `${diffs.length} ${diffs.length === 1 ? 'Tag weicht' : 'Tage weichen'} ab` : '✓ Alle Tage stimmen mit Toki überein'}</h4>
+      ${diffs.length ? `<div class="list" style="max-height:38vh;overflow:auto">${dRows}</div>` : ''}
+      <h4 style="margin:14px 0 6px">Konten</h4><div class="list">${kRows}</div>
+      <p class="xs muted mt-s">Beim Übernehmen gilt der Nachweis für ${dShort(pdf.from)}–${dShort(pdf.to)}${pdf.to.slice(0, 4)}: Zeiten, Urlaub/Krank/Kur und die Kontostände werden ersetzt. Das PDF wird nur auf deinem Gerät gelesen und nicht gespeichert.</p>
+      <div class="grid2 mt"><button class="btn ghost" data-act="close">Nur prüfen</button><button class="btn" id="pdfOk">Übernehmen</button></div>`,
+    (el) => el.querySelector('#pdfOk').addEventListener('click', () => {
+      C.applyImport(st, plan, Date.now(), uid);
+      save(); closeSheet(); render();
+      toast(`✓ ${monthName(pdf.month)} aus dem Zeitnachweis übernommen`, 3000, 'ok');
+    }));
   }
 
   // ---------- Hilfen ----------
@@ -2360,6 +2689,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
       <div class="grid2 mt"><input class="field" id="nachH" inputmode="decimal" placeholder="Stunden"><button class="btn" data-act="addNach">Eintragen</button></div>
     </section>` : ''}
     ${nachList.length ? `<section class="card"><h2>Nachbeantragt</h2><div class="list">${nachList.map((n) => `<div class="li"><span class="badge nach">${H(num(n.hours))}</span><span class="grow">${monthName(n.month)}<br><span class="xs muted">eingetragen ${dShort(n.date)}${n.date.slice(0, 4)}</span></span><button class="btn sm danger" data-act="delNach" data-id="${n.id}">Löschen</button></div>`).join('')}</div></section>` : ''}
+    <label class="btn soft" style="position:relative;margin-bottom:14px;width:100%">📄 Zeitnachweis (PDF) einlesen<input type="file" accept=".pdf,application/pdf" data-act="pdfFile" style="position:absolute;inset:0;opacity:0"></label>
     <div class="seg" style="margin-bottom:14px">${[['woche', 'Wochen'], ['monat', 'Monate'], ['jahr', 'Jahr']].map(([kk, l]) => `<button aria-pressed="${ui.view === kk}" data-act="view" data-v="${kk}">${l}</button>`).join('')}</div>
     ${body}
     <p class="xs muted onbg" style="text-align:center">Mehrarbeit ab ${D1(C.tagessoll(s))} Std./Tag · Samstag komplett · Zuschläge je Woche: erste 6 h +25 %, danach +50 % · Tag antippen zum Löschen</p>`;
@@ -2828,6 +3158,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
     ${sec('daten', 'Datentransport', `<p class="small muted">Deine Daten liegen nur in diesem Browser auf diesem Gerät. Für Handy ↔ PC: hier exportieren und am anderen Gerät importieren.</p>
       <div class="grid2"><button class="btn" data-act="export">Exportieren</button><label class="btn soft" style="position:relative">Importieren<input type="file" accept=".json,application/json" data-act="importFile" style="position:absolute;inset:0;opacity:0"></label></div>
       <button class="btn ghost mt-s" data-act="importPaste">Aus Text einfügen</button>
+      <label class="btn soft mt-s" style="position:relative;width:100%">📄 Zeitnachweis (PDF) einlesen<input type="file" accept=".pdf,application/pdf" data-act="pdfFile" style="position:absolute;inset:0;opacity:0"></label>
       <button class="btn danger mt" data-act="reset">Alle Daten löschen</button>`)}
     <p class="xs muted onbg" style="text-align:center">Toki · Feierabend, Mehrarbeit & Urlaub · v1.7</p>`;
   }
@@ -3096,6 +3427,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
       else { const g = { ...godDefaults(), ...(st.pref.god || {}) }; g.kasse = name; if (k) g.kvZusatz = k[1]; else if (!name) g.kvZusatz = 2.9; st.pref.god = g; }
       save(); render(); return;
     }
+    if (t.dataset.act === 'pdfFile') { const f = t.files && t.files[0]; if (f) f.arrayBuffer().then(pdfImport); t.value = ''; return; }
     if (t.dataset.act === 'importFile') { const f = t.files && t.files[0]; if (f) f.text().then(doImport); t.value = ''; return; }
     if (!applyField(t)) return;
     if (t.dataset.kont) ui.kEdit = false;
