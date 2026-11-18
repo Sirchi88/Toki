@@ -310,7 +310,8 @@ const Core = (() => {
       if (a.type === 'fza' && a.created > (Number(S.urlaub.fzaSetAt) || 0) && fzaStart) for (const [d, x] of absMap) if (x.id === a.id && d <= fzaStart) lateF += x.units * soll;
     }
     zk -= late; fza -= lateF;
-    zkToday = (Number(S.zk.stand) || 0) + zkTodaySum - late;
+    // Stand „heute“: alle eingetragenen Arbeitszeiten zählen (auch im Voraus erfasste), nur künftige ZK-Tage sind „verplant“
+    zkToday = zk + zkVerplant; void zkTodaySum;
     fzaToday = (Number(S.urlaub.fzaStand) || 0) - fzaTodaySum - lateF;
 
     // Monate
