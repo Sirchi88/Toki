@@ -221,6 +221,54 @@ test('PDF-Textleser: Text und Position aus einem Flate-Stream', async () => {
   assert.deepStrictEqual(rows.map((r) => r.items.map((i) => [Math.round(i.x), Math.round(i.y), i.s])), [[[50, 700, 'Zeitraum:']], [[50, 682, 'Grüße (Test)']]]);
 });
 
+test('Kurzarbeit: erst 7 h je Tag vom MAV-Konto, dann 60 % bzw. 67 % vom Tagesgehalt', () => {
+  const S = base(); S.mav.stunden = 10; S.kurz = { aktiv: true, monat: '2026-08' };
+  const st = { settings: S, entries: {}, absences: [{ id: 'k', from: '2026-08-10', to: '2026-08-12', type: 'kurz' }], kontingent: {}, nach: [] };
+  const kp = C.kurzPlan(st);
+  assert.deepStrictEqual([...kp.days.values()], [true, false, false]);
+  assert.ok(Math.abs(kp.rest - 3) < 1e-9);
+  const tag = C.stundenlohn(S) * 7;
+  let mp = C.monthPay(st, C.compute(st, '2026-08-31'), '2026-08');
+  assert.ok(Math.abs(mp.laufend - (4000 - 2 * tag)) < 1e-9 && Math.abs(mp.kug - 2 * tag * 0.6) < 1e-9);
+  S.steuer.kinderFB = 0.5;
+  mp = C.monthPay(st, C.compute(st, '2026-08-31'), '2026-08');
+  assert.ok(Math.abs(mp.kug - 2 * tag * 0.67) < 1e-9);
+  const n = C.netto(mp.laufend, 0, S, 8, mp.abzug, mp.basis);
+  assert.ok(Math.abs(n.net - (n.gross - n.svSum - n.taxSum + mp.kug)) < 1e-9); // KUG steuer- und SV-frei obendrauf
+});
+
+test('Mehrarbeit zur Verrechnung: Auszahlung im gewählten Monat, danach Konto auf 0', () => {
+  const S = base(); S.mav = { stunden: 12, datum: '', auszahlen: true, monat: '2026-12', ausgezahlt: [] };
+  const st = { settings: S, entries: {}, absences: [], kontingent: {}, nach: [] };
+  const rate = C.stundenlohn(S);
+  const dez = C.monthPay(st, C.compute(st, '2026-12-01'), '2026-12');
+  const l = dez.lines.find((x) => x.mav);
+  assert.ok(l && l.extra && !l.laufend && Math.abs(l.v - 12 * rate) < 1e-9);
+  assert.ok(!C.monthPay(st, C.compute(st, '2026-12-01'), '2026-11').lines.some((x) => x.mav));
+  assert.strictEqual(C.mavRollover(st, '2026-12-20'), false);
+  assert.strictEqual(C.mavRollover(st, '2027-01-02'), true);
+  assert.deepStrictEqual([S.mav.stunden, S.mav.auszahlen, S.mav.ausgezahlt], [0, false, [{ monat: '2026-12', stunden: 12 }]]);
+  // Dezember bleibt nachträglich korrekt (aus dem Verlauf), Auszahlung-Ansicht Januar zeigt sie als Vormonat
+  assert.ok(C.monthPay(st, C.compute(st, '2027-01-02'), '2027-01', 'auszahlung').lines.some((x) => x.mav === 12));
+});
+
+test('Tarifurlaub ins Minus: Vorgriff wird vom Folgejahr einbehalten', () => {
+  const S = base(); S.urlaub.tarifTage = 5;
+  const st = { settings: S, entries: {}, absences: [{ id: 't', from: '2026-03-02', to: '2026-03-10', type: 'tarif' }], kontingent: {}, nach: [] };
+  const v = C.vacation(st, '2026-01-10');
+  assert.deepStrictEqual([v[2026].rest, v[2026].vorgriff, v[2027].einbehalten, v[2027].rest], [-2, 2, 2, 3]);
+});
+
+test('Demo-Daten: ganzes Jahr, gemischt, mit 6 Tagen Kurzarbeit im August', () => {
+  const st = C.demoState(2026);
+  assert.strictEqual(st.settings.lohn.grundlohn, 3600);
+  const c = C.compute(st, '2026-12-31');
+  const mehr = [...c.months.values()].filter((m) => m.month.startsWith('2026')).map((m) => m.mehr);
+  assert.ok(mehr.some((x) => x === 0) && mehr.some((x) => x > 5));
+  assert.strictEqual([...C.kurzPlan(st).days.keys()].filter((d) => d.startsWith('2026-08')).length, 6);
+  assert.ok(Object.keys(st.entries).some((d) => d.startsWith('2026-12')));
+});
+
 (async () => {
   for (const [name, fn] of tests) { await fn(); passed++; console.log(`✓ ${name}`); }
   console.log(`\n${passed} Tests bestanden.`);

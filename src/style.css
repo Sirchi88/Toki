@@ -523,3 +523,20 @@ nav.tabs .in{grid-template-columns:repeat(4,1fr)}
   .fa-r .tiles { flex: 1; align-content: center; }
 }
 @media (min-width: 1000px) { #app:has(.page-feierabend) .top { max-width: 1040px; margin-left: auto; margin-right: auto; } }
+
+/* Kurzarbeit */
+:root{--c-kurz:oklch(58% .06 230)}
+.tdot.kurz{background:var(--c-kurz)}.cd.t-kurz{background:var(--c-kurz);color:#fff}.bal .b.kurz{border-left-color:var(--c-kurz)}
+.yc.t-kurz,.ydays i.t-kurz{background:var(--c-kurz)}
+/* Gehalt: aufklappbare Mehrarbeit */
+dl.money details.mline>summary{display:flex;justify-content:space-between;gap:8px;padding:2px 0;cursor:pointer;list-style:none}
+dl.money details.mline>summary::-webkit-details-marker{display:none}
+dl.money details.mline .chev{display:inline-block;font-size:11px;transition:transform .15s}
+dl.money details.mline[open] .chev{transform:rotate(180deg)}
+dl.money details.mline.hl25>summary dt,dl.money details.mline.hl25>summary dd{color:var(--fg);font-weight:700}
+dl.money .msub{margin:2px 0 6px 4px;padding:4px 0 4px 10px;border-left:2px solid var(--border);font-size:13px}
+dl.money .msub .mav{margin-top:4px;padding-top:6px;border-top:1px dashed var(--border)}
+/* Demo-Modus */
+.demobar{position:sticky;top:0;z-index:50;margin:0 -16px 8px;padding:8px 16px;background:repeating-linear-gradient(135deg,#f5b400 0 14px,#e0a200 14px 28px);color:#1b1500;font-weight:800;font-size:13px;letter-spacing:.04em;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.demobar button{border:0;border-radius:8px;padding:5px 10px;background:#1b1500;color:#fff;font-weight:700;font-size:12px;cursor:pointer}
+.btn.big{min-height:56px;font-size:17px;width:100%}

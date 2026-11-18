@@ -539,6 +539,23 @@ nav.tabs .in{grid-template-columns:repeat(4,1fr)}
   .fa-r .tiles { flex: 1; align-content: center; }
 }
 @media (min-width: 1000px) { #app:has(.page-feierabend) .top { max-width: 1040px; margin-left: auto; margin-right: auto; } }
+
+/* Kurzarbeit */
+:root{--c-kurz:oklch(58% .06 230)}
+.tdot.kurz{background:var(--c-kurz)}.cd.t-kurz{background:var(--c-kurz);color:#fff}.bal .b.kurz{border-left-color:var(--c-kurz)}
+.yc.t-kurz,.ydays i.t-kurz{background:var(--c-kurz)}
+/* Gehalt: aufklappbare Mehrarbeit */
+dl.money details.mline>summary{display:flex;justify-content:space-between;gap:8px;padding:2px 0;cursor:pointer;list-style:none}
+dl.money details.mline>summary::-webkit-details-marker{display:none}
+dl.money details.mline .chev{display:inline-block;font-size:11px;transition:transform .15s}
+dl.money details.mline[open] .chev{transform:rotate(180deg)}
+dl.money details.mline.hl25>summary dt,dl.money details.mline.hl25>summary dd{color:var(--fg);font-weight:700}
+dl.money .msub{margin:2px 0 6px 4px;padding:4px 0 4px 10px;border-left:2px solid var(--border);font-size:13px}
+dl.money .msub .mav{margin-top:4px;padding-top:6px;border-top:1px dashed var(--border)}
+/* Demo-Modus */
+.demobar{position:sticky;top:0;z-index:50;margin:0 -16px 8px;padding:8px 16px;background:repeating-linear-gradient(135deg,#f5b400 0 14px,#e0a200 14px 28px);color:#1b1500;font-weight:800;font-size:13px;letter-spacing:.04em;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.demobar button{border:0;border-radius:8px;padding:5px 10px;background:#1b1500;color:#fff;font-weight:700;font-size:12px;cursor:pointer}
+.btn.big{min-height:56px;font-size:17px;width:100%}
 </style>
 </head>
 <body data-theme="standard">
@@ -661,6 +678,9 @@ const Core = (() => {
       sonder: [{ id: 'weihnachtsgeld', name: 'Weihnachtsgeld', art: 'einmalig', monat: 11, modus: 'betrag', wert: 0 }],
     },
     zk: { stand: 0, datum: '', samstagBonus: true, max: 35, min: -35 },
+    // Konto „Mehrarbeit zur Verrechnung“ (Stunden), optional als einmalige Sonderzahlung in einem Monat
+    mav: { stunden: 0, datum: '', auszahlen: false, monat: '', ausgezahlt: [] },
+    kurz: { aktiv: false, monat: '' },
     urlaub: { tarifTage: 30, ugFaktor: 0.5, ugTeiler: 21.75, fzaStand: 0, fzaDatum: '', tzugTage: 8, jahre: {} },
     mail: { anrede: '', an: '', name: '' },
     steuer: { klasse: 1, kirche: true, kinderFB: 0, kinderPV: 0, geburtsjahr: 0, kasse: '', kvZusatz: 2.9, freiwillig: false, geprueft: false },
@@ -698,6 +718,7 @@ const Core = (() => {
     tzug: { label: 'T-Zug', short: 'TZ' },
     sonder: { label: 'Sonderurlaub', short: 'SU' },
     krank: { label: 'Krank', short: 'K' },
+    kurz: { label: 'Kurzarbeit', short: 'KA' },
   };
   /** Samstag/Sonn-/Feiertag: keine Brotzeit, ab 6 Std. Anwesenheit 30 min Mittag (nie unter 6 Std.) */
   const specialPause = (presenceMin) => (presenceMin > 360 ? Math.min(30, presenceMin - 360) : 0);
@@ -909,7 +930,7 @@ const Core = (() => {
     const S = st.settings;
     const absMap = absenceDays(st);
     const byYear = {};
-    const yr = (y) => (byYear[y] ||= { tarif: [], tzug: [], sonder: 0, zk: 0, fza: 0, krank: 0 });
+    const yr = (y) => (byYear[y] ||= { tarif: [], tzug: [], sonder: 0, zk: 0, fza: 0, krank: 0, kurz: 0 });
     for (const [d, a] of [...absMap.entries()].sort((x, y) => (x[0] < y[0] ? -1 : 1))) {
       const y = Number(d.slice(0, 4));
       if (a.type === 'tarif' || a.type === 'tzug') yr(y)[a.type].push([d, a.units]);
@@ -920,13 +941,16 @@ const Core = (() => {
     const startY = Math.min(curY, ...cfgYears, ...Object.keys(byYear).map(Number));
     const endY = Math.max(curY + 1, ...cfgYears, ...Object.keys(byYear).map(Number));
     const res = {};
-    let carryIn = 0;
+    let carryIn = 0, debt = 0;
     for (let y = startY; y <= endY; y++) {
       const c = yearCfg(S, y), o = yr(y);
       const hasStand = c.rest !== undefined && c.rest !== null && c.rest !== '';
       const anspruch = Number(c.tarif) || 0;
       let carry = hasStand ? 0 : carryIn;
       let pool = hasStand ? Number(c.rest) : anspruch;
+      // Vorgriff aus dem Vorjahr (Tarifurlaub ins Minus geplant) wird direkt einbehalten
+      const einbehalten = hasStand ? 0 : debt;
+      pool -= einbehalten;
       let fromCarry = 0, fromPool = 0, taken = 0, takenUntilToday = 0, vorStand = 0;
       for (const [d, u] of o.tarif) {
         taken += u;
@@ -944,9 +968,10 @@ const Core = (() => {
         carryIn: hasStand ? 0 : carryIn, fromCarry, carryLeft: carry, verfallen: carry, // Rest nach 31.03. verfällt
         taken, takenUntilToday, vorStand, rest,
         tzug: tzugTaken, tzugMax: Number(c.tzug) || 0, tzugRest: (tzugHasStand ? Number(c.tzugRest) : Number(c.tzug) || 0) - tzugAfter,
-        sonder: o.sonder, krank: o.krank, zkDays: o.zk, fzaDays: o.fza,
+        sonder: o.sonder, krank: o.krank, kurz: o.kurz, zkDays: o.zk, fzaDays: o.fza,
+        einbehalten, vorgriff: Math.max(0, -rest),
       };
-      carryIn = Math.max(0, rest);
+      carryIn = Math.max(0, rest); debt = Math.max(0, -rest);
     }
     return res;
   };
@@ -1157,12 +1182,97 @@ const Core = (() => {
     let tu = 0;
     for (const [d, a] of calc.absMap) if (a.type === 'tarif' && ym(d) === src) tu += a.units;
     const ugTag = (g / (Number(S.urlaub.ugTeiler) || 21.75)) * (Number(S.urlaub.ugFaktor) || 0);
-    if (tu && ugTag) lines.push({ k: `Urlaubsgeld (${String(tu).replace('.', ',')} Tage)${aus}`, v: tu * ugTag, laufend: false, extra: true });
+    if (tu && ugTag) lines.push({ k: `Urlaubsgeld (${String(tu).replace('.', ',')} ${tu === 1 ? 'Tag' : 'Tage'})`, v: tu * ugTag, laufend: false, extra: true });
+    // Konto „Mehrarbeit zur Verrechnung“ als einmalige Sonderzahlung (zählt zum Block Mehrarbeit)
+    const rate = stundenlohn(S);
+    const kp = kurzPlan(st, calc.absMap);
+    const paid = ((S.mav && S.mav.ausgezahlt) || []).find((x) => x.monat === src);
+    const mavH = paid ? Number(paid.stunden) || 0 : S.mav && S.mav.auszahlen && S.mav.monat === src ? kp.rest : 0;
+    if (mavH > 0 && rate) lines.push({ k: `Mehrarbeit zur Verrechnung (${String(Math.round(mavH * 100) / 100).replace('.', ',')} h)${aus}`, v: mavH * rate, laufend: false, extra: true, mav: mavH });
+    // Kurzarbeit im Monat m: Tage über das MAV-Konto (7 h) sind normal bezahlt, sonst Ausfall + Kurzarbeitergeld 60/67 %
+    const tag = rate * tagessoll(S);
+    const pct = (Number(S.steuer.kinderFB) || 0) >= 0.5 ? 0.67 : 0.6;
+    let ku = 0, kc = 0;
+    for (const [d, cov] of kp.days) if (ym(d) === m) { if (cov) kc++; else ku++; }
+    if (ku || kc) lines.push({ k: `Kurzarbeit – Ausfall (${ku} ${ku === 1 ? 'Tag' : 'Tage'}${kc ? `; ${kc} ${kc === 1 ? 'Tag' : 'Tage'} über Mehrarbeits-Konto ausgeglichen` : ''})`, v: -ku * tag, laufend: true, extra: false, kurz: true });
+    const kug = ku * tag * pct;
     const sum = (f) => lines.filter(f).reduce((a2, b2) => a2 + b2.v, 0);
     const laufend = sum((l) => l.laufend), einmal = sum((l) => !l.laufend);
     const extraL = sum((l) => l.laufend && l.extra), extraE = sum((l) => !l.laufend && l.extra);
     const mehrL = sum((l) => l.mehr);
-    return { lines, laufend, einmal, extraL, extraE, extra: extraL + extraE, basis: laufend - mehrL, vlSpar: 0, src, tu, ugTag, modus };
+    return { lines, laufend, einmal, extraL, extraE, extra: extraL + extraE, basis: laufend - mehrL, abzug: -kug, kug, kurz: { tage: ku, konto: kc, pct, tag }, mavH, src, tu, ugTag, modus };
+  };
+
+  /** Kurzarbeitstage chronologisch: solange das Konto „Mehrarbeit zur Verrechnung“ ≥ 7 h hat, werden je Tag 7 volle Stunden genommen */
+  const kurzPlan = (st, absMap = absenceDays(st)) => {
+    const S = st.settings, M = S.mav || {};
+    let rest = Number(M.stunden) || 0;
+    const days = new Map();
+    for (const [d, a] of [...absMap.entries()].sort((x, y) => (x[0] < y[0] ? -1 : 1))) {
+      if (a.type !== 'kurz') continue;
+      const cov = (!M.datum || d > M.datum) && rest >= 7;
+      if (cov) rest -= 7;
+      days.set(d, cov);
+    }
+    return { days, rest };
+  };
+  /** Auszahlungsmonat des MAV-Kontos vorbei und Haken noch gesetzt → gilt als ausbezahlt: Konto auf 0. Verändert st. */
+  const mavRollover = (st, today = todayIso()) => {
+    const M = st.settings.mav;
+    if (!M || !M.auszahlen || !M.monat || M.monat >= ym(today)) return false;
+    const rest = kurzPlan(st).rest;
+    M.ausgezahlt = [...(M.ausgezahlt || []).filter((x) => x.monat !== M.monat), { monat: M.monat, stunden: Math.round(rest * 100) / 100 }];
+    Object.assign(M, { stunden: 0, datum: today, auszahlen: false, monat: '' });
+    return true;
+  };
+
+  /** Demo-Daten (erfunden) für das ganze Jahr – zum Vorzeigen ohne echte Daten */
+  const demoState = (year = 2026) => {
+    let seed = 20260815;
+    const rnd = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; };
+    const S = merge(defaults(), {
+      theme: 'dark',
+      arbeit: { land: 'BY', mariae: true },
+      lohn: { grundlohn: 3600, sonder: [{ id: 'weihnachtsgeld', name: 'Weihnachtsgeld', art: 'einmalig', monat: 11, modus: 'faktor', wert: 0.55, gruppe: 'grund' }] },
+      zk: { stand: 6, datum: `${year - 1}-12-31` },
+      urlaub: { fzaStand: 14, fzaDatum: `${year - 1}-12-31` },
+      mav: { stunden: 24, datum: `${year - 1}-12-31`, auszahlen: false, monat: '', ausgezahlt: [] },
+      kurz: { aktiv: true, monat: `${year}-08` },
+      mail: { anrede: 'Hallo Chef', an: '', name: 'Demo' },
+      steuer: { klasse: 1, kirche: false, kinderFB: 1, kinderPV: 1, geburtsjahr: 1990, kasse: 'Techniker Krankenkasse (TK)', kvZusatz: 2.69, geprueft: true },
+    });
+    const A = (from, to, type, note = '') => ({ id: `demo-${from}-${type}`, created: 0, from, to, type, half: false, note });
+    const y = String(year);
+    const absences = [
+      A(`${y}-01-02`, `${y}-01-02`, 'tzug'), A(`${y}-02-16`, `${y}-02-20`, 'tarif', 'Fasching'), A(`${y}-03-10`, `${y}-03-11`, 'krank'),
+      A(`${y}-04-07`, `${y}-04-07`, 'zk'), A(`${y}-06-01`, `${y}-06-05`, 'tarif', 'Pfingsten'), A(`${y}-07-03`, `${y}-07-03`, 'zk'),
+      A(`${y}-07-17`, `${y}-07-17`, 'sonder', 'Hochzeit'), A(`${y}-08-10`, `${y}-08-17`, 'kurz'), A(`${y}-08-24`, `${y}-09-04`, 'tarif', 'Sommerurlaub'),
+      A(`${y}-09-18`, `${y}-09-18`, 'tzug'), A(`${y}-10-02`, `${y}-10-02`, 'fza'), A(`${y}-10-26`, `${y}-10-30`, 'tarif', 'Herbstferien'),
+      A(`${y}-11-03`, `${y}-11-03`, 'krank'), A(`${y}-12-23`, `${y}-12-23`, 'tzug'), A(`${y}-12-28`, `${y}-12-31`, 'tarif'),
+    ];
+    const st = { settings: S, entries: {}, absences, kontingent: {}, nach: [], pref: {}, meta: { demo: true } };
+    const kont = [15, 10, 0, 15, 15, 10, 0, 0, 10, 0, 20, 10];
+    kont.forEach((k, i) => { if (k) st.kontingent[`${y}-${String(i + 1).padStart(2, '0')}`] = k; });
+    const ruhig = [3, 7, 8, 10]; // Monate ohne Mehrarbeit
+    const abs = absenceDays(st), opt = holOpt(S);
+    const clock = (m) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+    for (const d of range(`${y}-01-01`, `${y}-12-31`)) {
+      const mo = Number(d.slice(5, 7)), w = dow(d), a = abs.get(d);
+      if (a && a.full) continue;
+      let start, dur, pause;
+      if (isWorkday(d, opt)) {
+        start = 375 + Math.round(rnd() * 60);
+        dur = ruhig.includes(mo) ? 405 + Math.round(rnd() * 25) : 415 + Math.round(rnd() * (mo % 2 ? 80 : 60));
+        pause = 45;
+      } else if (w === 6 && !ruhig.includes(mo) && rnd() < 0.15) {
+        start = 330 + Math.round(rnd() * 30); dur = 300 + Math.round(rnd() * 120);
+        pause = specialPause(dur); dur = Math.max(dur - pause, 0);
+      } else continue;
+      const end = start + dur + pause;
+      const raw = workedRaw(clock(start), clock(end), pause), c = capDay(raw);
+      st.entries[d] = { start: clock(start), end: clock(end), pause, hours: c.hours, raw, capped: c.capped, half: false };
+    }
+    return st;
   };
 
   // ---------- Zeitnachweis (PDF des Arbeitgebers) ----------
@@ -1173,6 +1283,7 @@ const Core = (() => {
     const d = String(desc || '').toLowerCase();
     if (!d || /anwesend|dienstgang|dienstreise|homeoffice|mobil/.test(d)) return null;
     if (/sonderurlaub/.test(d)) return { type: 'sonder', note: desc };
+    if (/kurzarbeit/.test(d)) return { type: 'kurz', note: '' };
     if (/\bkur\b|reha/.test(d)) return { type: 'sonder', note: desc };
     if (/krank/.test(d)) return { type: 'krank', note: /^krank(heit)?$/i.test(desc.trim()) ? '' : desc };
     if (/t-?zug|tarifl.*zusatz/.test(d)) return { type: 'tzug', note: '' };
@@ -1322,7 +1433,7 @@ const Core = (() => {
   return {
     toMin, fmtClock, leaveAt, workedRaw, capDay, MAX_DAY, D, iso, addDays, dow, monday, isoWeek, ym, todayIso, range,
     LAENDER, easter, holidays, holidayName, isWorkday, workdaysBetween, defaults, merge, tagessoll, stundenlohn, holOpt,
-    TYPES, specialPause, presence, absenceDays, halfDay, dayNeed, yearCfg, dayTarget, zuschlag, compute, vacation, est, steuerJahr, netto, monthPay, monatsentgelt, sonderGruppe, prevMonth, KASSEN, P, parseZeitnachweis, importPlan, applyImport, kontenAm,
+    TYPES, specialPause, presence, absenceDays, halfDay, dayNeed, yearCfg, dayTarget, zuschlag, compute, vacation, est, steuerJahr, netto, monthPay, monatsentgelt, sonderGruppe, prevMonth, KASSEN, P, parseZeitnachweis, importPlan, applyImport, kontenAm, kurzPlan, mavRollover, demoState,
   };
 })();
 if (typeof module !== 'undefined') module.exports = Core;
@@ -2171,20 +2282,42 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
     ['fryer', 'Airfryer', 'repeating-linear-gradient(0deg,#f8e2b5 0 14px,#f1d49c 14px 16px)'],
   ];
   const THEME_IDS = THEMES.map((t) => t[0]);
+  // Demo-Modus: erfundene Daten unter eigenem Schlüssel, echte Daten bleiben unberührt, kein Sync
+  const DEMO_KEY = 'toki-demo';
+  let demo = false;
+  try { demo = localStorage.getItem(`${DEMO_KEY}-an`) === '1'; } catch { /* */ }
+  function loadDemo() {
+    try { const raw = localStorage.getItem(DEMO_KEY); if (raw) return norm(JSON.parse(raw)); } catch { /* */ }
+    return norm(C.demoState(new Date().getFullYear()));
+  }
   function load() {
+    if (demo) return loadDemo();
     try { const raw = localStorage.getItem(KEY); return norm(raw ? JSON.parse(raw) : {}); }
     catch { storageOk = false; return norm({}); }
   }
   let st = load();
   const S = () => st.settings;
   function persist() {
-    try { localStorage.setItem(KEY, JSON.stringify(st)); storageOk = true; } catch { storageOk = false; }
+    try { localStorage.setItem(demo ? DEMO_KEY : KEY, JSON.stringify(st)); storageOk = true; } catch { storageOk = false; }
   }
   function save() {
     st.pref = { ...st.pref, start: ui.start, bz: ui.bz, mi: ui.mi };
     st.meta = { ...(st.meta || {}), updated: Date.now() };
     persist();
     schedulePush();
+  }
+
+  function setDemo(on) {
+    try {
+      if (on) { localStorage.setItem(`${DEMO_KEY}-an`, '1'); localStorage.removeItem(DEMO_KEY); }
+      else { localStorage.removeItem(`${DEMO_KEY}-an`); localStorage.removeItem(DEMO_KEY); }
+    } catch { /* */ }
+    demo = on;
+    st = on ? loadDemo() : load();
+    ui.kmonth = C.ym(today); ui.nmonth = C.ym(today); ui.cal = C.ym(today); ui.sel = null;
+    lastTheme = null; ui.tab = on ? 'mehrarbeit' : 'einstellungen';
+    render(false); window.scrollTo({ top: 0 });
+    toast(on ? '🎬 Demo-Modus aktiv – erfundene Daten' : '✓ Zurück bei deinen echten Daten', 2600, 'ok');
   }
 
   // ---------- Cloud-Sync (Sync-Code) ----------
@@ -2199,17 +2332,17 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
     return { off: 'Sync aus', idle: 'Sync aktiv', busy: 'Synchronisiere …', ok: 'In der Cloud gespeichert', err: `Sync-Fehler: ${sync.msg}` }[sync.status] || '';
   }
   function schedulePush() {
-    if (!Sync.code || !Sync.available()) return;
+    if (demo || !Sync.code || !Sync.available()) return;
     clearTimeout(pushT);
     pushT = setTimeout(() => pushNow(), 1200);
   }
   async function pushNow() {
-    if (!Sync.code) return;
+    if (demo || !Sync.code) return;
     try { setSync('busy'); await Sync.push(st, st.meta.updated); st.meta.syncedAt = Date.now(); persist(); setSync('ok'); }
     catch (e) { setSync('err', e.message); }
   }
   async function syncNow(manual = false) {
-    if (!Sync.code || !Sync.available() || sync.busy) return;
+    if (demo || !Sync.code || !Sync.available() || sync.busy) return;
     sync.busy = true; setSync('busy');
     try {
       const remote = await Sync.pull();
@@ -2330,7 +2463,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
 
   // ---------- Berechnung ----------
   let calc, vac;
-  const recompute = () => { calc = C.compute(st, today); vac = C.vacation(st, today); };
+  const recompute = () => { if (C.mavRollover(st, today)) save(); calc = C.compute(st, today); vac = C.vacation(st, today); };
   const opt = () => C.holOpt(S());
   const absAt = (d) => { const a = calc.absMap.get(d); return a && !a.fromEntry ? a : null; };
 
@@ -2660,8 +2793,10 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
     let body = '';
     if (ui.view === 'woche') {
       // Wochen mit erfassten Zeiten immer (auch im Voraus eingetragene); reine Urlaubswochen erst, wenn ihre KW begonnen hat
+      // angezeigt werden nur KWs, die (ganz oder teilweise) im oben gewählten Monat liegen
       const all = calc.weeks.filter((w) => w.days.some((d) => d.entry) || (w.monday <= today && w.days.some((d) => d.absence && !d.absence.fromEntry)));
-      body = all.length ? all.map((w, i) => weekCard(w, all[i - 1] && all[i - 1].days.some((x) => x.entry) ? all[i - 1] : null)).reverse().join('') : '<p class="empty">Noch keine Tage gespeichert.</p>';
+      const shown = all.filter((w) => w.monday <= `${m}-31` && w.sunday >= `${m}-01`);
+      body = shown.length ? shown.map((w) => { const p = all[all.indexOf(w) - 1]; return weekCard(w, p && p.days.some((x) => x.entry) ? p : null); }).reverse().join('') : `<p class="empty">Keine KW mit Einträgen im ${monthName(m)}.</p>`;
     } else if (ui.view === 'monat') {
       const ms = [...calc.months.values()].filter((x) => x.days || x.weeks.some((w) => w.mehr || w.zkChange)).sort((a, b) => (a.month < b.month ? 1 : -1));
       body = ms.length ? ms.map(monthCard).join('') : '<p class="empty">Noch keine Monate mit Einträgen.</p>';
@@ -2689,7 +2824,6 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
       <div class="grid2 mt"><input class="field" id="nachH" inputmode="decimal" placeholder="Stunden"><button class="btn" data-act="addNach">Eintragen</button></div>
     </section>` : ''}
     ${nachList.length ? `<section class="card"><h2>Nachbeantragt</h2><div class="list">${nachList.map((n) => `<div class="li"><span class="badge nach">${H(num(n.hours))}</span><span class="grow">${monthName(n.month)}<br><span class="xs muted">eingetragen ${dShort(n.date)}${n.date.slice(0, 4)}</span></span><button class="btn sm danger" data-act="delNach" data-id="${n.id}">Löschen</button></div>`).join('')}</div></section>` : ''}
-    <label class="btn soft" style="position:relative;margin-bottom:14px;width:100%">📄 Zeitnachweis (PDF) einlesen<input type="file" accept=".pdf,application/pdf" data-act="pdfFile" style="position:absolute;inset:0;opacity:0"></label>
     <div class="seg" style="margin-bottom:14px">${[['woche', 'Wochen'], ['monat', 'Monate'], ['jahr', 'Jahr']].map(([kk, l]) => `<button aria-pressed="${ui.view === kk}" data-act="view" data-v="${kk}">${l}</button>`).join('')}</div>
     ${body}
     <p class="xs muted onbg" style="text-align:center">Mehrarbeit ab ${D1(C.tagessoll(s))} Std./Tag · Samstag komplett · Zuschläge je Woche: erste 6 h +25 %, danach +50 % · Tag antippen zum Löschen</p>`;
@@ -2703,6 +2837,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
     if (type === 'fza') return `${H(calc.fzaPlanned, 1)} ≈ ${Math.floor(calc.fzaPlanned / calc.soll)} Tage`;
     if (type === 'tzug') return `${D1(v.tzugRest ?? C.yearCfg(S(), y).tzug)} Tage frei`;
     if (type === 'krank') return `${D1(v.krank || 0)} Tage in ${y}`;
+    if (type === 'kurz') return S().kurz.monat ? `nur ${monthName(S().kurz.monat)}` : 'Monat fehlt';
     return `${D1(v.sonder || 0)} Tage genommen`;
   }
   /** Monatskalender (mit KW-Spalte) – für Urlaub und Datumsauswahl */
@@ -2796,18 +2931,19 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
     const verpl = calc.zkVerplant > 0 ? `<b class="neg">${H(calc.zkVerplant, 0)} verplant</b>` : '';
     return `<div class="between"><h1>Urlaub</h1><div class="row yearnav"><button class="iconbtn" data-act="vyear" data-d="-1">${I.left}</button><b>${y}</b><button class="iconbtn" data-act="vyear" data-d="1">${I.right}</button></div></div>
     <div class="bal">
-      ${tile('tarif', 'Tarifurlaub', `${D1(tf.frei)} <small>T frei</small>`, `${D1(tarifGen)} von ${D1(tarifBasis)} genommen`, tf.carry > 0 ? `inkl. ${D1(tf.carry)} T Vorjahr bis 31.03.` : v.verfallen > 0 && y <= curY ? `${D1(v.verfallen)} T verfallen` : '')}
+      ${tile('tarif', 'Tarifurlaub', `${D1(tf.frei)} <small>T frei</small>`, `${D1(tarifGen)} von ${D1(tarifBasis)} genommen${v.einbehalten > 0 ? `<br><b class="neg">${D1(v.einbehalten)} T für ${y - 1} einbehalten</b>` : ''}`, v.vorgriff > 0 ? `<b class="neg">${D1(v.vorgriff)} T Vorgriff auf ${y + 1}</b>` : tf.carry > 0 ? `inkl. ${D1(tf.carry)} T Vorjahr bis 31.03.` : v.verfallen > 0 && y <= curY ? `${D1(v.verfallen)} T verfallen` : '')}
       ${tile('zk', 'Zeitkonto', sH(calc.zk), `${D1(zkDays)} ${zkDays === 1 ? 'Tag' : 'Tage'} genommen${calc.zkVerplant > 0 ? `<br>${verpl} (${D1(calc.zkVerplantTage)} T) → ${sH(calc.zkPlanned)}` : ''}`, `≈ ${Math.max(0, Math.floor(calc.zkPlanned / calc.soll))} T frei`)}
       ${tile('fza', 'FZA-Konto', H(calc.fza, 1), `${D1(fzaDays)} ${fzaDays === 1 ? 'Tag' : 'Tage'} genommen`, `≈ ${Math.max(0, Math.floor(calc.fzaPlanned / calc.soll))} T frei`)}
       ${tile('tzug', 'T-Zug', `${D1(v.tzugRest ?? cfg.tzug)} <small>T frei</small>`, `${D1(v.tzug || 0)} von ${D1(v.tzugMax ?? cfg.tzug)} genommen`, `nur ${y}`)}
       ${tile('sonder', 'Sonderurlaub', `${D1(v.sonder || 0)} <small>T</small>`, 'genommen')}
       ${tile('krank', 'Krank', `${D1(v.krank || 0)} <small>T</small>`, `in ${y} · bezahlt mit ${D1(calc.soll)} h/Tag`)}
+      ${s.kurz.aktiv || v.kurz ? tile('kurz', 'Kurzarbeit', `${D1(v.kurz || 0)} <small>T</small>`, `in ${y}${s.kurz.aktiv && s.kurz.monat ? ` · aktiv ${monthName(s.kurz.monat)}` : ''}`) : ''}
     </div>
     <section class="card">
       <div class="cal-head"><button class="iconbtn" data-act="cal" data-d="-1">${I.left}</button><h3>${monthName(m)}</h3><button class="iconbtn" data-act="cal" data-d="1">${I.right}</button></div>
       ${monthGrid(m, (d) => dayCell(d, m, 'day'))}
       <p class="hint" style="text-align:center">${ui.sel ? `Start: <b>${dShort(ui.sel.from)}</b> – jetzt Endtag tippen (gleicher Tag = 1 Tag) · <a href="#" data-act="selClear">abbrechen</a>` : 'Tippe Start- und Endtag, um Urlaub zu planen. Tippe auf einen Urlaubstag zum Bearbeiten.'}</p>
-      <div class="legend" style="justify-content:center">${Object.entries(C.TYPES).map(([kk, t]) => `<span><i class="tdot ${kk}"></i>${t.label}</span>`).join('')}<span><i style="background:repeating-linear-gradient(135deg,var(--secondary) 0 3px,var(--accent) 3px 6px)"></i>Feiertag</span></div>
+      <div class="legend" style="justify-content:center">${Object.entries(C.TYPES).filter(([kk]) => kk !== 'kurz' || s.kurz.aktiv || v.kurz).map(([kk, t]) => `<span><i class="tdot ${kk}"></i>${t.label}</span>`).join('')}<span><i style="background:repeating-linear-gradient(135deg,var(--secondary) 0 3px,var(--accent) 3px 6px)"></i>Feiertag</span></div>
     </section>
     <section class="card"><div class="between"><h2 style="margin:0">Jahresüberblick ${y}</h2><span class="xs muted">${D1(Object.values(sums).reduce((a2, b2) => a2 + b2, 0))} Tage frei</span></div>
       ${grid}
@@ -2832,14 +2968,16 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
     const draw = (el) => {
       const n = cost();
       const warn = [];
-      if (f.type === 'tarif') { const free = tarifFrei(y, from).frei; if (n > free + 1e-9) warn.push(`Nur noch ${D1(free)} Tage Tarifurlaub frei.`); }
-      if (f.type === 'tzug') { const free = (vac[y] || {}).tzugRest ?? C.yearCfg(s, y).tzug; if (from.slice(0, 4) !== to.slice(0, 4)) warn.push('T-Zug-Tage gelten nur innerhalb eines Kalenderjahres.'); if (n > free) warn.push(`Nur noch ${D1(free)} T-Zug-Tage in ${y}.`); }
+      const err = [];
+      if (f.type === 'tarif') { const free = Math.max(0, tarifFrei(y, from).frei); if (n > free + 1e-9) warn.push(`Vorsicht: Urlaub vom nächsten Jahr muss verwendet werden – ${D1(n - free)} ${n - free === 1 ? 'Tag wird' : 'Tage werden'} von deinem Tarifurlaub ${y + 1} einbehalten (nur noch ${D1(free)} Tage frei in ${y}).`); }
+      if (f.type === 'tzug') { const free = (vac[y] || {}).tzugRest ?? C.yearCfg(s, y).tzug; if (from.slice(0, 4) !== to.slice(0, 4)) err.push('T-Zug-Tage gelten nur innerhalb eines Kalenderjahres.'); if (n > free + 1e-9) err.push(`Das geht nicht: Nur noch ${D1(Math.max(0, free))} T-Zug-${free === 1 ? 'Tag' : 'Tage'} in ${y} frei – ins Minus geht T-Zug nicht.`); }
+      if (f.type === 'kurz') { if (!s.kurz.monat) err.push('Für Kurzarbeit fehlt der Monat (Einstellungen → Mehrarbeit & Zeitkonto).'); else if (days.some((d) => d.slice(0, 7) !== s.kurz.monat)) err.push(`Kurzarbeit ist nur für ${monthName(s.kurz.monat)} eingestellt.`); }
       if (f.type === 'zk' && calc.zkPlanned - n * calc.soll < s.zk.min) warn.push(`Zeitkonto ginge unter ${s.zk.min} h (${sH(calc.zkPlanned - n * calc.soll)}).`);
       if (f.type === 'fza' && calc.fzaPlanned - n * calc.soll < 0) warn.push(`FZA-Konto reicht nicht (${H(calc.fzaPlanned - n * calc.soll, 1)}).`);
-      const hard = clash.length > 0 || !days.length || (f.type === 'tzug' && from.slice(0, 4) !== to.slice(0, 4));
+      const hard = clash.length > 0 || !days.length || err.length > 0;
       el.innerHTML = `<h3>Urlaub eintragen</h3>
         <p class="small"><b>${from === to ? dLong(from) : `${dLong(from)} – ${dLong(to)}`}</b><br><span class="muted">${D1(n)} Urlaubstag${n === 1 ? '' : 'e'} (ohne Wochenende & Feiertage${days.some((d) => C.halfDay(d, s)) ? ', Heiligabend/Silvester als ½ Tag' : ''})</span></p>
-        <div class="typepick mt">${Object.entries(C.TYPES).map(([k, t]) => `<button aria-pressed="${f.type === k}" data-t="${k}"><span class="tdot ${k}"></span><span>${t.label}<small>${typeAvail(k, y)}</small></span></button>`).join('')}</div>
+        <div class="typepick mt">${Object.entries(C.TYPES).filter(([k]) => k !== 'kurz' || s.kurz.aktiv).map(([k, t]) => `<button aria-pressed="${f.type === k}" data-t="${k}"><span class="tdot ${k}"></span><span>${t.label}<small>${typeAvail(k, y)}</small></span></button>`).join('')}</div>
         ${days.length === 1 ? `<label class="switch mt-s"><span>Nur halber Tag</span><input type="checkbox" id="halfc" ${f.half ? 'checked' : ''}></label>` : ''}
         <div id="halfErr"></div>
         <input class="field mt-s" id="note" placeholder="Notiz (optional)" value="${esc(f.note)}">
@@ -2849,7 +2987,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
         ${clash.length ? `<div class="notice danger">An ${clash.length} Tag(en) ist schon Urlaub eingetragen.</div>` : ''}
         ${!days.length ? '<div class="notice danger">Im Zeitraum liegt kein Arbeitstag.</div>' : ''}
         ${worked.length ? `<div class="notice warn">An ${worked.length} Tag(en) ist schon Arbeitszeit gespeichert – die wird für diese Tage nicht mehr gezählt.</div>` : ''}
-        ${warn.map((w) => `<div class="notice warn">${esc(w)}</div>`).join('')}
+        ${err.map((w) => `<div class="notice danger">${esc(w)}</div>`).join('')}${warn.map((w) => `<div class="notice warn">${esc(w)}</div>`).join('')}
         <div class="grid2 mt"><button class="btn ghost" data-act="close">Abbrechen</button><button class="btn" id="saveAbs" ${hard ? 'disabled' : ''}>Eintragen</button></div>`;
       el.querySelectorAll('[data-t]').forEach((b) => b.addEventListener('click', () => { f.type = b.dataset.t; f.note = el.querySelector('#note').value; draw(el); }));
       const hc = el.querySelector('#halfc'); if (hc) hc.addEventListener('change', () => { f.half = hc.checked; f.note = el.querySelector('#note').value; draw(el); });
@@ -2858,8 +2996,16 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
           el.querySelector('#halfErr').innerHTML = '<div class="notice danger">Ein halber Tag geht nur bei <b>Tarifurlaub</b> oder <b>Zeitkonto</b>.</div>';
           return;
         }
-        st.absences.push({ id: uid(), created: Date.now(), from, to, type: f.type, half: f.half && days.length === 1, note: el.querySelector('#note').value.trim() });
-        ui.sel = null; save(); sheetOnClose = null; closeSheet(); toast(`✓ ${C.TYPES[f.type].label} eingetragen`); render();
+        const note = el.querySelector('#note').value.trim();
+        const doSave = () => {
+          st.absences.push({ id: uid(), created: Date.now(), from, to, type: f.type, half: f.half && days.length === 1, note });
+          ui.sel = null; save(); sheetOnClose = null; closeSheet(); toast(`✓ ${C.TYPES[f.type].label} eingetragen`); render();
+        };
+        const free = Math.max(0, tarifFrei(y, from).frei), n = cost();
+        if (f.type === 'tarif' && n > free + 1e-9) {
+          return confirmBox('Vorsicht', `Urlaub vom nächsten Jahr muss verwendet werden: <b>${D1(n - free)} ${n - free === 1 ? 'Tag' : 'Tage'}</b> ${n - free === 1 ? 'wird' : 'werden'} direkt von deinem Tarifurlaub ${y + 1} einbehalten. Trotzdem eintragen?`, `Ja, aus ${y + 1} nehmen`, doSave, false);
+        }
+        doSave();
       });
     };
     sheetOnClose = () => { ui.sel = null; render(); };
@@ -2886,6 +3032,8 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
     // Block „Mehrarbeit“ = Mehrarbeit + Urlaubsgeld + Sonderzahlungen (außer Zahlungen mit dem Grundlohn, z. B. Weihnachtsgeld)
     const xl = typeof mehrG === 'object' ? mehrG.l : mehrG, xe = typeof mehrG === 'object' ? mehrG.e : 0;
     const inkl = typeof mehrG === 'object' && mehrG.inkl;
+    const kurz = typeof mehrG === 'object' && mehrG.kurz ? mehrG.kurz : null;
+    const kug = n.abzug < 0 ? -n.abzug : 0;
     mehrG = xl + xe;
     const nOhne = mehrG > 0 ? C.netto(laufend - xl, einmal - xe, S2, mo, abzug, Math.min(basis, laufend - xl)) : n;
     const netMehr = n.net - nOhne.net;
@@ -2899,16 +3047,15 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
     else if (grenz > 0.42) tipp = `Grenzbelastung <b>${nf(grenz * 100, 0)} %</b> – von 1 € Mehrarbeit bleiben ca. ${nf((1 - grenz) * 100, 0)} Cent. Die +50 %-Stunden (ab der 7. Überstunde der Woche) bringen netto am meisten.`;
     else tipp = `Grenzbelastung <b>${nf(grenz * 100, 0)} %</b> – von 1 € Mehrarbeit bleiben ca. ${nf((1 - grenz) * 100, 0)} Cent. Bezahlte Mehrarbeit lohnt sich bei dir noch gut.`;
     const parts = [[n.net, 'var(--success)', 'Netto'], [n.taxSum, 'var(--danger)', 'Steuern'], [n.svSum, 'var(--c-zk)', 'Sozialvers.']];
-    if (n.abzug) parts.push([n.abzug, 'var(--muted)', 'Sonstiges']);
     return `<section class="card">
-      <div class="hero"><div class="s">${n.abzug ? 'Aufs Konto (ca.)' : 'Netto (ca.)'}</div><div class="v num ${cls}">${nf(n.net)} €</div><div class="s ${cls}">Brutto ${nf(n.gross)} €${n.abzug ? ` · Netto ${nf(n.net + n.abzug)} € − VL-Sparrate ${nf(n.abzug)} €` : ''}</div></div>
+      <div class="hero"><div class="s">Netto (ca.)</div><div class="v num ${cls}">${nf(n.net)} €</div><div class="s ${cls}">Brutto ${nf(n.gross)} €${kug ? ` · inkl. ${nf(kug)} € Kurzarbeitergeld` : ''}</div></div>
       <div class="nsplit ${cls}"><div><span>Netto (Grundgehalt)</span><b class="num">${nf(nOhne.net)} €</b><small>aus ${nf(n.gross - mehrG)} € brutto</small></div><div class="m"><span>Netto (Mehrarbeit)</span><b class="num">${mehrG > 0 ? nf(netMehr) + ' €' : '–'}</b><small>${mehrG > 0 ? `aus ${nf(mehrG)} € brutto · ${nf((netMehr / mehrG) * 100, 0)} % bleiben${inkl ? '<br>inkl. Urlaubsgeld & Sonderzahlungen' : ''}` : 'keine Mehrarbeit'}</small></div></div>
       <div class="split ${cls}">${parts.map(([v, c]) => `<i style="width:${n.gross ? (v / n.gross) * 100 : 0}%;background:${c}"></i>`).join('')}</div>
       <div class="legend">${parts.map(([v, c, l]) => `<span><i style="background:${c}"></i>${l} ${nf(n.gross ? (v / n.gross) * 100 : 0, 0)} %</span>`).join('')}</div>
       ${note}
     </section>
     <section class="card"><h2>Brutto</h2>
-      <dl class="money ${cls}" style="margin-top:0">${lines.map((l) => `<div class="${l.cls || ''}"><dt>${l.k}</dt><dd>${nf(l.v)} €</dd></div>`).join('')}<div class="sum"><dt>Brutto gesamt</dt><dd>${nf(n.gross)} €</dd></div></dl>
+      <dl class="money ${cls}" style="margin-top:0">${lines.map((l) => (l.sub ? `<details class="mline ${l.cls || ''}"><summary><dt>${l.k} <span class="chev">▾</span></dt><dd>${nf(l.v)} €</dd></summary><div class="msub">${l.sub}</div></details>` : `<div class="${l.cls || ''}"><dt>${l.k}</dt><dd>${nf(l.v)} €</dd></div>`)).join('')}<div class="sum"><dt>Brutto gesamt</dt><dd>${nf(n.gross)} €</dd></div></dl>
       <h2 class="mt">Abzüge</h2>
       <dl class="money ${cls}" style="margin-top:0">
         <div class="grp"><dt>Steuern</dt><dd>−${nf(n.taxSum)} €</dd></div>
@@ -2920,8 +3067,8 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
         <div><dt>Pflegevers. <small>${S2.steuer.freiwillig ? `freiwillig: Beitrag ${nf(n.sv.pv + n.kvBase * (S2.arbeit.land === 'SN' ? 0.013 : 0.018))} € − AG-Zuschuss ${nf(n.kvBase * (S2.arbeit.land === 'SN' ? 0.013 : 0.018))} €` : `${nf(n.rates.pv * 100)} %${Number(S2.steuer.kinderPV) === 0 ? ' inkl. Kinderlosen-Zuschlag' : ''}`}</small></dt><dd>−${nf(n.sv.pv)} €</dd></div>
         <div><dt>Rentenvers. <small>${nf(n.rates.rv * 100, 1)} % von ${nf(n.rvBase, 0)} €</small></dt><dd>−${nf(n.sv.rv)} €</dd></div>
         <div><dt>Arbeitslosenvers. <small>${nf(n.rates.av * 100, 1)} %</small></dt><dd>−${nf(n.sv.av)} €</dd></div>
-        ${n.abzug ? `<div class="sum"><dt>Netto</dt><dd>${nf(n.net + n.abzug)} €</dd></div><div><dt>VL-Sparrate <small>Überweisung an deinen Sparvertrag</small></dt><dd>−${nf(n.abzug)} €</dd></div>` : ''}
-        <div class="sum"><dt>${n.abzug ? 'Aufs Konto' : 'Netto'}</dt><dd>${nf(n.net)} €</dd></div>
+        ${kug ? `<div class="sum"><dt>Netto aus Lohn</dt><dd>${nf(n.net - kug)} €</dd></div><div><dt>Kurzarbeitergeld <small>${kurz ? `${kurz.tage} ${kurz.tage === 1 ? 'Tag' : 'Tage'} × ${nf(kurz.tag)} € × ${nf(kurz.pct * 100, 0)} %` : ''} · steuer- & SV-frei</small></dt><dd>+${nf(kug)} €</dd></div>` : ''}
+        <div class="sum"><dt>Netto</dt><dd>${nf(n.net)} €</dd></div>
       </dl>
       <details class="mini mt"><summary>So wird gerechnet</summary>
         <dl class="money ${cls}">
@@ -3004,7 +3151,13 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
     const modus = ui.gmode || 'aktuell';
     const mp = C.monthPay(st, calc, m, modus);
     const mo = Number(m.slice(5, 7));
-    const lines = mp.lines.map((l) => ({ k: `${esc(l.k)}${l.mehr ? ` <span class="xs">(${H(l.mehr.mehr)}: ${H(l.mehr.pay.h25)} à 25 %, ${H(l.mehr.pay.h50)} à 50 %)</span>` : ''}`, v: l.v, cls: l.extra ? 'hl25' : '' }));
+    const kp = C.kurzPlan(st, calc.absMap);
+    const mavRow = kp.rest > 0 ? `<div class="mav"><dt>Mehrarbeit zur Verrechnung <small>Konto, noch nicht ausbezahlt</small></dt><dd>${H(kp.rest)} · ${nf(kp.rest * calc.rate)} €</dd></div>` : '';
+    const lines = mp.lines.map((l) => ({
+      k: esc(l.k), v: l.v, cls: l.extra ? 'hl25' : '',
+      sub: l.mehr ? `<div><dt>${H(l.mehr.mehr)} × ${nf(calc.rate)} € Stundenlohn</dt><dd>${nf(l.mehr.pay.base)} €</dd></div><div><dt>Zuschlag 25 % <small>${H(l.mehr.pay.h25)}</small></dt><dd>${nf(l.mehr.pay.z25)} €</dd></div><div><dt>Zuschlag 50 % <small>${H(l.mehr.pay.h50)}</small></dt><dd>${nf(l.mehr.pay.z50)} €</dd></div>${mavRow}` : '',
+    }));
+    if (mavRow && !mp.lines.some((l) => l.mehr)) lines.push({ k: 'Mehrarbeit', v: 0, cls: 'hl25', sub: `<div><dt>In diesem Monat keine bezahlte Mehrarbeit</dt><dd></dd></div>${mavRow}` });
     // fehlende Angaben
     const miss = [];
     if (!s.steuer.geprueft) miss.push(`Steuerdaten noch nicht geprüft – gerechnet wird mit StKl ${['I', 'II', 'III', 'IV', 'V', 'VI'][s.steuer.klasse - 1]}, KV-Zusatz ${nf(s.steuer.kvZusatz, 2)} %, ${s.steuer.kirche ? 'mit' : 'ohne'} Kirchensteuer.`);
@@ -3029,7 +3182,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
     return `${head}
     <div class="between" style="margin-bottom:10px"><button class="iconbtn" data-act="nmonth" data-d="-1">${I.left}</button><b class="onbg" style="font-family:var(--font-d);font-size:26px">${monthName(m)}</b><button class="iconbtn" data-act="nmonth" data-d="1">${I.right}</button></div>
     <div class="gmode"><span class="xs onbg">${modus === 'aktuell' ? `Grundlohn + alles, was im ${MON[mo - 1]} anfällt` : `Grundlohn ${MON[mo - 1]} + Mehrarbeit, Urlaubsgeld & Sonderzahlungen aus ${MON[Number(C.prevMonth(m).slice(5, 7)) - 1]}`}</span><div class="seg mini"><button aria-pressed="${modus === 'aktuell'}" data-act="gmode" data-v="aktuell">Aktuell</button><button aria-pressed="${modus === 'auszahlung'}" data-act="gmode" data-v="auszahlung">Auszahlung</button></div></div>
-    ${nettoResult(lines, mp.laufend, mp.einmal, s, mo, mp.vlSpar, calc.rate, cls, note, { l: mp.extraL, e: mp.extraE, inkl: mp.lines.some((l) => l.extra && !l.mehr), basis: mp.basis })}
+    ${nettoResult(lines, mp.laufend, mp.einmal, s, mo, mp.abzug, calc.rate, cls, note, { l: mp.extraL, e: mp.extraE, inkl: mp.lines.some((l) => l.extra && !l.mehr), basis: mp.basis, kurz: mp.kurz })}
     <section class="card"><h2>Bericht exportieren</h2><p class="small muted">Alle Werte von ${monthName(m)} (${modus === 'aktuell' ? 'Aktuell' : 'Auszahlung'}) mit Statistiken zu Mehrarbeit und Arbeitszeit.</p>
       <div class="grid2"><button class="btn" data-act="exportPdf">📄 PDF</button><button class="btn soft" data-act="exportXlsx">📊 Excel</button></div></section>
     ${yG > 0 ? `<section class="card"><h2>Mehrarbeit ${y}</h2><dl class="money ${cls}" style="margin-top:0"><div><dt>Mehrarbeit brutto</dt><dd>${nf(yG)} €</dd></div><div class="sum"><dt>davon netto ca.</dt><dd>${nf(yN)} €</dd></div></dl></section>` : ''}
@@ -3040,9 +3193,9 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
   function reportData() {
     const s = S(), m = ui.nmonth, modus = ui.gmode || 'aktuell', mo = Number(m.slice(5, 7));
     const mp = C.monthPay(st, calc, m, modus);
-    const n = C.netto(mp.laufend, mp.einmal, s, mo, mp.vlSpar, mp.basis);
+    const n = C.netto(mp.laufend, mp.einmal, s, mo, mp.abzug, mp.basis);
     const mehrG = mp.extra;
-    const nOhne = mehrG ? C.netto(mp.laufend - mp.extraL, mp.einmal - mp.extraE, s, mo, mp.vlSpar, Math.min(mp.basis, mp.laufend - mp.extraL)) : n;
+    const nOhne = mehrG ? C.netto(mp.laufend - mp.extraL, mp.einmal - mp.extraE, s, mo, mp.abzug, Math.min(mp.basis, mp.laufend - mp.extraL)) : n;
     const mm = calc.months.get(m);
     const keys = Object.keys(st.entries).filter((d) => d.startsWith(m)).sort();
     const days = keys.map((d) => {
@@ -3072,7 +3225,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
         { k: 'Pflegeversicherung', note: `${nf(r.pv * 100)} %`, n: n.sv.pv, v: `−${nf(n.sv.pv)} €` },
         { k: 'Rentenversicherung', note: `${nf(r.rv * 100, 1)} %`, n: n.sv.rv, v: `−${nf(n.sv.rv)} €` },
         { k: 'Arbeitslosenversicherung', note: `${nf(r.av * 100, 1)} %`, n: n.sv.av, v: `−${nf(n.sv.av)} €` },
-        ...(n.abzug ? [{ k: 'VL-Sparrate', note: 'an Sparvertrag', n: n.abzug, v: `−${nf(n.abzug)} €` }] : []),
+        ...(mp.kug ? [{ k: 'Kurzarbeitergeld', note: `${nf(mp.kurz.pct * 100, 0)} % · steuer- & SV-frei`, n: mp.kug, v: `+${nf(mp.kug)} €` }] : []),
       ],
       stats: { gearbeitet: mm ? mm.worked : 0, tage: days.length, mehr: mm ? mm.mehr : 0, h25: mm ? mm.pay.h25 : 0, h50: mm ? mm.pay.h50 : 0, zk: mm ? mm.zkChange : 0, zkStand: calc.zk, kont: (Number(st.kontingent[m]) || 0) + (mm ? mm.nach : 0), used: mm ? mm.used : 0, avgStart: mins.length ? C.fmtClock(avg(mins)) : '–', avgEnd: ends.length ? C.fmtClock(avg(ends)) : '–', avgDur: avg(days.map((x) => x.hours)), longest: longest ? `${longest.date} · ${nf(longest.hours)} h` : '–' },
       weeks, days, abwesend: abw,
@@ -3095,7 +3248,9 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
   const fld = (label, path, val, attrs = '', hint = '') => `<div><label class="label">${label}</label><input class="field" data-set="${path}" value="${esc(val)}" ${attrs}>${hint ? `<div class="hint">${hint}</div>` : ''}</div>`;
   const sw = (label, path, val, sub = '') => `<label class="switch"><span>${label}${sub ? `<br><span class="xs muted">${sub}</span>` : ''}</span><input type="checkbox" data-set="${path}" data-type="bool" ${val ? 'checked' : ''}></label>`;
   const sec = (id, title, body) => `<details class="fold set-sec" ${ui.setOpen === id ? 'open' : ''} data-sec="${id}"><summary><h2>${title}</h2>${I.chev}</summary><div class="body">${body}<div class="secfoot"><button class="secclose" data-act="secClose" data-sec="${id}" aria-label="Bereich schließen" title="Schließen"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 15l6-6 6 6"/></svg></button></div></div></details>`;
+  const monthSel = (path, val, from, n) => { const opts = []; for (let i = 0; i < n; i++) { const m = shiftMonth(from, i); opts.push(`<option value="${m}" ${val === m ? 'selected' : ''}>${monthName(m)}</option>`); } return `<select class="field" data-set="${path}"><option value="" ${val ? '' : 'selected'}>Monat wählen …</option>${opts.join('')}</select>`; };
   function pageSettings() {
+    const demoTop = demo ? '<button class="btn danger big" data-act="demoExit" style="width:100%;margin-bottom:14px">🎬 Demo-Modus verlassen</button>' : '';
     const s = S();
     const auto = !Number(s.lohn.stundenlohn) && Number(s.lohn.grundlohn) > 0;
     const sonder = s.lohn.sonder.map((x, i) => `<div class="sonderbox">
@@ -3111,7 +3266,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
     const jc = (s.urlaub.jahre || {})[Y] || {};
     const yv = vac[Y] || {};
     const zkInfo = s.zk.datum ? `Stand am ${dShort(s.zk.datum)}${s.zk.datum.slice(0, 4)}: <b>${sH(Number(s.zk.stand) || 0)}</b> → heute: <b>${sH(calc.zk)}</b>` : 'Stand eintragen – das Datum wird automatisch auf heute gesetzt.';
-    return `<h1>Einstellungen</h1>
+    return `${demoTop}<h1>Einstellungen</h1>
     ${!storageOk ? '<div class="notice danger" style="margin-bottom:14px">Dein Browser erlaubt hier kein dauerhaftes Speichern. Sichere deine Daten unter „Datentransport“.</div>' : ''}
     ${sec('design', 'Design', `<div class="themes">${THEMES.map(([id, l, bg]) => `<button class="th" aria-pressed="${s.theme === id}" data-act="theme" data-id="${id}"><div class="pv" style="background:${bg}">${FX.preview(id)}</div><div class="nm">${l}</div></button>`).join('')}</div>`)}
     ${sec('arbeit', 'Arbeitszeit & Feiertage', `<div class="grid2"><div><label class="label">Wochenstunden</label><input class="field" data-set="arbeit.wochenstunden" value="${esc(deNum(s.arbeit.wochenstunden))}" inputmode="decimal"><div class="hint" id="tsoll">= ${D1(C.tagessoll(s))} Std./Tag</div></div><div></div>${fld('Brotzeit (min)', 'arbeit.brotzeit', s.arbeit.brotzeit, 'inputmode="numeric"')}${fld('Mittag (min)', 'arbeit.mittag', s.arbeit.mittag, 'inputmode="numeric"')}</div>
@@ -3125,6 +3280,9 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
       <details class="mini"><summary>Anderen Stundenlohn verwenden</summary>${fld('Eigener Stundenlohn (€) – leer = automatisch', 'lohn.stundenlohn', deNum(s.lohn.stundenlohn || ''), 'inputmode="decimal" placeholder="automatisch"')}</details>
       ${sw('€-Beträge in der App anzeigen', 'lohn.zeigen', s.lohn.zeigen, 'aus = alle Beträge versteckt, z. B. wenn du Kollegen die App zeigst')}
       <div class="subh">🎁 Sonderzahlungen</div>${sonder}<button class="btn soft sm" data-act="addSonder">+ Sonderzahlung</button>
+      <div class="sonderbox mt-s">${(() => { const r = C.kurzPlan(st, calc.absMap).rest; return sw('Mehrarbeit zur Verrechnung auszahlen', 'mav.auszahlen', s.mav.auszahlen, `einmalig · ${H(r)} × ${nf(C.stundenlohn(s))} € = ${EUR(r * C.stundenlohn(s))} brutto · zählt zur Mehrarbeit`); })()}
+        ${s.mav.auszahlen ? `<div><label class="label">Im Monat</label>${monthSel('mav.monat', s.mav.monat, C.ym(today), 13)}<div class="hint">Bleibt der Haken über diesen Monat hinaus gesetzt, gilt das Konto als ausbezahlt und wird auf 0 gesetzt.</div></div>` : ''}
+        ${(s.mav.ausgezahlt || []).length ? `<div class="hint">Ausbezahlt: ${s.mav.ausgezahlt.map((x) => `${monthName(x.monat)} ${H(x.stunden)}`).join(' · ')}</div>` : ''}</div>
       <div class="subh">🌴 Urlaubsgeld je Tarifurlaubstag</div>
       <div class="grid3">${fld('Faktor', 'urlaub.ugFaktor', deNum(s.urlaub.ugFaktor), 'inputmode="decimal"')}${fld('Teiler', 'urlaub.ugTeiler', deNum(s.urlaub.ugTeiler), 'inputmode="decimal"')}<div><span class="label">pro Tag</span><div class="field calc num" id="ugTag">${nf((C.monatsentgelt(s) / (Number(s.urlaub.ugTeiler) || 21.75)) * (Number(s.urlaub.ugFaktor) || 0))} €</div></div></div>
       <div class="hint">Grundlohn ÷ Teiler × Faktor</div>`)}
@@ -3132,7 +3290,14 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
       <div class="notice info">${zkInfo}</div>
       <div class="grid2 mt">${fld('Maximum (h)', 'zk.max', deNum(s.zk.max), 'inputmode="decimal"')}${fld('Minimum (h)', 'zk.min', deNum(s.zk.min), 'inputmode="decimal"')}</div>
       ${sw('Samstag-Zuschlag 25 % fürs Zeitkonto', 'zk.samstagBonus', s.zk.samstagBonus, 'Samstagsstunden, die ins Zeitkonto laufen, zählen ×1,25')}
-      <div class="grid2">${fld('FZA-Konto (h)', 'urlaub.fzaStand', deNum(s.urlaub.fzaStand), 'inputmode="decimal"')}<div><label class="label">FZA Stand vom</label><input class="field" type="date" data-set="urlaub.fzaDatum" value="${esc(s.urlaub.fzaDatum)}"></div></div>`)}
+      <div class="grid2">${fld('FZA-Konto (h)', 'urlaub.fzaStand', deNum(s.urlaub.fzaStand), 'inputmode="decimal"')}<div><label class="label">FZA Stand vom</label><input class="field" type="date" data-set="urlaub.fzaDatum" value="${esc(s.urlaub.fzaDatum)}"></div></div>
+      <div class="subh">⏳ Konto Mehrarbeit zur Verrechnung</div>
+      <div class="grid2">${fld('Stunden (h)', 'mav.stunden', deNum(s.mav.stunden || ''), 'inputmode="decimal" placeholder="z. B. 24"', s.mav.datum ? `Stand vom ${dShort(s.mav.datum)}${s.mav.datum.slice(0, 4)}` : '')}<div><span class="label">Aktuell</span><div class="field calc num">${H(C.kurzPlan(st, calc.absMap).rest)}</div><div class="hint">nach Kurzarbeitstagen</div></div></div>
+      <div class="hint">Wird im Gehalt bei der Mehrarbeit angezeigt (Stunden × Stundenlohn). Bei Kurzarbeit werden zuerst je Tag 7 volle Stunden davon genommen. Auszahlen: unter <b>Verdienst</b>.</div>
+      <div class="subh">📉 Kurzarbeit</div>
+      ${sw('Kurzarbeit', 'kurz.aktiv', s.kurz.aktiv, 'Dann kannst du Kurzarbeit in der Urlaubsplanung eintragen')}
+      ${s.kurz.aktiv ? `<div><label class="label">Für welchen Monat?</label>${monthSel('kurz.monat', s.kurz.monat, shiftMonth(C.ym(today), -12), 25)}${!s.kurz.monat ? '<div class="hint neg">Bitte den Monat angeben – erst dann lässt sich Kurzarbeit eintragen.</div>' : ''}</div>
+      <div class="hint">Je Kurzarbeitstag: ${Number(s.steuer.kinderFB) >= 0.5 ? '67 %' : '60 %'} vom Tagesgehalt (${nf(C.stundenlohn(s) * C.tagessoll(s))} €) – 67 % ab einem Kinderfreibetrag von 0,5. Steht auf dem Konto Mehrarbeit zur Verrechnung noch mindestens 7 h, werden stattdessen 7 h davon genommen.</div>` : ''}`)}
     ${sec('urlaub', 'Urlaub & Konten', `<div class="between"><span class="label" style="margin:0">Jahr wählen ${info('urlaubsjahr')}</span></div>
       <div class="minirow mt-s">${[curY - 1, curY, curY + 1, curY + 2].map((yy) => `<button class="chip" aria-pressed="${yy === Y}" data-act="setYear" data-y="${yy}">${yy}</button>`).join('')}</div>
       <div class="ybox mt">
@@ -3160,7 +3325,8 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
       <button class="btn ghost mt-s" data-act="importPaste">Aus Text einfügen</button>
       <label class="btn soft mt-s" style="position:relative;width:100%">📄 Zeitnachweis (PDF) einlesen<input type="file" accept=".pdf,application/pdf" data-act="pdfFile" style="position:absolute;inset:0;opacity:0"></label>
       <button class="btn danger mt" data-act="reset">Alle Daten löschen</button>`)}
-    <p class="xs muted onbg" style="text-align:center">Toki · Feierabend, Mehrarbeit & Urlaub · v1.7</p>`;
+    ${sec('admin', 'Demobereich (Admin)', demo ? '<p class="small">Du bist im <b>Demo-Modus</b> – alles hier ist erfunden. Deine echten Daten sind sicher und kommen beim Verlassen zurück.</p><button class="btn danger big" data-act="demoExit">Demo-Modus verlassen</button>' : '<p class="small muted">Zum Vorzeigen: Toki mit erfundenen Daten (Gehalt, Mehrarbeit, Urlaub, Kurzarbeit) für das ganze Jahr. Deine echten Daten bleiben unberührt und werden in der Demo nicht synchronisiert.</p><button class="btn" data-act="demoLogin">Demo starten</button>')}
+    <p class="xs muted onbg" style="text-align:center">Toki · Feierabend, Mehrarbeit & Urlaub · v1.8</p>`;
   }
 
   // ---------- Render ----------
@@ -3172,7 +3338,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
     document.body.dataset.theme = s.theme;
     const page = { feierabend: pageFeierabend, mehrarbeit: pageMehrarbeit, urlaub: pageUrlaub, netto: pageNetto, einstellungen: pageSettings }[ui.tab] || pageFeierabend;
     const onSet = ui.tab === 'einstellungen';
-    root.innerHTML = `<div class="top"><div class="brand"><img src="${LOGO}" alt=""><span>TOKI</span></div><button class="iconbtn gearbtn ${onSet ? 'on' : ''}" data-act="tab" data-tab="${onSet ? ui.lastTab || 'feierabend' : 'einstellungen'}" title="${onSet ? 'Einstellungen schließen' : 'Einstellungen'}" aria-label="Einstellungen">${onSet ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>' : I.gear}</button></div><div class="page page-${ui.tab}">${page()}</div>`;
+    root.innerHTML = `${demo ? '<div class="demobar">🎬 DEMO-MODUS · erfundene Daten <button data-act="demoExit">Beenden</button></div>' : ''}<div class="top"><div class="brand"><img src="${LOGO}" alt=""><span>TOKI</span></div><button class="iconbtn gearbtn ${onSet ? 'on' : ''}" data-act="tab" data-tab="${onSet ? ui.lastTab || 'feierabend' : 'einstellungen'}" title="${onSet ? 'Einstellungen schließen' : 'Einstellungen'}" aria-label="Einstellungen">${onSet ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>' : I.gear}</button></div><div class="page page-${ui.tab}">${page()}</div>`;
     document.getElementById('nav').innerHTML = `<div class="in">${NAV.map(([id, l, ic]) => `<button data-act="tab" data-tab="${id}" ${ui.tab === id ? 'aria-current="page"' : ''}>${ic}<span>${l}</span></button>`).join('')}</div>`;
     if (keepScroll) window.scrollTo(0, y);
     applyTheme();
@@ -3210,9 +3376,24 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
     syncNow: () => syncNow(true),
     kEdit: () => { ui.kEdit = true; render(); const i = document.getElementById('kont'); if (i) { i.focus(); i.select(); } },
     kDone: () => { ui.kEdit = false; render(); },
+    demoLogin: () => {
+      sheet(`<h3>Demobereich</h3><p class="small muted">Anmelden, um die Demo zu starten.</p>
+        <label class="label">Name</label><input class="field" id="dName" autocomplete="off">
+        <label class="label mt-s">Passwort</label><input class="field" id="dPw" type="password" inputmode="numeric" autocomplete="off">
+        <div id="dErr"></div>
+        <div class="grid2 mt"><button class="btn ghost" data-act="close">Abbrechen</button><button class="btn" id="dOk">Anmelden</button></div>`, (el) => {
+        const go = () => {
+          if (el.querySelector('#dName').value.trim().toLowerCase() === 'dani' && el.querySelector('#dPw').value.trim() === '8989') { closeSheet(); setDemo(true); }
+          else el.querySelector('#dErr').innerHTML = '<div class="notice danger mt-s">Name oder Passwort falsch.</div>';
+        };
+        el.querySelector('#dOk').addEventListener('click', go);
+        el.querySelector('#dPw').addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
+      });
+    },
+    demoExit: () => setDemo(false),
     vacMail: () => {
       const s = S();
-      const list = st.absences.filter((a) => a.to >= today && a.type !== 'krank').sort((a, b) => (a.from < b.from ? -1 : 1));
+      const list = st.absences.filter((a) => a.to >= today && a.type !== 'krank' && a.type !== 'kurz').sort((a, b) => (a.from < b.from ? -1 : 1));
       const half = Object.entries(st.entries).filter(([d, e]) => e.half && d >= today).map(([d]) => ({ from: d, to: d, type: 'tarif', half: true, fromEntry: true }));
       const all = list.concat(half).sort((a, b) => (a.from < b.from ? -1 : 1));
       if (!all.length) return toast('Ab heute ist kein Urlaub geplant', 2500);
@@ -3401,6 +3582,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
       setPath(S(), path, v);
       if (path.startsWith('steuer.')) S().steuer.geprueft = true;
       if (path === 'zk.stand' || path === 'zk.datum') { if (!S().zk.datum) S().zk.datum = today; S().zk.setAt = Date.now(); }
+      if (path === 'mav.stunden') { S().mav.datum = today; }
       if (path === 'urlaub.fzaStand' || path === 'urlaub.fzaDatum') { if (!S().urlaub.fzaDatum) S().urlaub.fzaDatum = today; S().urlaub.fzaSetAt = Date.now(); }
       if (/^urlaub\.jahre\.\d+\.(rest|tzugRest)$/.test(path) && v !== undefined) { const yy = path.split('.')[2]; if (!S().urlaub.jahre[yy].restDatum) S().urlaub.jahre[yy].restDatum = today; }
       save(); return true;
