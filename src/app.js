@@ -583,7 +583,7 @@
     items.sort((a, b) => (a.from < b.from ? -1 : 1));
     const sums = {};
     for (const it of items) sums[it.type] = (sums[it.type] || 0) + it.n;
-    const ugTag = ((Number(s.lohn.grundlohn) || 0) / (Number(s.urlaub.ugTeiler) || 21.75)) * (Number(s.urlaub.ugFaktor) || 0);
+    const ugTag = (C.monatsentgelt(s) / (Number(s.urlaub.ugTeiler) || 21.75)) * (Number(s.urlaub.ugFaktor) || 0);
     // Jahresüberblick als Mini-Kalender je Monat (Wochentage in Spalten, Tage mit Zahl)
     const nextQ = st.absences.some((a) => a.to >= `${y + 1}-01-01` && a.from <= `${y + 1}-03-31`);
     const rows = Array.from({ length: 12 }, (_, i) => [y, i + 1]).concat(nextQ ? [[y + 1, 1], [y + 1, 2], [y + 1, 3]] : []);
@@ -652,7 +652,7 @@
     const clash = days.filter((d) => absAt(d));
     const worked = days.filter((d) => st.entries[d]);
     const f = { type: 'tarif', half: false, note: '' };
-    const ugTag = ((Number(s.lohn.grundlohn) || 0) / (Number(s.urlaub.ugTeiler) || 21.75)) * (Number(s.urlaub.ugFaktor) || 0);
+    const ugTag = (C.monatsentgelt(s) / (Number(s.urlaub.ugTeiler) || 21.75)) * (Number(s.urlaub.ugFaktor) || 0);
     const cost = () => days.reduce((a, d) => a + (f.half && days.length === 1 ? Math.min(0.5, C.dayNeed(d, s)) : C.dayNeed(d, s)), 0);
     const draw = (el) => {
       const n = cost();
@@ -703,17 +703,18 @@
   // ---------- Seite: Netto Rechner ----------
   function godDefaults() {
     const s = S();
-    return { grundlohn: Number(s.lohn.grundlohn) || 3800, mea: 40, h25: 24, zulage: 0, einmal: 0, utage: 0, klasse: Number(s.steuer.klasse) || 1, kirche: !!s.steuer.kirche, kasse: s.steuer.kasse || '', kvZusatz: Number(s.steuer.kvZusatz) || 2.9, kinderPV: Number(s.steuer.kinderPV) || 0, kinderFB: Number(s.steuer.kinderFB) || 0, land: s.arbeit.land || 'BY', alter: Number(s.steuer.geburtsjahr) ? new Date().getFullYear() - Number(s.steuer.geburtsjahr) : '' };
+    return { grundlohn: C.monatsentgelt(s) || 3800, mea: 40, h25: 24, zulage: 0, einmal: 0, utage: 0, klasse: Number(s.steuer.klasse) || 1, kirche: !!s.steuer.kirche, kasse: s.steuer.kasse || '', kvZusatz: Number(s.steuer.kvZusatz) || 2.9, kinderPV: Number(s.steuer.kinderPV) || 0, kinderFB: Number(s.steuer.kinderFB) || 0, land: s.arbeit.land || 'BY', alter: Number(s.steuer.geburtsjahr) ? new Date().getFullYear() - Number(s.steuer.geburtsjahr) : '' };
   }
   function nettoResult(lines, laufend, einmal, S2, mo, abzug, rate, cls, note = '', mehrG = 0) {
-    const n = C.netto(laufend, einmal, S2, mo, abzug);
+    const basis = typeof mehrG === 'object' && mehrG.basis !== undefined ? mehrG.basis : laufend;
+    const n = C.netto(laufend, einmal, S2, mo, abzug, basis);
     // Block „Mehrarbeit“ = Mehrarbeit + Urlaubsgeld + Sonderzahlungen (außer Zahlungen mit dem Grundlohn, z. B. Weihnachtsgeld)
     const xl = typeof mehrG === 'object' ? mehrG.l : mehrG, xe = typeof mehrG === 'object' ? mehrG.e : 0;
     const inkl = typeof mehrG === 'object' && mehrG.inkl;
     mehrG = xl + xe;
-    const nOhne = mehrG > 0 ? C.netto(laufend - xl, einmal - xe, S2, mo, abzug) : n;
+    const nOhne = mehrG > 0 ? C.netto(laufend - xl, einmal - xe, S2, mo, abzug, Math.min(basis, laufend - xl)) : n;
     const netMehr = n.net - nOhne.net;
-    const n25 = C.netto(laufend + rate * 1.25, einmal, S2, mo, abzug), n50 = C.netto(laufend + rate * 1.5, einmal, S2, mo, abzug);
+    const n25 = C.netto(laufend + rate * 1.25, einmal, S2, mo, abzug, basis), n50 = C.netto(laufend + rate * 1.5, einmal, S2, mo, abzug, basis);
     const net25 = n25.net - n.net, net50 = n50.net - n.net;
     const grenz = rate ? 1 - net25 / (rate * 1.25) : 0;
     const spitze = n.zveJahr >= 69879;
@@ -725,7 +726,7 @@
     const parts = [[n.net, 'var(--success)', 'Netto'], [n.taxSum, 'var(--danger)', 'Steuern'], [n.svSum, 'var(--c-zk)', 'Sozialvers.']];
     if (n.abzug) parts.push([n.abzug, 'var(--muted)', 'Sonstiges']);
     return `<section class="card">
-      <div class="hero"><div class="s">Netto (ca.)</div><div class="v num ${cls}">${nf(n.net)} €</div><div class="s ${cls}">Brutto ${nf(n.gross)} €</div></div>
+      <div class="hero"><div class="s">${n.abzug ? 'Aufs Konto (ca.)' : 'Netto (ca.)'}</div><div class="v num ${cls}">${nf(n.net)} €</div><div class="s ${cls}">Brutto ${nf(n.gross)} €${n.abzug ? ` · Netto ${nf(n.net + n.abzug)} € − VL-Sparrate ${nf(n.abzug)} €` : ''}</div></div>
       <div class="nsplit ${cls}"><div><span>Netto (Grundgehalt)</span><b class="num">${nf(nOhne.net)} €</b><small>aus ${nf(n.gross - mehrG)} € brutto</small></div><div class="m"><span>Netto (Mehrarbeit)</span><b class="num">${mehrG > 0 ? nf(netMehr) + ' €' : '–'}</b><small>${mehrG > 0 ? `aus ${nf(mehrG)} € brutto · ${nf((netMehr / mehrG) * 100, 0)} % bleiben${inkl ? '<br>inkl. Urlaubsgeld & Sonderzahlungen' : ''}` : 'keine Mehrarbeit'}</small></div></div>
       <div class="split ${cls}">${parts.map(([v, c]) => `<i style="width:${n.gross ? (v / n.gross) * 100 : 0}%;background:${c}"></i>`).join('')}</div>
       <div class="legend">${parts.map(([v, c, l]) => `<span><i style="background:${c}"></i>${l} ${nf(n.gross ? (v / n.gross) * 100 : 0, 0)} %</span>`).join('')}</div>
@@ -740,12 +741,12 @@
         <div><dt>Solidaritätszuschlag <small>${n.soli > 0.005 ? '5,5 % (Milderungszone)' : `0 € – unter Freigrenze ${nf(n.jahr.soliFrei, 0)} €/Jahr`}</small></dt><dd>−${nf(n.soli)} €</dd></div>
         <div><dt>Kirchensteuer <small>${S2.steuer.kirche ? `${nf(n.jahr.kistSatz * 100, 0)} % der Lohnsteuer` : 'keine'}</small></dt><dd>−${nf(n.kist)} €</dd></div>
         <div class="grp"><dt>Sozialversicherung</dt><dd>−${nf(n.svSum)} €</dd></div>
-        <div><dt>Krankenvers. <small>${nf(n.rates.kv * 100)} % von ${nf(n.kvBase, 0)} €</small></dt><dd>−${nf(n.sv.kv)} €</dd></div>
-        <div><dt>Pflegevers. <small>${nf(n.rates.pv * 100)} %${Number(S2.steuer.kinderPV) === 0 ? ' inkl. Kinderlosen-Zuschlag' : ''}</small></dt><dd>−${nf(n.sv.pv)} €</dd></div>
+        <div><dt>Krankenvers. <small>${S2.steuer.freiwillig ? `freiwillig: Beitrag ${nf(n.sv.kv * 2)} € − AG-Zuschuss ${nf(n.sv.kv)} €` : `${nf(n.rates.kv * 100)} % von ${nf(n.kvBase, 0)} €`}</small></dt><dd>−${nf(n.sv.kv)} €</dd></div>
+        <div><dt>Pflegevers. <small>${S2.steuer.freiwillig ? `freiwillig: Beitrag ${nf(n.sv.pv + n.kvBase * (S2.arbeit.land === 'SN' ? 0.013 : 0.018))} € − AG-Zuschuss ${nf(n.kvBase * (S2.arbeit.land === 'SN' ? 0.013 : 0.018))} €` : `${nf(n.rates.pv * 100)} %${Number(S2.steuer.kinderPV) === 0 ? ' inkl. Kinderlosen-Zuschlag' : ''}`}</small></dt><dd>−${nf(n.sv.pv)} €</dd></div>
         <div><dt>Rentenvers. <small>${nf(n.rates.rv * 100, 1)} % von ${nf(n.rvBase, 0)} €</small></dt><dd>−${nf(n.sv.rv)} €</dd></div>
         <div><dt>Arbeitslosenvers. <small>${nf(n.rates.av * 100, 1)} %</small></dt><dd>−${nf(n.sv.av)} €</dd></div>
-        ${n.abzug ? `<div><dt>Sonstige Abzüge (netto)</dt><dd>−${nf(n.abzug)} €</dd></div>` : ''}
-        <div class="sum"><dt>Netto</dt><dd>${nf(n.net)} €</dd></div>
+        ${n.abzug ? `<div class="sum"><dt>Netto</dt><dd>${nf(n.net + n.abzug)} €</dd></div><div><dt>VL-Sparrate <small>Überweisung an deinen Sparvertrag</small></dt><dd>−${nf(n.abzug)} €</dd></div>` : ''}
+        <div class="sum"><dt>${n.abzug ? 'Aufs Konto' : 'Netto'}</dt><dd>${nf(n.net)} €</dd></div>
       </dl>
       <details class="mini mt"><summary>So wird gerechnet</summary>
         <dl class="money ${cls}">
@@ -853,7 +854,7 @@
     return `${head}
     <div class="between" style="margin-bottom:10px"><button class="iconbtn" data-act="nmonth" data-d="-1">${I.left}</button><b class="onbg" style="font-family:var(--font-d);font-size:26px">${monthName(m)}</b><button class="iconbtn" data-act="nmonth" data-d="1">${I.right}</button></div>
     <div class="gmode"><span class="xs onbg">${modus === 'aktuell' ? `Grundlohn + alles, was im ${MON[mo - 1]} anfällt` : `Grundlohn ${MON[mo - 1]} + Mehrarbeit, Urlaubsgeld & Sonderzahlungen aus ${MON[Number(C.prevMonth(m).slice(5, 7)) - 1]}`}</span><div class="seg mini"><button aria-pressed="${modus === 'aktuell'}" data-act="gmode" data-v="aktuell">Aktuell</button><button aria-pressed="${modus === 'auszahlung'}" data-act="gmode" data-v="auszahlung">Auszahlung</button></div></div>
-    ${nettoResult(lines, mp.laufend, mp.einmal, s, mo, 0, calc.rate, cls, note, { l: mp.extraL, e: mp.extraE, inkl: mp.lines.some((l) => l.extra && !l.mehr) })}
+    ${nettoResult(lines, mp.laufend, mp.einmal, s, mo, mp.vlSpar, calc.rate, cls, note, { l: mp.extraL, e: mp.extraE, inkl: mp.lines.some((l) => l.extra && !l.mehr), basis: mp.basis })}
     <section class="card"><h2>Bericht exportieren</h2><p class="small muted">Alle Werte von ${monthName(m)} (${modus === 'aktuell' ? 'Aktuell' : 'Auszahlung'}) mit Statistiken zu Mehrarbeit und Arbeitszeit.</p>
       <div class="grid2"><button class="btn" data-act="exportPdf">📄 PDF</button><button class="btn soft" data-act="exportXlsx">📊 Excel</button></div></section>
     ${yG > 0 ? `<section class="card"><h2>Mehrarbeit ${y}</h2><dl class="money ${cls}" style="margin-top:0"><div><dt>Mehrarbeit brutto</dt><dd>${nf(yG)} €</dd></div><div class="sum"><dt>davon netto ca.</dt><dd>${nf(yN)} €</dd></div></dl></section>` : ''}
@@ -864,9 +865,9 @@
   function reportData() {
     const s = S(), m = ui.nmonth, modus = ui.gmode || 'aktuell', mo = Number(m.slice(5, 7));
     const mp = C.monthPay(st, calc, m, modus);
-    const n = C.netto(mp.laufend, mp.einmal, s, mo);
+    const n = C.netto(mp.laufend, mp.einmal, s, mo, mp.vlSpar, mp.basis);
     const mehrG = mp.extra;
-    const nOhne = mehrG ? C.netto(mp.laufend - mp.extraL, mp.einmal - mp.extraE, s, mo) : n;
+    const nOhne = mehrG ? C.netto(mp.laufend - mp.extraL, mp.einmal - mp.extraE, s, mo, mp.vlSpar, Math.min(mp.basis, mp.laufend - mp.extraL)) : n;
     const mm = calc.months.get(m);
     const keys = Object.keys(st.entries).filter((d) => d.startsWith(m)).sort();
     const days = keys.map((d) => {
@@ -896,6 +897,7 @@
         { k: 'Pflegeversicherung', note: `${nf(r.pv * 100)} %`, n: n.sv.pv, v: `−${nf(n.sv.pv)} €` },
         { k: 'Rentenversicherung', note: `${nf(r.rv * 100, 1)} %`, n: n.sv.rv, v: `−${nf(n.sv.rv)} €` },
         { k: 'Arbeitslosenversicherung', note: `${nf(r.av * 100, 1)} %`, n: n.sv.av, v: `−${nf(n.sv.av)} €` },
+        ...(n.abzug ? [{ k: 'VL-Sparrate', note: 'an Sparvertrag', n: n.abzug, v: `−${nf(n.abzug)} €` }] : []),
       ],
       stats: { gearbeitet: mm ? mm.worked : 0, tage: days.length, mehr: mm ? mm.mehr : 0, h25: mm ? mm.pay.h25 : 0, h50: mm ? mm.pay.h50 : 0, zk: mm ? mm.zkChange : 0, zkStand: calc.zk, kont: (Number(st.kontingent[m]) || 0) + (mm ? mm.nach : 0), used: mm ? mm.used : 0, avgStart: mins.length ? C.fmtClock(avg(mins)) : '–', avgEnd: ends.length ? C.fmtClock(avg(ends)) : '–', avgDur: avg(days.map((x) => x.hours)), longest: longest ? `${longest.date} · ${nf(longest.hours)} h` : '–' },
       weeks, days, abwesend: abw,
@@ -928,7 +930,7 @@
       <div class="grid2"><select class="field sm" data-sonder="${i}.modus" data-struct="1"><option value="betrag" ${x.modus === 'betrag' ? 'selected' : ''}>Betrag in € (brutto)</option><option value="faktor" ${x.modus === 'faktor' ? 'selected' : ''}>Faktor × Grundlohn</option></select>
       <input class="field sm" inputmode="decimal" data-sonder="${i}.wert" value="${esc(deNum(x.wert))}" placeholder="${x.modus === 'faktor' ? 'z. B. 0,55' : 'z. B. 2.300'}"></div>
       <div><label class="label">Gezahlt mit</label><select class="field sm" data-sonder="${i}.gruppe" data-struct="1"><option value="mehr" ${C.sonderGruppe(x) === 'mehr' ? 'selected' : ''}>der Mehrarbeit (Netto Mehrarbeit)</option><option value="grund" ${C.sonderGruppe(x) === 'grund' ? 'selected' : ''}>dem Grundlohn (Netto Grundgehalt)</option></select></div>
-      <div class="hint">${x.modus === 'faktor' ? `Faktor × Grundlohn${s.lohn.grundlohn ? ` = ${EUR(num(x.wert) * s.lohn.grundlohn)} brutto` : ''}` : 'Bruttobetrag in Euro'}</div>
+      <div class="hint">${x.modus === 'faktor' ? `Faktor × Monatsentgelt${C.monatsentgelt(s) ? ` = ${EUR(num(x.wert) * C.monatsentgelt(s))} brutto` : ''}` : 'Bruttobetrag in Euro'}</div>
     </div>`).join('');
     const Y = ui.setYear;
     const jc = (s.urlaub.jahre || {})[Y] || {};
@@ -943,13 +945,18 @@
       ${sw('Heiligabend = halber Arbeitstag', 'arbeit.halb24', s.arbeit.halb24, 'für den freien Tag ist nur ½ Urlaubstag nötig')}${sw('Silvester = halber Arbeitstag', 'arbeit.halb31', s.arbeit.halb31, 'für den freien Tag ist nur ½ Urlaubstag nötig')}`)}
     ${sec('verdienst', 'Verdienst', `
       <div class="subh">💶 Lohn</div>
-      <div class="grid2">${fld('Grundlohn / Monat (€ brutto)', 'lohn.grundlohn', deNum(s.lohn.grundlohn || ''), 'inputmode="decimal" placeholder="z. B. 4.200"')}
-        <div><span class="label">Stundenlohn</span><div class="field calc num" id="slAuto">${nf(C.stundenlohn(s))} €</div><div class="hint" id="slHint">${Number(s.lohn.stundenlohn) ? 'eigener Wert' : `= Grundlohn ÷ (${D1(s.arbeit.wochenstunden)} h × 4,35)`}</div></div></div>
+      <div class="grid2">${fld('Grundentgelt / Monat (€)', 'lohn.grundlohn', deNum(s.lohn.grundlohn || ''), 'inputmode="decimal" placeholder="z. B. 4.991"')}${fld('Feste Zulagen / Monat (€)', 'lohn.zulagen', deNum(s.lohn.zulagen || ''), 'inputmode="decimal" placeholder="z. B. 922,78"')}</div>
+      <div class="hint">Feste Zulagen = z. B. tarifliche Zulage + Funktionszulage. Zusammen ergibt das dein Monatsentgelt (auf der Abrechnung „Entgelt gesamt“) – davon hängen Stundenlohn, Urlaubsgeld und Weihnachtsgeld ab.</div>
+      <div class="grid2 mt-s"><div><span class="label">Monatsentgelt</span><div class="field calc num" id="meAuto">${nf(C.monatsentgelt(s))} €</div></div>
+        <div><span class="label">Stundenlohn</span><div class="field calc num" id="slAuto">${nf(C.stundenlohn(s))} €</div><div class="hint" id="slHint">${Number(s.lohn.stundenlohn) ? 'eigener Wert' : `= Monatsentgelt ÷ (${D1(s.arbeit.wochenstunden)} h × 4,35)`}</div></div></div>
       <details class="mini"><summary>Anderen Stundenlohn verwenden</summary>${fld('Eigener Stundenlohn (€) – leer = automatisch', 'lohn.stundenlohn', deNum(s.lohn.stundenlohn || ''), 'inputmode="decimal" placeholder="automatisch"')}</details>
       ${sw('€-Beträge in der App anzeigen', 'lohn.zeigen', s.lohn.zeigen, 'aus = alle Beträge versteckt, z. B. wenn du Kollegen die App zeigst')}
+      <div class="subh">🏦 Vermögenswirksame Leistungen</div>
+      <div class="grid2">${fld('Zuschuss Arbeitgeber (€/Monat)', 'lohn.vlAG', deNum(s.lohn.vlAG || ''), 'inputmode="decimal" placeholder="z. B. 26,59"')}${fld('Sparrate an Vertrag (€/Monat)', 'lohn.vlSpar', deNum(s.lohn.vlSpar || ''), 'inputmode="decimal" placeholder="z. B. 26,59"')}</div>
+      <div class="hint">Der Zuschuss erhöht dein Brutto (steuer- und SV-pflichtig), die Sparrate wird vom Netto direkt an deinen VL-Vertrag überwiesen – Toki zeigt dir dann, was wirklich aufs Konto kommt.</div>
       <div class="subh">🎁 Sonderzahlungen</div>${sonder}<button class="btn soft sm" data-act="addSonder">+ Sonderzahlung</button>
       <div class="subh">🌴 Urlaubsgeld je Tarifurlaubstag</div>
-      <div class="grid3">${fld('Faktor', 'urlaub.ugFaktor', deNum(s.urlaub.ugFaktor), 'inputmode="decimal"')}${fld('Teiler', 'urlaub.ugTeiler', deNum(s.urlaub.ugTeiler), 'inputmode="decimal"')}<div><span class="label">pro Tag</span><div class="field calc num" id="ugTag">${nf(((Number(s.lohn.grundlohn) || 0) / (Number(s.urlaub.ugTeiler) || 21.75)) * (Number(s.urlaub.ugFaktor) || 0))} €</div></div></div>
+      <div class="grid3">${fld('Faktor', 'urlaub.ugFaktor', deNum(s.urlaub.ugFaktor), 'inputmode="decimal"')}${fld('Teiler', 'urlaub.ugTeiler', deNum(s.urlaub.ugTeiler), 'inputmode="decimal"')}<div><span class="label">pro Tag</span><div class="field calc num" id="ugTag">${nf((C.monatsentgelt(s) / (Number(s.urlaub.ugTeiler) || 21.75)) * (Number(s.urlaub.ugFaktor) || 0))} €</div></div></div>
       <div class="hint">Grundlohn ÷ Teiler × Faktor</div>`)}
     ${sec('mehrarbeit', 'Mehrarbeit & Zeitkonto', `<div class="grid2">${fld(`Zeitkonto-Stand (h) ${info('zk')}`, 'zk.stand', deNum(s.zk.stand), 'inputmode="decimal"')}<div><label class="label">Stand vom</label><input class="field" type="date" data-set="zk.datum" value="${esc(s.zk.datum)}"></div></div>
       <div class="notice info">${zkInfo}</div>
@@ -975,7 +982,7 @@
       ${s.steuer.kasse === '__andere' ? fld('KV-Zusatzbeitrag (%)', 'steuer.kvZusatz', deNum(s.steuer.kvZusatz), 'inputmode="decimal" placeholder="z. B. 2,9"') : ''}
       ${fld('Kinderfreibeträge', 'steuer.kinderFB', deNum(s.steuer.kinderFB), 'inputmode="decimal"', 'laut Abrechnung, z. B. 0,5 / 1')}${fld('Kinder (Pflegevers.)', 'steuer.kinderPV', s.steuer.kinderPV, 'inputmode="numeric"', 'Anzahl Kinder')}</div>
       <div class="grid2">${fld(`Geburtsjahr ${info('alter')}`, 'steuer.geburtsjahr', s.steuer.geburtsjahr || '', 'inputmode="numeric" placeholder="z. B. 1990"')}<div></div></div>
-      ${sw('Kirchensteuer', 'steuer.kirche', s.steuer.kirche)}
+      ${sw('Kirchensteuer', 'steuer.kirche', s.steuer.kirche)}${sw('Freiwillig gesetzlich versichert', 'steuer.freiwillig', s.steuer.freiwillig, 'Einkommen über der Versicherungspflichtgrenze: Beitrag wird abgeführt, Arbeitgeber zahlt Zuschuss – unterm Strich gleich, Anzeige wie auf deiner Abrechnung')}
       ${!s.steuer.geprueft ? '<button class="btn soft sm" data-act="steuerOk">✓ Angaben stimmen so</button>' : '<p class="xs muted">✓ Steuerdaten geprüft</p>'}`)}
     ${sec('konto', `${Sync.code ? '☁ ' : ''}Handy ↔ Laptop (Sync)${Sync.code ? ` <span class="syncdot ${sync.status}"></span>` : ''}`, '<div id="syncinfo">' + syncInfoHtml() + '</div>')}
     ${sec('daten', 'Datentransport', `<p class="small muted">Deine Daten liegen nur in diesem Browser auf diesem Gerät. Für Handy ↔ PC: hier exportieren und am anderen Gerät importieren.</p>
@@ -1231,8 +1238,9 @@
   function liveHints() {
     const s = S();
     const sl = document.getElementById('slAuto'); if (sl) sl.textContent = `${nf(C.stundenlohn(s))} €`;
-    const slh = document.getElementById('slHint'); if (slh) slh.textContent = Number(s.lohn.stundenlohn) ? 'eigener Wert' : `= Grundlohn ÷ (${D1(s.arbeit.wochenstunden)} h × 4,35)`;
-    const ug = document.getElementById('ugTag'); if (ug) ug.textContent = `${nf(((Number(s.lohn.grundlohn) || 0) / (Number(s.urlaub.ugTeiler) || 21.75)) * (Number(s.urlaub.ugFaktor) || 0))} €`;
+    const slh = document.getElementById('slHint'); if (slh) slh.textContent = Number(s.lohn.stundenlohn) ? 'eigener Wert' : `= Monatsentgelt ÷ (${D1(s.arbeit.wochenstunden)} h × 4,35)`;
+    const me = document.getElementById('meAuto'); if (me) me.textContent = `${nf(C.monatsentgelt(s))} €`;
+    const ug = document.getElementById('ugTag'); if (ug) ug.textContent = `${nf((C.monatsentgelt(s) / (Number(s.urlaub.ugTeiler) || 21.75)) * (Number(s.urlaub.ugFaktor) || 0))} €`;
     const ts = document.getElementById('tsoll'); if (ts) ts.textContent = `= ${D1(C.tagessoll(s))} Std./Tag`;
   }
   const isText = (t) => t.tagName === 'INPUT' && !['checkbox', 'date', 'file', 'time'].includes(t.type);
