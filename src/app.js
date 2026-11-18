@@ -104,7 +104,7 @@
         if (!remote) { setSync('off'); toast('⚠ Zu diesem Code gibt es keine Daten – bitte Code prüfen', 4500); return; }
       }
       Sync.set(c); st.meta.syncedAt = 0; persist();
-      if (created) { if (!st.meta.updated) st.meta.updated = Date.now(); await Sync.push(st, st.meta.updated); st.meta.syncedAt = Date.now(); persist(); setSync('ok'); ui.showCode = true; toast('✓ Sync ist an – Code auf dem anderen Gerät eingeben', 3500, 'ok'); }
+      if (created) { if (!st.meta.updated) st.meta.updated = Date.now(); await Sync.push(st, st.meta.updated); st.meta.syncedAt = Date.now(); persist(); setSync('ok'); ui.showCode = true; ui.showQR = true; toast('✓ Sync ist an – QR-Code mit dem anderen Gerät abscannen', 3500, 'ok'); }
       else { await syncNow(false); toast('✓ Verbunden', 2500, 'ok'); }
     } catch (e) { if (created) Sync.set(''); setSync(Sync.code ? 'err' : 'off', e.message); toast(`⚠ ${e.message}`, 6000); }
     render();
@@ -125,6 +125,7 @@
     const shown = ui.showCode ? Sync.pretty(Sync.code) : Sync.pretty(Sync.code).replace(/(TOKI-\w{4})-.*/, '$1-••••-••••-••••');
     return `<div class="between"><div><b>☁ Sync aktiv</b><div class="xs muted">${esc(syncLabel())} · zuletzt ${last}</div></div><span class="syncdot ${sync.status}"></span></div>
       <div class="codebox mt"><span class="num">${shown}</span><button class="btn sm soft" data-act="syncShow">${ui.showCode ? 'Verbergen' : 'Anzeigen'}</button></div>
+      <div class="qrbox ${ui.showQR ? 'on' : ''}">${ui.showQR ? `<div class="qr">${QR.svg(Sync.link(), { px: 200 })}</div><p class="small" style="margin:8px 0 0"><b>Mit dem anderen Handy abscannen</b> (Kamera-App) – der Link verbindet Toki sofort.</p>` : ''}<button class="btn ${ui.showQR ? 'ghost' : ''} sm" style="width:100%;margin-top:8px" data-act="syncQR">${ui.showQR ? 'QR-Code ausblenden' : '▦ QR-Code zum Abscannen'}</button></div>
       <div class="grid2 mt-s"><button class="btn soft sm" style="width:100%" data-act="syncCopy">Code kopieren</button><button class="btn soft sm" style="width:100%" data-act="syncMail">Sync-Link per Mail</button></div>
       <p class="hint">Auf dem anderen Gerät: Code bei „Verbinden“ eingeben oder den Link aus der Mail öffnen. <b>Code nicht weitergeben</b> – wer ihn kennt, sieht deine Daten.</p>
       <div class="grid2 mt"><button class="btn soft" data-act="syncNow">Jetzt synchronisieren</button><button class="btn ghost" data-act="syncOff">Sync ausschalten</button></div>`;
@@ -176,7 +177,7 @@
   const NAV = TABS.slice(0, 4);
   const info = (k) => `<button class="ibtn" data-act="info" data-k="${k}" aria-label="Info">i</button>`;
   const INFO = {
-    kv: ['KV-Zusatzbeitrag', `<p><b>Was bedeutet das?</b> Deine Krankenversicherung kostet 14,6 % vom Brutto (Hälfte zahlst du, Hälfte die Firma) <b>plus</b> einen Zusatzbeitrag, den jede Kasse selbst festlegt. Auch der wird halbiert.</p><p><b>Was eintragen?</b> Den vollen Zusatzbeitrag deiner Kasse in Prozent, z. B. <b>2,69</b> bei der TK. Weißt du ihn nicht, lass 2,9 stehen (Durchschnitt 2026).</p><p>Jede gesetzliche Krankenkasse verlangt zusätzlich zum allgemeinen Satz von 14,6 % einen eigenen <b>Zusatzbeitrag</b>. 2026 liegt er im Schnitt bei 2,9 %.</p>
+    kv: ['KV-Zusatzbeitrag', `<p><b>Was bedeutet das?</b> Deine Krankenversicherung kostet 14,6 % vom Brutto (Hälfte zahlst du, Hälfte die Firma) <b>plus</b> einen Zusatzbeitrag, den jede Kasse selbst festlegt. Auch der wird halbiert.</p><p><b>Was auswählen?</b> Einfach deine Krankenkasse aus der Liste – der Zusatzbeitrag 2026 ist hinterlegt (z. B. TK 2,69 %, AOK Bayern 2,69 %). Fehlt deine Kasse oder hat sie den Beitrag geändert, wähle „Andere“ und trag den Wert selbst ein.</p><p>Jede gesetzliche Krankenkasse verlangt zusätzlich zum allgemeinen Satz von 14,6 % einen eigenen <b>Zusatzbeitrag</b>. 2026 liegt er im Schnitt bei 2,9 %.</p>
       <p><b>So findest du ihn:</b></p><ul><li><b>Lohnabrechnung:</b> Steht bei der Krankenversicherung ein Gesamtsatz (z. B. 17,29 %), ist der Zusatzbeitrag dieser Satz minus 14,6 (hier: 2,69 %). Steht dort dein Arbeitnehmeranteil (z. B. 8,65 %), rechne: Anteil × 2 − 14,6.</li><li><b>Webseite deiner Krankenkasse:</b> Suche nach „Beitragssatz“ oder „Zusatzbeitrag 2026“.</li><li><b>Mitgliedschreiben:</b> Die Kasse informiert dich bei jeder Änderung per Brief.</li></ul><p class="small muted">Eintragen bitte den vollen Satz (z. B. 2,69), die App rechnet die Hälfte für dich.</p>`],
     stkl: ['Welche Steuerklasse habe ich?', `<ul><li><b>I</b> – ledig, geschieden oder dauernd getrennt lebend.</li><li><b>II</b> – alleinerziehend mit mindestens einem Kind im Haushalt (Entlastungsbetrag).</li><li><b>III</b> – verheiratet, du verdienst deutlich mehr als dein Partner (der hat dann V).</li><li><b>IV</b> – verheiratet, beide verdienen ähnlich viel (auch IV mit Faktor möglich).</li><li><b>V</b> – verheiratet, Partner von jemandem in III.</li><li><b>VI</b> – für einen Zweit- oder Nebenjob.</li></ul><p class="small muted">Deine Steuerklasse steht oben auf jeder Lohnabrechnung (meist als „StKl“) und in deinem ELStAM-Ausdruck vom Finanzamt.</p>`],
     zk: ['Zeitkonto-Stand', '<p>Trag einmal den Stand von deiner Abrechnung oder dem Zeiterfassungs-Terminal ein. Ab dem Tag danach rechnet Toki jede gespeicherte Arbeitszeit und jeden Zeitkonto-Urlaub selbst dazu. Den Stand musst du nur ändern, wenn du ihn mit der Firma abgleichen willst.</p>'],
@@ -298,6 +299,7 @@
   function pageFeierabend() {
     const { s, d, w, special, soll, live, tiles, summary } = faParts();
     return `${ampel()}
+    <div class="fa-grid"><div class="fa-l">
     <section class="card">
       <label class="label" for="work-date">Arbeitstag</label>
       <button class="datebtn" id="work-date" data-act="pickDate"><span>${d === today ? `Heute · ${WD[w]}. ${dShort(d)}` : dLong(d)}</span>${I.cal.replace('<svg', '<svg width="20" height="20"')}</button>
@@ -307,6 +309,7 @@
       </div>
       <div id="fa-live">${live}</div>
     </section>
+    </div><div class="fa-r">
     <section class="card">
       <h2>Gehen um … <span class="xs muted" style="text-transform:none;letter-spacing:0;font-weight:500">· antippen übernimmt die Zeit</span></h2>
       <div class="tiles" id="fa-tiles">${tiles}</div>
@@ -320,7 +323,8 @@
         </div>
         <label class="switch mt-s"><span><b>Halbtags Urlaub</b><br><span class="xs muted">${D1(soll / 2)} Std. arbeiten + Brotzeit, ½ Tag Tarifurlaub wird abgezogen</span></span><input type="checkbox" data-act="half" ${ui.half ? 'checked' : ''} ${special ? 'disabled' : ''}></label>
       </div>
-    </details>`;
+    </details>
+    </div></div>`;
   }
 
   // ---------- Seite: Mehrarbeit ----------
@@ -699,7 +703,7 @@
   // ---------- Seite: Netto Rechner ----------
   function godDefaults() {
     const s = S();
-    return { grundlohn: Number(s.lohn.grundlohn) || 3800, mea: 40, h25: 24, zulage: 0, einmal: 0, utage: 0, klasse: Number(s.steuer.klasse) || 1, kirche: !!s.steuer.kirche, kvZusatz: Number(s.steuer.kvZusatz) || 2.9, kinderPV: Number(s.steuer.kinderPV) || 0, kinderFB: Number(s.steuer.kinderFB) || 0, land: s.arbeit.land || 'BY', alter: Number(s.steuer.geburtsjahr) ? new Date().getFullYear() - Number(s.steuer.geburtsjahr) : '' };
+    return { grundlohn: Number(s.lohn.grundlohn) || 3800, mea: 40, h25: 24, zulage: 0, einmal: 0, utage: 0, klasse: Number(s.steuer.klasse) || 1, kirche: !!s.steuer.kirche, kasse: s.steuer.kasse || '', kvZusatz: Number(s.steuer.kvZusatz) || 2.9, kinderPV: Number(s.steuer.kinderPV) || 0, kinderFB: Number(s.steuer.kinderFB) || 0, land: s.arbeit.land || 'BY', alter: Number(s.steuer.geburtsjahr) ? new Date().getFullYear() - Number(s.steuer.geburtsjahr) : '' };
   }
   function nettoResult(lines, laufend, einmal, S2, mo, abzug, rate, cls, note = '', mehrG = 0) {
     const n = C.netto(laufend, einmal, S2, mo, abzug);
@@ -752,7 +756,7 @@
           <div><dt>Grenzsteuersatz (nächster Euro)</dt><dd>${nf(n.jahr.grenz * 100, 1)} %</dd></div>
           <div><dt>Bundesland</dt><dd>${C.LAENDER[S2.arbeit.land]}</dd></div>
           <div><dt>Kinderfreibeträge / Kinder (PV)</dt><dd>${D1(Number(S2.steuer.kinderFB) || 0)} / ${Number(S2.steuer.kinderPV) || 0}</dd></div>
-          <div><dt>KV-Zusatzbeitrag</dt><dd>${nf(S2.steuer.kvZusatz)} %</dd></div>
+          <div><dt>Krankenkasse · Zusatzbeitrag</dt><dd>${S2.steuer.kasse && S2.steuer.kasse !== '__andere' ? `${esc(S2.steuer.kasse)} · ` : ''}${nf(S2.steuer.kvZusatz)} %</dd></div>
           <div><dt>Beitragsbemessungsgrenze KV/PV · RV/AV</dt><dd>${nf(C.P.bbgKV)} € · ${nf(C.P.bbgRV, 0)} €</dd></div>
         </dl>
         <p class="xs muted">Lohnsteuer nach § 32a EStG 2026 und Programmablaufplan (Vorsorgepauschale), SV-Werte 2026. Arbeitgeberanteile sind nicht abgezogen.</p>
@@ -802,7 +806,8 @@
           <input class="field big2" data-god="manuell" inputmode="decimal" value="${manual ? esc(deNum(g.manuell)) : ''}" placeholder="${nf(Number(g.grundlohn) + mea)}">
           ${manual ? `<div class="notice warn"><div>✋ <b>Manueller Wert aktiv:</b> Grundlohn und Mehrarbeit oben werden ignoriert, gerechnet wird mit ${nf(Number(g.manuell))} €.<br><button class="btn sm soft mt-s" data-act="godManualOff">Wieder automatisch rechnen</button></div></div>` : '<div class="hint">Automatisch = Grundlohn + Mehrarbeit. Eigenen Wert eintippen, um ihn direkt zu verwenden.</div>'}</div>
         <div class="grid2 mt"><div><label class="label">Steuerklasse ${info('stkl')}</label><select class="field" data-god="klasse">${[1, 2, 3, 4, 5, 6].map((k) => `<option value="${k}" ${Number(g.klasse) === k ? 'selected' : ''}>${['I', 'II', 'III', 'IV', 'V', 'VI'][k - 1]}</option>`).join('')}</select></div>
-        ${gf('kvZusatz', `KV-Zusatz (%) ${info('kv')}`)}
+        <div style="grid-column:1/-1"><label class="label">Krankenkasse ${info('kv')}</label>${kasseSelect('data-kasse="g"', g.kasse || '')}<div class="hint">${kasseHint(g.kasse || '', g.kvZusatz)}</div></div>
+        ${g.kasse === '__andere' ? gf('kvZusatz', 'KV-Zusatz (%)') : ''}
         <div><label class="label">Bundesland</label><select class="field" data-god="land" data-str="1">${Object.entries(C.LAENDER).map(([k, l]) => `<option value="${k}" ${(g.land || 'BY') === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
         ${gf('alter', `Alter ${info('alter')}`, 'inputmode="numeric" placeholder="z. B. 35"')}
         ${gf('kinderPV', 'Kinder (PV)', 'inputmode="numeric"')}${gf('kinderFB', 'Kinderfreibeträge')}</div>
@@ -823,9 +828,10 @@
     // fehlende Angaben
     const miss = [];
     if (!s.steuer.geprueft) miss.push(`Steuerdaten noch nicht geprüft – gerechnet wird mit StKl ${['I', 'II', 'III', 'IV', 'V', 'VI'][s.steuer.klasse - 1]}, KV-Zusatz ${nf(s.steuer.kvZusatz, 2)} %, ${s.steuer.kirche ? 'mit' : 'ohne'} Kirchensteuer.`);
+    else if (!s.steuer.kasse) miss.push('Krankenkasse noch nicht gewählt – gerechnet wird mit dem Durchschnitt 2,9 %.');
     const src = mp.src;
     const srcMo = Number(src.slice(5, 7));
-    let missSec = s.steuer.geprueft ? '' : 'steuer';
+    let missSec = s.steuer.geprueft && s.steuer.kasse ? '' : 'steuer';
     for (const x of s.lohn.sonder) if (x.art === 'einmalig' && Number(x.monat) === srcMo && !Number(x.wert)) { miss.push(`${esc(x.name || 'Sonderzahlung')} ist für ${MON[srcMo - 1]} angelegt, aber ohne Betrag.`); missSec = missSec || 'verdienst'; }
     const srcHas = Object.keys(st.entries).some((d) => d.startsWith(src));
     if (!srcHas) miss.push(`Für ${monthName(src)} sind keine Arbeitszeiten erfasst – Mehrarbeit ist deshalb nicht enthalten.`);
@@ -889,7 +895,7 @@
       ],
       stats: { gearbeitet: mm ? mm.worked : 0, tage: days.length, mehr: mm ? mm.mehr : 0, h25: mm ? mm.pay.h25 : 0, h50: mm ? mm.pay.h50 : 0, zk: mm ? mm.zkChange : 0, zkStand: calc.zk, kont: (Number(st.kontingent[m]) || 0) + (mm ? mm.nach : 0), used: mm ? mm.used : 0, avgStart: mins.length ? C.fmtClock(avg(mins)) : '–', avgEnd: ends.length ? C.fmtClock(avg(ends)) : '–', avgDur: avg(days.map((x) => x.hours)), longest: longest ? `${longest.date} · ${nf(longest.hours)} h` : '–' },
       weeks, days, abwesend: abw,
-      grundlagen: `StKl ${stk}, ${C.LAENDER[s.arbeit.land]}, ${s.steuer.kirche ? 'mit' : 'ohne'} Kirchensteuer, KV-Zusatz ${nf(s.steuer.kvZusatz)} %, Kinder ${Number(s.steuer.kinderPV) || 0}, Grundlohn ${nf(s.lohn.grundlohn)} €, Stundenlohn ${nf(calc.rate)} €, ${D1(s.arbeit.wochenstunden)}-h-Woche`,
+      grundlagen: `StKl ${stk}, ${C.LAENDER[s.arbeit.land]}, ${s.steuer.kirche ? 'mit' : 'ohne'} Kirchensteuer, ${s.steuer.kasse && s.steuer.kasse !== '__andere' ? `${s.steuer.kasse} ` : 'KV-Zusatz '}${nf(s.steuer.kvZusatz)} %, Kinder ${Number(s.steuer.kinderPV) || 0}, Grundlohn ${nf(s.lohn.grundlohn)} €, Stundenlohn ${nf(calc.rate)} €, ${D1(s.arbeit.wochenstunden)}-h-Woche`,
     };
   }
   async function saveFile(blob, filename) {
@@ -897,6 +903,12 @@
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 4000);
   }
+
+  /** Auswahlliste aller gesetzlichen Krankenkassen mit Zusatzbeitrag 2026 */
+  function kasseSelect(attr, cur) {
+    return `<select class="field" ${attr}><option value="" ${!cur ? 'selected' : ''}>– Krankenkasse wählen –</option>${C.KASSEN.map(([n, v]) => `<option value="${esc(n)}" ${cur === n ? 'selected' : ''}>${esc(n)} · ${nf(v)} %</option>`).join('')}<option value="__andere" ${cur === '__andere' ? 'selected' : ''}>Andere / Wert selbst eingeben</option></select>`;
+  }
+  const kasseHint = (name, kv) => (name && name !== '__andere' ? `Zusatzbeitrag ${nf(kv)} % · Gesamtbeitrag ${nf(14.6 + Number(kv))} % (du zahlst die Hälfte)` : !name ? 'Ohne Auswahl wird mit dem Durchschnitt 2,9 % gerechnet.' : '');
 
   // ---------- Seite: Einstellungen ----------
   const fld = (label, path, val, attrs = '', hint = '') => `<div><label class="label">${label}</label><input class="field" data-set="${path}" value="${esc(val)}" ${attrs}>${hint ? `<div class="hint">${hint}</div>` : ''}</div>`;
@@ -954,7 +966,8 @@
       <div class="grid2">${fld('Chef (Name)', 'mail.anrede', s.mail.anrede, 'placeholder="z. B. Herr Maier"')}${fld('E-Mail Chef', 'mail.an', s.mail.an, 'type="email" inputmode="email" placeholder="chef@firma.de"')}</div>
       <div class="grid2 mt-s">${fld('Dein Name (Gruß)', 'mail.name', s.mail.name, 'placeholder="z. B. Daniel"')}<div></div></div>`)}
     ${sec('steuer', 'Steuer (für Gehalt)', `<div class="grid2"><div><label class="label">Steuerklasse ${info('stkl')}</label><select class="field" data-set="steuer.klasse" data-type="num">${[1, 2, 3, 4, 5, 6].map((k) => `<option value="${k}" ${Number(s.steuer.klasse) === k ? 'selected' : ''}>${['I', 'II', 'III', 'IV', 'V', 'VI'][k - 1]}</option>`).join('')}</select></div>
-      ${fld(`KV-Zusatzbeitrag (%) ${info('kv')}`, 'steuer.kvZusatz', deNum(s.steuer.kvZusatz), 'inputmode="decimal"', 'Ø 2026: 2,9 %')}
+      <div style="grid-column:1/-1"><label class="label">Krankenkasse ${info('kv')}</label>${kasseSelect('data-kasse="s"', s.steuer.kasse)}<div class="hint">${kasseHint(s.steuer.kasse, s.steuer.kvZusatz)}</div></div>
+      ${s.steuer.kasse === '__andere' ? fld('KV-Zusatzbeitrag (%)', 'steuer.kvZusatz', deNum(s.steuer.kvZusatz), 'inputmode="decimal" placeholder="z. B. 2,9"') : ''}
       ${fld('Kinderfreibeträge', 'steuer.kinderFB', deNum(s.steuer.kinderFB), 'inputmode="decimal"', 'laut Abrechnung, z. B. 0,5 / 1')}${fld('Kinder (Pflegevers.)', 'steuer.kinderPV', s.steuer.kinderPV, 'inputmode="numeric"', 'Anzahl Kinder')}</div>
       <div class="grid2">${fld(`Geburtsjahr ${info('alter')}`, 'steuer.geburtsjahr', s.steuer.geburtsjahr || '', 'inputmode="numeric" placeholder="z. B. 1990"')}<div></div></div>
       ${sw('Kirchensteuer', 'steuer.kirche', s.steuer.kirche)}
@@ -976,7 +989,7 @@
     document.body.dataset.theme = s.theme;
     const page = { feierabend: pageFeierabend, mehrarbeit: pageMehrarbeit, urlaub: pageUrlaub, netto: pageNetto, einstellungen: pageSettings }[ui.tab] || pageFeierabend;
     const onSet = ui.tab === 'einstellungen';
-    root.innerHTML = `<div class="top"><div class="brand"><img src="${LOGO}" alt=""><span>TOKI</span></div><button class="iconbtn gearbtn ${onSet ? 'on' : ''}" data-act="tab" data-tab="${onSet ? ui.lastTab || 'feierabend' : 'einstellungen'}" title="${onSet ? 'Einstellungen schließen' : 'Einstellungen'}" aria-label="Einstellungen">${onSet ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>' : I.gear}</button></div><div class="page">${page()}</div>`;
+    root.innerHTML = `<div class="top"><div class="brand"><img src="${LOGO}" alt=""><span>TOKI</span></div><button class="iconbtn gearbtn ${onSet ? 'on' : ''}" data-act="tab" data-tab="${onSet ? ui.lastTab || 'feierabend' : 'einstellungen'}" title="${onSet ? 'Einstellungen schließen' : 'Einstellungen'}" aria-label="Einstellungen">${onSet ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>' : I.gear}</button></div><div class="page page-${ui.tab}">${page()}</div>`;
     document.getElementById('nav').innerHTML = `<div class="in">${NAV.map(([id, l, ic]) => `<button data-act="tab" data-tab="${id}" ${ui.tab === id ? 'aria-current="page"' : ''}>${ic}<span>${l}</span></button>`).join('')}</div>`;
     if (keepScroll) window.scrollTo(0, y);
     applyTheme();
@@ -1008,6 +1021,7 @@
       connectCode(c, false);
     },
     syncShow: () => { ui.showCode = !ui.showCode; setSync(sync.status, sync.msg); },
+    syncQR: () => { ui.showQR = !ui.showQR; setSync(sync.status, sync.msg); },
     syncCopy: async () => { try { await navigator.clipboard.writeText(Sync.pretty(Sync.code)); toast('✓ Code kopiert', 1800, 'ok'); } catch { ui.showCode = true; setSync(sync.status, sync.msg); toast('Code angezeigt – bitte abschreiben', 2500); } },
     syncMail: () => { location.href = `mailto:?subject=${encodeURIComponent('Toki Sync-Link')}&body=${encodeURIComponent(`Diesen Link auf dem anderen Gerät öffnen, dann sind die Toki-Daten verbunden:\n\n${Sync.link()}\n\nSync-Code: ${Sync.pretty(Sync.code)}`)}`; },
     syncNow: () => syncNow(true),
@@ -1222,6 +1236,12 @@
     const t = e.target;
     if (t.dataset.bind === 'date') { if (t.value) { loadDate(t.value); render(); } return; }
     if (t.dataset.act === 'half') { ui.half = t.checked; render(); return; }
+    if (t.dataset.kasse) {
+      const name = t.value, k = C.KASSEN.find(([n]) => n === name);
+      if (t.dataset.kasse === 's') { S().steuer.kasse = name; if (k) S().steuer.kvZusatz = k[1]; else if (!name) S().steuer.kvZusatz = 2.9; S().steuer.geprueft = true; }
+      else { const g = { ...godDefaults(), ...(st.pref.god || {}) }; g.kasse = name; if (k) g.kvZusatz = k[1]; else if (!name) g.kvZusatz = 2.9; st.pref.god = g; }
+      save(); render(); return;
+    }
     if (t.dataset.act === 'importFile') { const f = t.files && t.files[0]; if (f) f.text().then(doImport); t.value = ''; return; }
     if (!applyField(t)) return;
     if (t.dataset.kont) ui.kEdit = false;

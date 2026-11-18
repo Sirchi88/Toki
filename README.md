@@ -36,6 +36,7 @@ src/
   fx.js         animierte Design-Hintergründe
   sync.js       Sync per persönlichem Code (Supabase-RPC)
   report.js     PDF-Bericht und Excel-Export (xlsx ohne Bibliothek)
+  qr.js         QR-Code-Generator für den Sync-Link (ohne Bibliothek)
   style.css     Layout und Designs
   index.html    HTML-Vorlage
   logo*.svg     Logo
@@ -64,7 +65,7 @@ Im Repository unter **Settings → Pages** als Quelle den Branch `main` und den 
 ## Daten & Sync (Handy ↔ Laptop)
 
 - Ohne Sync liegen alle Daten nur im Browser des jeweiligen Geräts (localStorage). Übertragen geht auch per **Mehr → Datentransport** (Export/Import).
-- **Sync per persönlichem Code** (Mehr → Handy ↔ Laptop): Auf dem ersten Gerät „Sync-Code erstellen“, auf dem zweiten den Code eingeben oder den Sync-Link öffnen. Kein Login, kein Passwort, keine E-Mail.
+- **Sync per persönlichem Code** (Mehr → Handy ↔ Laptop): Auf dem ersten Gerät „Sync-Code erstellen“, auf dem zweiten den **QR-Code abscannen**, den Code eingeben oder den Sync-Link öffnen. Kein Login, kein Passwort, keine E-Mail.
 - Jede Änderung wird automatisch hochgeladen; beim Öffnen der App wird der neueste Stand geholt (neuester Stand gewinnt, beim ersten Verbinden mit eigenen Daten wird gefragt).
 - In Supabase liegt nur der SHA-256-Hash des Codes; die Tabelle ist direkt gesperrt, Zugriff nur über die Funktionen `toki_laden` / `toki_speichern`. Einrichtung: `supabase/schema.sql` einmal im SQL Editor ausführen.
 - Der Sync funktioniert nur unter der eigenen Adresse (GitHub Pages), nicht in der Claude-Vorschau.

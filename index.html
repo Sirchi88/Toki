@@ -480,7 +480,6 @@ nav.tabs .in{grid-template-columns:repeat(4,1fr)}
 
 /* ===== PC / großer Bildschirm (Handy-Ansicht bleibt unverändert) ===== */
 @media (min-width: 1000px) {
-  body { padding-left: 120px; }
   #app { max-width: 1120px; padding: 28px 28px 60px; }
   .top { margin-bottom: 18px; }
   .brand img { width: 40px; height: 40px; }
@@ -494,19 +493,52 @@ nav.tabs .in{grid-template-columns:repeat(4,1fr)}
   .ymonths { grid-template-columns: repeat(4, 1fr); }
   .ydays i { font-size: 9.5px; line-height: 15px; height: 15px; }
   .seg { max-width: 520px; }
-  /* Navigation als Leiste links */
-  nav.tabs { top: 50%; bottom: auto; left: 22px; right: auto; transform: translateY(-50%); padding: 0; justify-content: flex-start; }
-  nav.tabs .in { grid-template-columns: 1fr; width: 92px; gap: 6px; padding: 8px; border-radius: 22px; }
-  nav.tabs button { padding: 12px 0; font-size: 11.5px; }
-  nav.tabs button svg { width: 24px; height: 24px; }
-  .toast { bottom: 32px; }
-  .savebar { bottom: 20px; }
+  /* Navigation bleibt unten, etwas breiter */
+  nav.tabs .in { max-width: 560px; }
   body[data-theme=schrank] #app, body[data-theme=dorf] #app { padding-bottom: 200px; }
 }
 @media (min-width: 1400px) {
   #app { max-width: 1240px; }
 }
 .anal svg{max-width:560px;display:block;margin:0 auto}
+
+/* Sync: QR-Code */
+.qrbox{margin-top:10px;text-align:center}
+.qrbox .qr{display:inline-block;padding:10px;background:#fff;border-radius:14px;box-shadow:var(--shadow);line-height:0}
+.qrbox .qr svg{width:200px;height:200px}
+
+/* ===== PC: Reiter Feierabend ===== */
+@media (min-width: 1000px) {
+  .page-feierabend { column-count: 1 !important; max-width: 1040px; margin: 0 auto; }
+  .page-feierabend .ampel { grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+  .page-feierabend .amp { padding: 14px 18px; border-radius: 16px; }
+  .page-feierabend .amp .k { font-size: 11px; }
+  .page-feierabend .amp .v { font-size: 36px; }
+  .fa-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 22px; align-items: stretch; }
+  .fa-l, .fa-r { display: flex; flex-direction: column; gap: 18px; }
+  .fa-l .card, .fa-r .card { margin: 0; padding: 24px; border-radius: 20px; }
+  .fa-l .card { flex: 1; }
+  .page-feierabend .datebtn { height: 54px; font-size: 18px; }
+  .page-feierabend .field.big { height: 92px; font-size: 56px; border-radius: 14px; }
+  .page-feierabend .worked { margin-top: 18px; padding: 18px; border-radius: 16px; }
+  .page-feierabend .worked .v { font-size: 72px; }
+  .page-feierabend #fa-live .btn { height: 54px; font-size: 17px; border-radius: 14px; }
+  .fa-r .card { flex: 1; }
+  .fa-r h2 { font-size: 14px; margin-bottom: 14px; }
+  .fa-r .tiles { grid-template-columns: 1fr 1fr; gap: 14px; }
+  .fa-r .tile { padding: 20px 10px; border-radius: 16px; }
+  .fa-r .tile .k { font-size: 14px; }
+  .fa-r .tile .v { font-size: 52px; }
+  .fa-r .tile.single { grid-column: 1 / -1; }
+  .fa-r details.fold { margin: 0; border-radius: 16px; }
+  .fa-r details.fold summary { padding: 16px 20px; font-size: 15px; }
+}
+@media (min-width: 1000px) {
+  #app { padding-bottom: 130px; }
+  .fa-r .card { display: flex; flex-direction: column; }
+  .fa-r .tiles { flex: 1; align-content: center; }
+}
+@media (min-width: 1000px) { #app:has(.page-feierabend) .top { max-width: 1040px; margin-left: auto; margin-right: auto; } }
 </style>
 </head>
 <body data-theme="standard">
@@ -631,7 +663,7 @@ const Core = (() => {
     zk: { stand: 0, datum: '', samstagBonus: true, max: 35, min: -35 },
     urlaub: { tarifTage: 30, ugFaktor: 0.5, ugTeiler: 21.75, fzaStand: 0, fzaDatum: '', tzugTage: 8, jahre: {} },
     mail: { anrede: '', an: '', name: '' },
-    steuer: { klasse: 1, kirche: true, kinderFB: 0, kinderPV: 0, geburtsjahr: 0, kvZusatz: 2.9, geprueft: false },
+    steuer: { klasse: 1, kirche: true, kinderFB: 0, kinderPV: 0, geburtsjahr: 0, kasse: '', kvZusatz: 2.9, geprueft: false },
   });
   const merge = (base, over) => {
     if (Array.isArray(base)) return Array.isArray(over) ? over : base;
@@ -916,6 +948,102 @@ const Core = (() => {
     return res;
   };
 
+  /** Zusatzbeiträge der gesetzlichen Krankenkassen 2026 (Stand 01.11.2026, Quellen: krankenkasse-guenstiger.de, krankenkassen.de) */
+  const KASSEN = [
+    ['AOK Baden-Württemberg', 2.99],
+    ['AOK Bayern', 2.69],
+    ['AOK Bremen/Bremerhaven', 3.29],
+    ['AOK Hessen', 2.98],
+    ['AOK Niedersachsen', 2.98],
+    ['AOK Nordost', 3.5],
+    ['AOK NordWest', 2.99],
+    ['AOK PLUS', 3.1],
+    ['AOK Rheinland-Pfalz/Saarland', 2.47],
+    ['AOK Rheinland/Hamburg', 3.29],
+    ['AOK Sachsen-Anhalt', 2.89],
+    ['Audi BKK', 2.6],
+    ['BAHN-BKK', 3.65],
+    ['BARMER', 3.29],
+    ['Bergische Krankenkasse', 3.79],
+    ['Bertelsmann BKK', 3.2],
+    ['BIG direkt gesund', 3.69],
+    ['BKK Akzo Nobel Bayern', 3.39],
+    ['BKK B. Braun Aesculap', 3.65],
+    ['BKK Deutsche Bank', 3.4],
+    ['BKK Diakonie', 3.8],
+    ['BKK DürkoppAdler', 3.88],
+    ['BKK EUREGIO', 3.39],
+    ['BKK evm', 2.5],
+    ['BKK EWE', 3.19],
+    ['BKK exklusiv', 3.49],
+    ['BKK Faber-Castell & Partner', 2.48],
+    ['BKK firmus', 2.18],
+    ['BKK Freudenberg', 2.99],
+    ['BKK Gildemeister Seidensticker', 3.4],
+    ['BKK Groz-Beckert', 4.2],
+    ['BKK Herkules', 3.48],
+    ['BKK Linde', 2.99],
+    ['BKK MAHLE', 4.2],
+    ['BKK melitta hmr', 3.9],
+    ['BKK Miele', 3.2],
+    ['BKK mkk', 3.5],
+    ['BKK Mobil', 3.89],
+    ['BKK MTU', 2.8],
+    ['BKK Pfaff', 2.78],
+    ['BKK Pfalz', 3.9],
+    ['BKK ProVita', 3.79],
+    ['BKK Public', 2.5],
+    ['BKK PwC', 2.8],
+    ['BKK Rieker.Ricosta.Weisser', 4.2],
+    ['BKK Salzgitter', 3.5],
+    ['BKK Scheufelen', 3.99],
+    ['BKK Schwarzwald-Baar-Heuberg', 2.79],
+    ['BKK Technoform', 3.49],
+    ['BKK VDN', 3.19],
+    ['BKK VerbundPlus', 3.89],
+    ['BKK Werra-Meissner', 4.35],
+    ['BKK Wirtschaft & Finanzen', 3.99],
+    ['BKK Würth', 3.4],
+    ['BKK24', 4.39],
+    ['BMW BKK', 2.9],
+    ['Bosch BKK', 3.18],
+    ['Continentale BKK', 3.33],
+    ['DAK-Gesundheit', 3.2],
+    ['Debeka BKK', 3.25],
+    ['energie-BKK', 3.98],
+    ['EY BKK', 2.75],
+    ['Heimat Krankenkasse', 3.9],
+    ['HEK', 2.89],
+    ['hkk', 2.59],
+    ['IKK Brandenburg und Berlin', 4.35],
+    ['IKK classic', 3.85],
+    ['IKK gesund plus', 3.39],
+    ['IKK Südwest', 3.87],
+    ['IKK – Die Innovationskasse', 4.3],
+    ['Karl Mayer BKK', 2.99],
+    ['KKH', 3.78],
+    ['Knappschaft', 4.3],
+    ['Koenig & Bauer BKK', 3.18],
+    ['Krones BKK', 2.2],
+    ['Mercedes-Benz BKK', 3.2],
+    ['Merck BKK', 3.97],
+    ['mhplus BKK', 3.86],
+    ['novitas bkk', 3.6],
+    ['Pronova BKK', 3.7],
+    ['R+V BKK', 3.49],
+    ['Salus BKK', 3.29],
+    ['SBK', 3.8],
+    ['SECURVITA BKK', 3.9],
+    ['SKD BKK', 3.65],
+    ['Südzucker BKK', 3.5],
+    ['Techniker Krankenkasse (TK)', 2.69],
+    ['TUI BKK', 2.5],
+    ['VIACTIV Krankenkasse', 4.19],
+    ['vivida bkk', 3.79],
+    ['WMF BKK', 2.85],
+    ['ZF BKK', 3.4],
+  ];
+
   // ---------- Steuer & Sozialversicherung 2026 (Näherung) ----------
   const P = {
     gfb: 12348, bbgKV: 5812.5, bbgRV: 8450, rv: 0.093, av: 0.013, kv: 0.073, pv: 0.018, pvKinderlos: 0.006,
@@ -1024,7 +1152,7 @@ const Core = (() => {
   return {
     toMin, fmtClock, leaveAt, workedRaw, capDay, MAX_DAY, D, iso, addDays, dow, monday, isoWeek, ym, todayIso, range,
     LAENDER, easter, holidays, holidayName, isWorkday, workdaysBetween, defaults, merge, tagessoll, stundenlohn, holOpt,
-    TYPES, specialPause, presence, absenceDays, halfDay, dayNeed, yearCfg, dayTarget, zuschlag, compute, vacation, est, steuerJahr, netto, monthPay, prevMonth, P,
+    TYPES, specialPause, presence, absenceDays, halfDay, dayNeed, yearCfg, dayTarget, zuschlag, compute, vacation, est, steuerJahr, netto, monthPay, prevMonth, KASSEN, P,
   };
 })();
 if (typeof module !== 'undefined') module.exports = Core;
@@ -1349,6 +1477,130 @@ const FX = (() => {
   }[id] || '');
   return { set, preview };
 })();
+</script>
+<script>/* Toki – kleiner QR-Code-Generator (Byte-Modus, Fehlerkorrektur M, Version 1–10). Ohne Bibliothek.
+   Nach dem Verfahren der QR-Norm (ISO/IEC 18004); Aufbau angelehnt an Project Nayuki. */
+const QR = (() => {
+  'use strict';
+  const ECC = [-1, 10, 16, 26, 18, 24, 16, 18, 22, 22, 26]; // Fehlerkorrektur-Codewörter je Block (Stufe M)
+  const BLK = [-1, 1, 1, 1, 2, 2, 4, 4, 4, 5, 5]; // Anzahl Blöcke (Stufe M)
+  const rawMods = (v) => { let r = (16 * v + 128) * v + 64; if (v >= 2) { const n = Math.floor(v / 7) + 2; r -= (25 * n - 10) * n - 55; if (v >= 7) r -= 36; } return r; };
+  const dataCw = (v) => Math.floor(rawMods(v) / 8) - ECC[v] * BLK[v];
+
+  const mul = (x, y) => { let z = 0; for (let i = 7; i >= 0; i--) { z = (z << 1) ^ ((z >>> 7) * 0x11d); z ^= ((y >>> i) & 1) * x; } return z & 0xff; };
+  const rsDivisor = (deg) => {
+    const r = new Array(deg).fill(0); r[deg - 1] = 1; let root = 1;
+    for (let i = 0; i < deg; i++) { for (let j = 0; j < r.length; j++) { r[j] = mul(r[j], root); if (j + 1 < r.length) r[j] ^= r[j + 1]; } root = mul(root, 2); }
+    return r;
+  };
+  const rsRemainder = (data, div) => {
+    const r = div.map(() => 0);
+    for (const b of data) { const f = b ^ r.shift(); r.push(0); div.forEach((c, i) => { r[i] ^= mul(c, f); }); }
+    return r;
+  };
+  const alignPos = (v, size) => {
+    if (v === 1) return [];
+    const n = Math.floor(v / 7) + 2, step = Math.ceil((v * 4 + 4) / (n * 2 - 2)) * 2, res = [6];
+    for (let pos = size - 7; res.length < n; pos -= step) res.splice(1, 0, pos);
+    return res;
+  };
+
+  function matrix(text) {
+    const bytes = [...new TextEncoder().encode(text)];
+    let v = 1;
+    for (; v <= 10; v++) if (4 + (v < 10 ? 8 : 16) + bytes.length * 8 <= dataCw(v) * 8) break;
+    if (v > 10) throw new Error('Text zu lang für QR-Code');
+    // Bitstrom
+    const bits = [];
+    const ap = (val, len) => { for (let i = len - 1; i >= 0; i--) bits.push((val >>> i) & 1); };
+    ap(4, 4); ap(bytes.length, v < 10 ? 8 : 16); bytes.forEach((b) => ap(b, 8));
+    const cap = dataCw(v) * 8;
+    ap(0, Math.min(4, cap - bits.length)); ap(0, (8 - (bits.length % 8)) % 8);
+    for (let p = 0xec; bits.length < cap; p ^= 0xec ^ 0x11) ap(p, 8);
+    const data = [];
+    for (let i = 0; i < bits.length; i += 8) { let b = 0; for (let j = 0; j < 8; j++) b = (b << 1) | bits[i + j]; data.push(b); }
+    // Blöcke + Reed-Solomon, verschränkt
+    const nb = BLK[v], ecl = ECC[v], raw = Math.floor(rawMods(v) / 8), nShort = nb - (raw % nb), shortLen = Math.floor(raw / nb);
+    const div = rsDivisor(ecl), blocks = [];
+    for (let i = 0, k = 0; i < nb; i++) {
+      const dat = data.slice(k, k + shortLen - ecl + (i < nShort ? 0 : 1)); k += dat.length;
+      const ec = rsRemainder(dat, div);
+      if (i < nShort) dat.push(0);
+      blocks.push(dat.concat(ec));
+    }
+    const cw = [];
+    for (let i = 0; i < blocks[0].length; i++) blocks.forEach((b, j) => { if (i !== shortLen - ecl || j >= nShort) cw.push(b[i]); });
+    // Muster
+    const size = v * 4 + 17;
+    const m = [...Array(size)].map(() => Array(size).fill(false));
+    const fn = [...Array(size)].map(() => Array(size).fill(false));
+    const set = (x, y, d) => { m[y][x] = d; fn[y][x] = true; };
+    for (let i = 0; i < size; i++) { set(6, i, i % 2 === 0); set(i, 6, i % 2 === 0); }
+    const finder = (cx, cy) => { for (let dy = -4; dy <= 4; dy++) for (let dx = -4; dx <= 4; dx++) { const d = Math.max(Math.abs(dx), Math.abs(dy)), x = cx + dx, y = cy + dy; if (x >= 0 && x < size && y >= 0 && y < size) set(x, y, d !== 2 && d !== 4); } };
+    finder(3, 3); finder(size - 4, 3); finder(3, size - 4);
+    const al = alignPos(v, size), n = al.length;
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+      if ((i === 0 && j === 0) || (i === 0 && j === n - 1) || (i === n - 1 && j === 0)) continue;
+      for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) set(al[i] + dx, al[j] + dy, Math.max(Math.abs(dx), Math.abs(dy)) !== 1);
+    }
+    const drawFormat = (mask) => {
+      const d = (0 << 3) | mask; // Stufe M = 00
+      let rem = d; for (let i = 0; i < 10; i++) rem = (rem << 1) ^ ((rem >>> 9) * 0x537);
+      const b = ((d << 10) | rem) ^ 0x5412, bit = (i) => ((b >>> i) & 1) !== 0;
+      for (let i = 0; i <= 5; i++) set(8, i, bit(i));
+      set(8, 7, bit(6)); set(8, 8, bit(7)); set(7, 8, bit(8));
+      for (let i = 9; i < 15; i++) set(14 - i, 8, bit(i));
+      for (let i = 0; i < 8; i++) set(size - 1 - i, 8, bit(i));
+      for (let i = 8; i < 15; i++) set(8, size - 15 + i, bit(i));
+      set(8, size - 8, true);
+    };
+    drawFormat(0);
+    if (v >= 7) {
+      let rem = v; for (let i = 0; i < 12; i++) rem = (rem << 1) ^ ((rem >>> 11) * 0x1f25);
+      const b = (v << 12) | rem;
+      for (let i = 0; i < 18; i++) { const bit = ((b >>> i) & 1) !== 0, a = size - 11 + (i % 3), c = Math.floor(i / 3); set(a, c, bit); set(c, a, bit); }
+    }
+    // Daten im Zickzack einsetzen
+    let k = 0;
+    for (let right = size - 1; right >= 1; right -= 2) {
+      if (right === 6) right = 5;
+      for (let vert = 0; vert < size; vert++) for (let j = 0; j < 2; j++) {
+        const x = right - j, up = ((right + 1) & 2) === 0, y = up ? size - 1 - vert : vert;
+        if (!fn[y][x] && k < cw.length * 8) { m[y][x] = ((cw[k >>> 3] >>> (7 - (k & 7))) & 1) !== 0; k++; }
+      }
+    }
+    // Maske mit geringster Strafpunktzahl wählen
+    const cond = [(x, y) => (x + y) % 2 === 0, (x, y) => y % 2 === 0, (x) => x % 3 === 0, (x, y) => (x + y) % 3 === 0, (x, y) => (Math.floor(x / 3) + Math.floor(y / 2)) % 2 === 0, (x, y) => ((x * y) % 2) + ((x * y) % 3) === 0, (x, y) => (((x * y) % 2) + ((x * y) % 3)) % 2 === 0, (x, y) => (((x + y) % 2) + ((x * y) % 3)) % 2 === 0];
+    const applyMask = (mk) => { for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) if (!fn[y][x] && cond[mk](x, y)) m[y][x] = !m[y][x]; };
+    const penalty = () => {
+      let p = 0, dark = 0;
+      for (let y = 0; y < size; y++) {
+        let rx = 1, ry = 1;
+        for (let x = 0; x < size; x++) {
+          if (m[y][x]) dark++;
+          if (x > 0) { if (m[y][x] === m[y][x - 1]) { rx++; if (rx === 5) p += 3; else if (rx > 5) p++; } else rx = 1; }
+          if (x > 0) { if (m[x][y] === m[x - 1][y]) { ry++; if (ry === 5) p += 3; else if (ry > 5) p++; } else ry = 1; }
+          if (x > 0 && y > 0 && m[y][x] === m[y][x - 1] && m[y][x] === m[y - 1][x] && m[y][x] === m[y - 1][x - 1]) p += 3;
+        }
+      }
+      return p + Math.floor(Math.abs(dark * 20 - size * size * 10) / (size * size)) * 10;
+    };
+    let best = 0, bestP = Infinity;
+    for (let mk = 0; mk < 8; mk++) { applyMask(mk); drawFormat(mk); const p = penalty(); if (p < bestP) { bestP = p; best = mk; } applyMask(mk); }
+    applyMask(best); drawFormat(best);
+    return m;
+  }
+
+  /** QR-Code als SVG (dunkle Module als ein Pfad, 4 Module Ruhezone) */
+  function svg(text, { px = 220, dark = '#111', light = '#fff' } = {}) {
+    const m = matrix(text), n = m.length, q = 4, s = n + q * 2;
+    let d = '';
+    for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (m[y][x]) d += `M${x + q} ${y + q}h1v1h-1z`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${s} ${s}" width="${px}" height="${px}" shape-rendering="crispEdges" role="img" aria-label="QR-Code"><rect width="${s}" height="${s}" fill="${light}"/><path d="${d}" fill="${dark}"/></svg>`;
+  }
+  return { matrix, svg };
+})();
+if (typeof module !== 'undefined') module.exports = QR;
 </script>
 <script>/* Toki – Cloud-Sync per persönlichem Sync-Code (ohne Login). Supabase-RPC, keine Bibliothek nötig.
    Der Code ist das Geheimnis: Wer ihn kennt, sieht die Daten. In der Datenbank liegt nur sein SHA-256-Hash. */
@@ -1681,7 +1933,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
         if (!remote) { setSync('off'); toast('⚠ Zu diesem Code gibt es keine Daten – bitte Code prüfen', 4500); return; }
       }
       Sync.set(c); st.meta.syncedAt = 0; persist();
-      if (created) { if (!st.meta.updated) st.meta.updated = Date.now(); await Sync.push(st, st.meta.updated); st.meta.syncedAt = Date.now(); persist(); setSync('ok'); ui.showCode = true; toast('✓ Sync ist an – Code auf dem anderen Gerät eingeben', 3500, 'ok'); }
+      if (created) { if (!st.meta.updated) st.meta.updated = Date.now(); await Sync.push(st, st.meta.updated); st.meta.syncedAt = Date.now(); persist(); setSync('ok'); ui.showCode = true; ui.showQR = true; toast('✓ Sync ist an – QR-Code mit dem anderen Gerät abscannen', 3500, 'ok'); }
       else { await syncNow(false); toast('✓ Verbunden', 2500, 'ok'); }
     } catch (e) { if (created) Sync.set(''); setSync(Sync.code ? 'err' : 'off', e.message); toast(`⚠ ${e.message}`, 6000); }
     render();
@@ -1702,6 +1954,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
     const shown = ui.showCode ? Sync.pretty(Sync.code) : Sync.pretty(Sync.code).replace(/(TOKI-\w{4})-.*/, '$1-••••-••••-••••');
     return `<div class="between"><div><b>☁ Sync aktiv</b><div class="xs muted">${esc(syncLabel())} · zuletzt ${last}</div></div><span class="syncdot ${sync.status}"></span></div>
       <div class="codebox mt"><span class="num">${shown}</span><button class="btn sm soft" data-act="syncShow">${ui.showCode ? 'Verbergen' : 'Anzeigen'}</button></div>
+      <div class="qrbox ${ui.showQR ? 'on' : ''}">${ui.showQR ? `<div class="qr">${QR.svg(Sync.link(), { px: 200 })}</div><p class="small" style="margin:8px 0 0"><b>Mit dem anderen Handy abscannen</b> (Kamera-App) – der Link verbindet Toki sofort.</p>` : ''}<button class="btn ${ui.showQR ? 'ghost' : ''} sm" style="width:100%;margin-top:8px" data-act="syncQR">${ui.showQR ? 'QR-Code ausblenden' : '▦ QR-Code zum Abscannen'}</button></div>
       <div class="grid2 mt-s"><button class="btn soft sm" style="width:100%" data-act="syncCopy">Code kopieren</button><button class="btn soft sm" style="width:100%" data-act="syncMail">Sync-Link per Mail</button></div>
       <p class="hint">Auf dem anderen Gerät: Code bei „Verbinden“ eingeben oder den Link aus der Mail öffnen. <b>Code nicht weitergeben</b> – wer ihn kennt, sieht deine Daten.</p>
       <div class="grid2 mt"><button class="btn soft" data-act="syncNow">Jetzt synchronisieren</button><button class="btn ghost" data-act="syncOff">Sync ausschalten</button></div>`;
@@ -1753,7 +2006,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
   const NAV = TABS.slice(0, 4);
   const info = (k) => `<button class="ibtn" data-act="info" data-k="${k}" aria-label="Info">i</button>`;
   const INFO = {
-    kv: ['KV-Zusatzbeitrag', `<p><b>Was bedeutet das?</b> Deine Krankenversicherung kostet 14,6 % vom Brutto (Hälfte zahlst du, Hälfte die Firma) <b>plus</b> einen Zusatzbeitrag, den jede Kasse selbst festlegt. Auch der wird halbiert.</p><p><b>Was eintragen?</b> Den vollen Zusatzbeitrag deiner Kasse in Prozent, z. B. <b>2,69</b> bei der TK. Weißt du ihn nicht, lass 2,9 stehen (Durchschnitt 2026).</p><p>Jede gesetzliche Krankenkasse verlangt zusätzlich zum allgemeinen Satz von 14,6 % einen eigenen <b>Zusatzbeitrag</b>. 2026 liegt er im Schnitt bei 2,9 %.</p>
+    kv: ['KV-Zusatzbeitrag', `<p><b>Was bedeutet das?</b> Deine Krankenversicherung kostet 14,6 % vom Brutto (Hälfte zahlst du, Hälfte die Firma) <b>plus</b> einen Zusatzbeitrag, den jede Kasse selbst festlegt. Auch der wird halbiert.</p><p><b>Was auswählen?</b> Einfach deine Krankenkasse aus der Liste – der Zusatzbeitrag 2026 ist hinterlegt (z. B. TK 2,69 %, AOK Bayern 2,69 %). Fehlt deine Kasse oder hat sie den Beitrag geändert, wähle „Andere“ und trag den Wert selbst ein.</p><p>Jede gesetzliche Krankenkasse verlangt zusätzlich zum allgemeinen Satz von 14,6 % einen eigenen <b>Zusatzbeitrag</b>. 2026 liegt er im Schnitt bei 2,9 %.</p>
       <p><b>So findest du ihn:</b></p><ul><li><b>Lohnabrechnung:</b> Steht bei der Krankenversicherung ein Gesamtsatz (z. B. 17,29 %), ist der Zusatzbeitrag dieser Satz minus 14,6 (hier: 2,69 %). Steht dort dein Arbeitnehmeranteil (z. B. 8,65 %), rechne: Anteil × 2 − 14,6.</li><li><b>Webseite deiner Krankenkasse:</b> Suche nach „Beitragssatz“ oder „Zusatzbeitrag 2026“.</li><li><b>Mitgliedschreiben:</b> Die Kasse informiert dich bei jeder Änderung per Brief.</li></ul><p class="small muted">Eintragen bitte den vollen Satz (z. B. 2,69), die App rechnet die Hälfte für dich.</p>`],
     stkl: ['Welche Steuerklasse habe ich?', `<ul><li><b>I</b> – ledig, geschieden oder dauernd getrennt lebend.</li><li><b>II</b> – alleinerziehend mit mindestens einem Kind im Haushalt (Entlastungsbetrag).</li><li><b>III</b> – verheiratet, du verdienst deutlich mehr als dein Partner (der hat dann V).</li><li><b>IV</b> – verheiratet, beide verdienen ähnlich viel (auch IV mit Faktor möglich).</li><li><b>V</b> – verheiratet, Partner von jemandem in III.</li><li><b>VI</b> – für einen Zweit- oder Nebenjob.</li></ul><p class="small muted">Deine Steuerklasse steht oben auf jeder Lohnabrechnung (meist als „StKl“) und in deinem ELStAM-Ausdruck vom Finanzamt.</p>`],
     zk: ['Zeitkonto-Stand', '<p>Trag einmal den Stand von deiner Abrechnung oder dem Zeiterfassungs-Terminal ein. Ab dem Tag danach rechnet Toki jede gespeicherte Arbeitszeit und jeden Zeitkonto-Urlaub selbst dazu. Den Stand musst du nur ändern, wenn du ihn mit der Firma abgleichen willst.</p>'],
@@ -1875,6 +2128,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
   function pageFeierabend() {
     const { s, d, w, special, soll, live, tiles, summary } = faParts();
     return `${ampel()}
+    <div class="fa-grid"><div class="fa-l">
     <section class="card">
       <label class="label" for="work-date">Arbeitstag</label>
       <button class="datebtn" id="work-date" data-act="pickDate"><span>${d === today ? `Heute · ${WD[w]}. ${dShort(d)}` : dLong(d)}</span>${I.cal.replace('<svg', '<svg width="20" height="20"')}</button>
@@ -1884,6 +2138,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
       </div>
       <div id="fa-live">${live}</div>
     </section>
+    </div><div class="fa-r">
     <section class="card">
       <h2>Gehen um … <span class="xs muted" style="text-transform:none;letter-spacing:0;font-weight:500">· antippen übernimmt die Zeit</span></h2>
       <div class="tiles" id="fa-tiles">${tiles}</div>
@@ -1897,7 +2152,8 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
         </div>
         <label class="switch mt-s"><span><b>Halbtags Urlaub</b><br><span class="xs muted">${D1(soll / 2)} Std. arbeiten + Brotzeit, ½ Tag Tarifurlaub wird abgezogen</span></span><input type="checkbox" data-act="half" ${ui.half ? 'checked' : ''} ${special ? 'disabled' : ''}></label>
       </div>
-    </details>`;
+    </details>
+    </div></div>`;
   }
 
   // ---------- Seite: Mehrarbeit ----------
@@ -2276,7 +2532,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
   // ---------- Seite: Netto Rechner ----------
   function godDefaults() {
     const s = S();
-    return { grundlohn: Number(s.lohn.grundlohn) || 3800, mea: 40, h25: 24, zulage: 0, einmal: 0, utage: 0, klasse: Number(s.steuer.klasse) || 1, kirche: !!s.steuer.kirche, kvZusatz: Number(s.steuer.kvZusatz) || 2.9, kinderPV: Number(s.steuer.kinderPV) || 0, kinderFB: Number(s.steuer.kinderFB) || 0, land: s.arbeit.land || 'BY', alter: Number(s.steuer.geburtsjahr) ? new Date().getFullYear() - Number(s.steuer.geburtsjahr) : '' };
+    return { grundlohn: Number(s.lohn.grundlohn) || 3800, mea: 40, h25: 24, zulage: 0, einmal: 0, utage: 0, klasse: Number(s.steuer.klasse) || 1, kirche: !!s.steuer.kirche, kasse: s.steuer.kasse || '', kvZusatz: Number(s.steuer.kvZusatz) || 2.9, kinderPV: Number(s.steuer.kinderPV) || 0, kinderFB: Number(s.steuer.kinderFB) || 0, land: s.arbeit.land || 'BY', alter: Number(s.steuer.geburtsjahr) ? new Date().getFullYear() - Number(s.steuer.geburtsjahr) : '' };
   }
   function nettoResult(lines, laufend, einmal, S2, mo, abzug, rate, cls, note = '', mehrG = 0) {
     const n = C.netto(laufend, einmal, S2, mo, abzug);
@@ -2329,7 +2585,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
           <div><dt>Grenzsteuersatz (nächster Euro)</dt><dd>${nf(n.jahr.grenz * 100, 1)} %</dd></div>
           <div><dt>Bundesland</dt><dd>${C.LAENDER[S2.arbeit.land]}</dd></div>
           <div><dt>Kinderfreibeträge / Kinder (PV)</dt><dd>${D1(Number(S2.steuer.kinderFB) || 0)} / ${Number(S2.steuer.kinderPV) || 0}</dd></div>
-          <div><dt>KV-Zusatzbeitrag</dt><dd>${nf(S2.steuer.kvZusatz)} %</dd></div>
+          <div><dt>Krankenkasse · Zusatzbeitrag</dt><dd>${S2.steuer.kasse && S2.steuer.kasse !== '__andere' ? `${esc(S2.steuer.kasse)} · ` : ''}${nf(S2.steuer.kvZusatz)} %</dd></div>
           <div><dt>Beitragsbemessungsgrenze KV/PV · RV/AV</dt><dd>${nf(C.P.bbgKV)} € · ${nf(C.P.bbgRV, 0)} €</dd></div>
         </dl>
         <p class="xs muted">Lohnsteuer nach § 32a EStG 2026 und Programmablaufplan (Vorsorgepauschale), SV-Werte 2026. Arbeitgeberanteile sind nicht abgezogen.</p>
@@ -2379,7 +2635,8 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
           <input class="field big2" data-god="manuell" inputmode="decimal" value="${manual ? esc(deNum(g.manuell)) : ''}" placeholder="${nf(Number(g.grundlohn) + mea)}">
           ${manual ? `<div class="notice warn"><div>✋ <b>Manueller Wert aktiv:</b> Grundlohn und Mehrarbeit oben werden ignoriert, gerechnet wird mit ${nf(Number(g.manuell))} €.<br><button class="btn sm soft mt-s" data-act="godManualOff">Wieder automatisch rechnen</button></div></div>` : '<div class="hint">Automatisch = Grundlohn + Mehrarbeit. Eigenen Wert eintippen, um ihn direkt zu verwenden.</div>'}</div>
         <div class="grid2 mt"><div><label class="label">Steuerklasse ${info('stkl')}</label><select class="field" data-god="klasse">${[1, 2, 3, 4, 5, 6].map((k) => `<option value="${k}" ${Number(g.klasse) === k ? 'selected' : ''}>${['I', 'II', 'III', 'IV', 'V', 'VI'][k - 1]}</option>`).join('')}</select></div>
-        ${gf('kvZusatz', `KV-Zusatz (%) ${info('kv')}`)}
+        <div style="grid-column:1/-1"><label class="label">Krankenkasse ${info('kv')}</label>${kasseSelect('data-kasse="g"', g.kasse || '')}<div class="hint">${kasseHint(g.kasse || '', g.kvZusatz)}</div></div>
+        ${g.kasse === '__andere' ? gf('kvZusatz', 'KV-Zusatz (%)') : ''}
         <div><label class="label">Bundesland</label><select class="field" data-god="land" data-str="1">${Object.entries(C.LAENDER).map(([k, l]) => `<option value="${k}" ${(g.land || 'BY') === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
         ${gf('alter', `Alter ${info('alter')}`, 'inputmode="numeric" placeholder="z. B. 35"')}
         ${gf('kinderPV', 'Kinder (PV)', 'inputmode="numeric"')}${gf('kinderFB', 'Kinderfreibeträge')}</div>
@@ -2400,9 +2657,10 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
     // fehlende Angaben
     const miss = [];
     if (!s.steuer.geprueft) miss.push(`Steuerdaten noch nicht geprüft – gerechnet wird mit StKl ${['I', 'II', 'III', 'IV', 'V', 'VI'][s.steuer.klasse - 1]}, KV-Zusatz ${nf(s.steuer.kvZusatz, 2)} %, ${s.steuer.kirche ? 'mit' : 'ohne'} Kirchensteuer.`);
+    else if (!s.steuer.kasse) miss.push('Krankenkasse noch nicht gewählt – gerechnet wird mit dem Durchschnitt 2,9 %.');
     const src = mp.src;
     const srcMo = Number(src.slice(5, 7));
-    let missSec = s.steuer.geprueft ? '' : 'steuer';
+    let missSec = s.steuer.geprueft && s.steuer.kasse ? '' : 'steuer';
     for (const x of s.lohn.sonder) if (x.art === 'einmalig' && Number(x.monat) === srcMo && !Number(x.wert)) { miss.push(`${esc(x.name || 'Sonderzahlung')} ist für ${MON[srcMo - 1]} angelegt, aber ohne Betrag.`); missSec = missSec || 'verdienst'; }
     const srcHas = Object.keys(st.entries).some((d) => d.startsWith(src));
     if (!srcHas) miss.push(`Für ${monthName(src)} sind keine Arbeitszeiten erfasst – Mehrarbeit ist deshalb nicht enthalten.`);
@@ -2466,7 +2724,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
       ],
       stats: { gearbeitet: mm ? mm.worked : 0, tage: days.length, mehr: mm ? mm.mehr : 0, h25: mm ? mm.pay.h25 : 0, h50: mm ? mm.pay.h50 : 0, zk: mm ? mm.zkChange : 0, zkStand: calc.zk, kont: (Number(st.kontingent[m]) || 0) + (mm ? mm.nach : 0), used: mm ? mm.used : 0, avgStart: mins.length ? C.fmtClock(avg(mins)) : '–', avgEnd: ends.length ? C.fmtClock(avg(ends)) : '–', avgDur: avg(days.map((x) => x.hours)), longest: longest ? `${longest.date} · ${nf(longest.hours)} h` : '–' },
       weeks, days, abwesend: abw,
-      grundlagen: `StKl ${stk}, ${C.LAENDER[s.arbeit.land]}, ${s.steuer.kirche ? 'mit' : 'ohne'} Kirchensteuer, KV-Zusatz ${nf(s.steuer.kvZusatz)} %, Kinder ${Number(s.steuer.kinderPV) || 0}, Grundlohn ${nf(s.lohn.grundlohn)} €, Stundenlohn ${nf(calc.rate)} €, ${D1(s.arbeit.wochenstunden)}-h-Woche`,
+      grundlagen: `StKl ${stk}, ${C.LAENDER[s.arbeit.land]}, ${s.steuer.kirche ? 'mit' : 'ohne'} Kirchensteuer, ${s.steuer.kasse && s.steuer.kasse !== '__andere' ? `${s.steuer.kasse} ` : 'KV-Zusatz '}${nf(s.steuer.kvZusatz)} %, Kinder ${Number(s.steuer.kinderPV) || 0}, Grundlohn ${nf(s.lohn.grundlohn)} €, Stundenlohn ${nf(calc.rate)} €, ${D1(s.arbeit.wochenstunden)}-h-Woche`,
     };
   }
   async function saveFile(blob, filename) {
@@ -2474,6 +2732,12 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 4000);
   }
+
+  /** Auswahlliste aller gesetzlichen Krankenkassen mit Zusatzbeitrag 2026 */
+  function kasseSelect(attr, cur) {
+    return `<select class="field" ${attr}><option value="" ${!cur ? 'selected' : ''}>– Krankenkasse wählen –</option>${C.KASSEN.map(([n, v]) => `<option value="${esc(n)}" ${cur === n ? 'selected' : ''}>${esc(n)} · ${nf(v)} %</option>`).join('')}<option value="__andere" ${cur === '__andere' ? 'selected' : ''}>Andere / Wert selbst eingeben</option></select>`;
+  }
+  const kasseHint = (name, kv) => (name && name !== '__andere' ? `Zusatzbeitrag ${nf(kv)} % · Gesamtbeitrag ${nf(14.6 + Number(kv))} % (du zahlst die Hälfte)` : !name ? 'Ohne Auswahl wird mit dem Durchschnitt 2,9 % gerechnet.' : '');
 
   // ---------- Seite: Einstellungen ----------
   const fld = (label, path, val, attrs = '', hint = '') => `<div><label class="label">${label}</label><input class="field" data-set="${path}" value="${esc(val)}" ${attrs}>${hint ? `<div class="hint">${hint}</div>` : ''}</div>`;
@@ -2531,7 +2795,8 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
       <div class="grid2">${fld('Chef (Name)', 'mail.anrede', s.mail.anrede, 'placeholder="z. B. Herr Maier"')}${fld('E-Mail Chef', 'mail.an', s.mail.an, 'type="email" inputmode="email" placeholder="chef@firma.de"')}</div>
       <div class="grid2 mt-s">${fld('Dein Name (Gruß)', 'mail.name', s.mail.name, 'placeholder="z. B. Daniel"')}<div></div></div>`)}
     ${sec('steuer', 'Steuer (für Gehalt)', `<div class="grid2"><div><label class="label">Steuerklasse ${info('stkl')}</label><select class="field" data-set="steuer.klasse" data-type="num">${[1, 2, 3, 4, 5, 6].map((k) => `<option value="${k}" ${Number(s.steuer.klasse) === k ? 'selected' : ''}>${['I', 'II', 'III', 'IV', 'V', 'VI'][k - 1]}</option>`).join('')}</select></div>
-      ${fld(`KV-Zusatzbeitrag (%) ${info('kv')}`, 'steuer.kvZusatz', deNum(s.steuer.kvZusatz), 'inputmode="decimal"', 'Ø 2026: 2,9 %')}
+      <div style="grid-column:1/-1"><label class="label">Krankenkasse ${info('kv')}</label>${kasseSelect('data-kasse="s"', s.steuer.kasse)}<div class="hint">${kasseHint(s.steuer.kasse, s.steuer.kvZusatz)}</div></div>
+      ${s.steuer.kasse === '__andere' ? fld('KV-Zusatzbeitrag (%)', 'steuer.kvZusatz', deNum(s.steuer.kvZusatz), 'inputmode="decimal" placeholder="z. B. 2,9"') : ''}
       ${fld('Kinderfreibeträge', 'steuer.kinderFB', deNum(s.steuer.kinderFB), 'inputmode="decimal"', 'laut Abrechnung, z. B. 0,5 / 1')}${fld('Kinder (Pflegevers.)', 'steuer.kinderPV', s.steuer.kinderPV, 'inputmode="numeric"', 'Anzahl Kinder')}</div>
       <div class="grid2">${fld(`Geburtsjahr ${info('alter')}`, 'steuer.geburtsjahr', s.steuer.geburtsjahr || '', 'inputmode="numeric" placeholder="z. B. 1990"')}<div></div></div>
       ${sw('Kirchensteuer', 'steuer.kirche', s.steuer.kirche)}
@@ -2553,7 +2818,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
     document.body.dataset.theme = s.theme;
     const page = { feierabend: pageFeierabend, mehrarbeit: pageMehrarbeit, urlaub: pageUrlaub, netto: pageNetto, einstellungen: pageSettings }[ui.tab] || pageFeierabend;
     const onSet = ui.tab === 'einstellungen';
-    root.innerHTML = `<div class="top"><div class="brand"><img src="${LOGO}" alt=""><span>TOKI</span></div><button class="iconbtn gearbtn ${onSet ? 'on' : ''}" data-act="tab" data-tab="${onSet ? ui.lastTab || 'feierabend' : 'einstellungen'}" title="${onSet ? 'Einstellungen schließen' : 'Einstellungen'}" aria-label="Einstellungen">${onSet ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>' : I.gear}</button></div><div class="page">${page()}</div>`;
+    root.innerHTML = `<div class="top"><div class="brand"><img src="${LOGO}" alt=""><span>TOKI</span></div><button class="iconbtn gearbtn ${onSet ? 'on' : ''}" data-act="tab" data-tab="${onSet ? ui.lastTab || 'feierabend' : 'einstellungen'}" title="${onSet ? 'Einstellungen schließen' : 'Einstellungen'}" aria-label="Einstellungen">${onSet ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>' : I.gear}</button></div><div class="page page-${ui.tab}">${page()}</div>`;
     document.getElementById('nav').innerHTML = `<div class="in">${NAV.map(([id, l, ic]) => `<button data-act="tab" data-tab="${id}" ${ui.tab === id ? 'aria-current="page"' : ''}>${ic}<span>${l}</span></button>`).join('')}</div>`;
     if (keepScroll) window.scrollTo(0, y);
     applyTheme();
@@ -2585,6 +2850,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
       connectCode(c, false);
     },
     syncShow: () => { ui.showCode = !ui.showCode; setSync(sync.status, sync.msg); },
+    syncQR: () => { ui.showQR = !ui.showQR; setSync(sync.status, sync.msg); },
     syncCopy: async () => { try { await navigator.clipboard.writeText(Sync.pretty(Sync.code)); toast('✓ Code kopiert', 1800, 'ok'); } catch { ui.showCode = true; setSync(sync.status, sync.msg); toast('Code angezeigt – bitte abschreiben', 2500); } },
     syncMail: () => { location.href = `mailto:?subject=${encodeURIComponent('Toki Sync-Link')}&body=${encodeURIComponent(`Diesen Link auf dem anderen Gerät öffnen, dann sind die Toki-Daten verbunden:\n\n${Sync.link()}\n\nSync-Code: ${Sync.pretty(Sync.code)}`)}`; },
     syncNow: () => syncNow(true),
@@ -2799,6 +3065,12 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
     const t = e.target;
     if (t.dataset.bind === 'date') { if (t.value) { loadDate(t.value); render(); } return; }
     if (t.dataset.act === 'half') { ui.half = t.checked; render(); return; }
+    if (t.dataset.kasse) {
+      const name = t.value, k = C.KASSEN.find(([n]) => n === name);
+      if (t.dataset.kasse === 's') { S().steuer.kasse = name; if (k) S().steuer.kvZusatz = k[1]; else if (!name) S().steuer.kvZusatz = 2.9; S().steuer.geprueft = true; }
+      else { const g = { ...godDefaults(), ...(st.pref.god || {}) }; g.kasse = name; if (k) g.kvZusatz = k[1]; else if (!name) g.kvZusatz = 2.9; st.pref.god = g; }
+      save(); render(); return;
+    }
     if (t.dataset.act === 'importFile') { const f = t.files && t.files[0]; if (f) f.text().then(doImport); t.value = ''; return; }
     if (!applyField(t)) return;
     if (t.dataset.kont) ui.kEdit = false;

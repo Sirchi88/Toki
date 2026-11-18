@@ -6,7 +6,7 @@ ROOT = pathlib.Path(__file__).parent
 SRC = ROOT / 'src'
 
 html = (SRC / 'index.html').read_text(encoding='utf-8')
-for marker, name in [('/*CSS*/', 'style.css'), ('/*CORE*/', 'core.js'), ('/*FX*/', 'fx.js'), ('/*SYNC*/', 'sync.js'), ('/*REPORT*/', 'report.js'), ('/*APP*/', 'app.js')]:
+for marker, name in [('/*CSS*/', 'style.css'), ('/*CORE*/', 'core.js'), ('/*FX*/', 'fx.js'), ('/*QR*/', 'qr.js'), ('/*SYNC*/', 'sync.js'), ('/*REPORT*/', 'report.js'), ('/*APP*/', 'app.js')]:
     html = html.replace(marker, (SRC / name).read_text(encoding='utf-8').replace('</script', '<\\/script'))
 logo = 'data:image/svg+xml;base64,' + base64.b64encode((SRC / 'logo-icon.svg').read_bytes()).decode()
 html = html.replace('__LOGO__', logo)
