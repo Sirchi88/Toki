@@ -932,6 +932,16 @@ body[data-theme=noel] .notice.warn{background:rgb(217 180 94/.12);border-color:r
 .updbar{position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 10px);z-index:200;border:0;border-radius:999px;padding:10px 16px;background:var(--primary);color:var(--on-primary);font:inherit;font-weight:800;font-size:14px;box-shadow:0 8px 24px -8px rgb(0 0 0/.5);cursor:pointer;max-width:92vw}
 .docview{border:1px solid var(--primary);background:transparent;color:var(--primary);border-radius:999px;padding:3px 9px;font-size:12px;font-weight:700;cursor:pointer;margin-left:6px}
 .pdfview{width:100%;height:62vh;border:1px solid var(--border);border-radius:12px;background:#fff;margin-top:6px}
+/* Samstag-Bonus fürs Zeitkonto */
+.satb{margin-top:10px;padding:10px 12px;border-radius:12px;background:color-mix(in oklch,var(--c-zk) 12%,transparent);border:1px solid color-mix(in oklch,var(--c-zk) 35%,transparent)}
+.satb-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:13px;font-weight:700}
+.satb-h b{color:var(--c-zk);font-family:var(--font-d);font-weight:400;font-size:20px}
+.satb-bar{display:flex;height:26px;margin:8px 0 6px;border-radius:8px;overflow:hidden}
+.satb-bar i{display:flex;align-items:center;justify-content:center;min-width:44px;font-style:normal;font-size:12px;font-weight:800;color:#fff;white-space:nowrap}
+.satb-bar .b1{background:var(--c-zk)}
+.satb-bar .b2{background:repeating-linear-gradient(-45deg,#f2b632 0 7px,#ffd36e 7px 14px);color:#3a2a00;box-shadow:inset 2px 0 0 rgb(255 255 255/.6)}
+.satb-f{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 8px;font-size:11.5px;color:var(--muted)}
+.satb-f b{color:var(--fg)}
 </style>
 </head>
 <body data-theme="standard">
@@ -2982,6 +2992,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
   const LOGO = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjE1IDMgOTAgODgiPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJ0ZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzM2Yjk4MiIvPjxzdG9wIG9mZnNldD0iLjU1IiBzdG9wLWNvbG9yPSIjMmE5YzZiIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWQ3NjUwIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJ0eCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzJjOWY2YyIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzFlN2E1MSIvPjwvbGluZWFyR3JhZGllbnQ+CjxmaWx0ZXIgaWQ9InNoIiB4PSItMjAlIiB5PSItMjAlIiB3aWR0aD0iMTQwJSIgaGVpZ2h0PSIxNDAlIj48ZmVEcm9wU2hhZG93IGR4PSIwIiBkeT0iMS41IiBzdGREZXZpYXRpb249IjEuNiIgZmxvb2QtY29sb3I9IiMwMDAiIGZsb29kLW9wYWNpdHk9Ii4zNSIvPjwvZmlsdGVyPgo8ZmlsdGVyIGlkPSJpbiI+PGZlT2Zmc2V0IGR5PSIxLjIiLz48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIxIi8+PGZlQ29tcG9zaXRlIG9wZXJhdG9yPSJvdXQiIGluPSJTb3VyY2VHcmFwaGljIi8+PGZlQ29tcG9uZW50VHJhbnNmZXI+PGZlRnVuY0EgdHlwZT0ibGluZWFyIiBzbG9wZT0iLjciLz48L2ZlQ29tcG9uZW50VHJhbnNmZXI+PGZlQmxlbmQgaW4yPSJTb3VyY2VHcmFwaGljIiBtb2RlPSJub3JtYWwiLz48L2ZpbHRlcj4KPC9kZWZzPgo8ZyBmaWx0ZXI9InVybCgjc2gpIj4KPHJlY3QgeD0iMTkiIHk9IjYiIHdpZHRoPSI4MiIgaGVpZ2h0PSI4MCIgcng9IjE1IiBmaWxsPSJ1cmwoI3RnKSIvPgo8cmVjdCB4PSIxOS42IiB5PSI2LjYiIHdpZHRoPSI4MC44IiBoZWlnaHQ9Ijc4LjgiIHJ4PSIxNC40IiBmaWxsPSJub25lIiBzdHJva2U9IiM3ZmYwYmQiIHN0cm9rZS1vcGFjaXR5PSIuMjIiIHN0cm9rZS13aWR0aD0iMS4yIi8+CjwvZz4KPHBhdGggZD0iTTM3LjUgMjFIODAuNVYzNEg2NS41VjY5SDUyLjVWMzRIMzcuNVoiIGZpbGw9IiMxZDIwMjUiIGZpbHRlcj0idXJsKCNpbikiLz4KPC9zdmc+Cg==';
   /** Release Notes – neueste zuerst: [Version, Datum, Themen] */
   const RELEASES = [
+    ['2.8', '20.11.2026', ['Samstag-Bonus (25 %) fürs Zeitkonto als Balken und Zahl']],
     ['2.7', '20.11.2026', ['PDFs auf Wunsch auf dem Gerät speichern und unter „Dokumente“ anschauen']],
     ['2.6', '20.11.2026', ['Hinweis bei neuer Version – ein Tipp aktualisiert die App']],
     ['2.5', '20.11.2026', ['Dokumente zum Einklappen', 'Großer Upload-Knopf, mehrere PDFs auf einmal']],
@@ -3624,14 +3635,22 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
         <div class="kpi"><div class="k">Zeitkonto</div><div class="v num">${sH(w.zkChange)}</div></div>
       </div>
       ${zusTable(w.pay, w.mehr, w.mehrNach)}
+      ${satBonus(w.bonus, 'Samstag ins Zeitkonto')}
       <div class="days">${days}</div>
       <button class="morebtn" data-act="openWeek" data-w="${w.monday}">${open ? 'Diagramme ausblenden ▲' : 'Diagramme ▼'}</button>
       ${open && ws ? `${weekChart(w, ws)}
         ${diff !== null ? `<p class="xs muted mt-s">Mehrarbeit ggü. Vorwoche (KW ${prev.kw}): <b class="${diff > 0 ? 'pos' : diff < 0 ? 'neg' : ''}">${sH(diff)}</b></p>` : ''}
         ${w.offset > 0 ? `<p class="xs muted mt-s">${H(w.offset)} Plus dieser Woche wurden mit dem Zeitkonto-Tag verrechnet (zählen nicht als Mehrarbeit).</p>` : ''}
-        ${w.bonus > 0 ? `<p class="xs muted mt-s">Samstag ins Zeitkonto: +${H(w.bonus)} Zeitzuschlag (25 %).</p>` : ''}
 ` : ''}
     </section>`;
+  }
+  /** Samstag ins Zeitkonto: Stunden + 25 %-Bonus als Balken und Zahl */
+  function satBonus(bonus, label) {
+    if (!(bonus > 0)) return '';
+    const base = bonus / 0.25, tot = base + bonus;
+    return `<div class="satb"><div class="satb-h"><span>🎁 ${label}</span><b class="num">+${H(bonus)} Bonus</b></div>
+      <div class="satb-bar"><i class="b1" style="width:${(base / tot) * 100}%"><span>${H(base)}</span></i><i class="b2" style="width:${(bonus / tot) * 100}%"><span>+${H(bonus)}</span></i></div>
+      <div class="satb-f"><span>${H(base)} Samstag</span><span>+ ${H(bonus)} Bonus (25 %)</span><span>= <b>${H(tot)}</b> aufs Zeitkonto</span></div></div>`;
   }
   function monthCard(m) {
     const show = S().lohn.zeigen, p = m.pay;
@@ -3645,6 +3664,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
         <div class="kpi"><div class="k">Zeitkonto</div><div class="v num">${sH(m.zkChange)}</div></div>
       </div>
       ${zusTable(p, m.mehr, m.mehrNach)}
+      ${satBonus(m.bonus, 'Samstage ins Zeitkonto')}
       ${K ? `<div class="mt"><div class="xs muted">MEA-Kontingent ${H(m.used)} von ${H(K)}${m.nach ? ` · inkl. <span class="badge nach">${H(m.nach)} nachbeantragt</span>` : ''}</div><div class="progress mt-s"><i style="width:${usedPct}%"></i></div></div>` : ''}
       <p class="xs muted mt-s">${m.days} Tage erfasst · Zuschläge werden je Woche berechnet</p>
     </section>`;

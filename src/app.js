@@ -6,6 +6,7 @@
   const LOGO = '__LOGO__';
   /** Release Notes – neueste zuerst: [Version, Datum, Themen] */
   const RELEASES = [
+    ['2.8', '20.11.2026', ['Samstag-Bonus (25 %) fürs Zeitkonto als Balken und Zahl']],
     ['2.7', '20.11.2026', ['PDFs auf Wunsch auf dem Gerät speichern und unter „Dokumente“ anschauen']],
     ['2.6', '20.11.2026', ['Hinweis bei neuer Version – ein Tipp aktualisiert die App']],
     ['2.5', '20.11.2026', ['Dokumente zum Einklappen', 'Großer Upload-Knopf, mehrere PDFs auf einmal']],
@@ -648,14 +649,22 @@
         <div class="kpi"><div class="k">Zeitkonto</div><div class="v num">${sH(w.zkChange)}</div></div>
       </div>
       ${zusTable(w.pay, w.mehr, w.mehrNach)}
+      ${satBonus(w.bonus, 'Samstag ins Zeitkonto')}
       <div class="days">${days}</div>
       <button class="morebtn" data-act="openWeek" data-w="${w.monday}">${open ? 'Diagramme ausblenden ▲' : 'Diagramme ▼'}</button>
       ${open && ws ? `${weekChart(w, ws)}
         ${diff !== null ? `<p class="xs muted mt-s">Mehrarbeit ggü. Vorwoche (KW ${prev.kw}): <b class="${diff > 0 ? 'pos' : diff < 0 ? 'neg' : ''}">${sH(diff)}</b></p>` : ''}
         ${w.offset > 0 ? `<p class="xs muted mt-s">${H(w.offset)} Plus dieser Woche wurden mit dem Zeitkonto-Tag verrechnet (zählen nicht als Mehrarbeit).</p>` : ''}
-        ${w.bonus > 0 ? `<p class="xs muted mt-s">Samstag ins Zeitkonto: +${H(w.bonus)} Zeitzuschlag (25 %).</p>` : ''}
 ` : ''}
     </section>`;
+  }
+  /** Samstag ins Zeitkonto: Stunden + 25 %-Bonus als Balken und Zahl */
+  function satBonus(bonus, label) {
+    if (!(bonus > 0)) return '';
+    const base = bonus / 0.25, tot = base + bonus;
+    return `<div class="satb"><div class="satb-h"><span>🎁 ${label}</span><b class="num">+${H(bonus)} Bonus</b></div>
+      <div class="satb-bar"><i class="b1" style="width:${(base / tot) * 100}%"><span>${H(base)}</span></i><i class="b2" style="width:${(bonus / tot) * 100}%"><span>+${H(bonus)}</span></i></div>
+      <div class="satb-f"><span>${H(base)} Samstag</span><span>+ ${H(bonus)} Bonus (25 %)</span><span>= <b>${H(tot)}</b> aufs Zeitkonto</span></div></div>`;
   }
   function monthCard(m) {
     const show = S().lohn.zeigen, p = m.pay;
@@ -669,6 +678,7 @@
         <div class="kpi"><div class="k">Zeitkonto</div><div class="v num">${sH(m.zkChange)}</div></div>
       </div>
       ${zusTable(p, m.mehr, m.mehrNach)}
+      ${satBonus(m.bonus, 'Samstage ins Zeitkonto')}
       ${K ? `<div class="mt"><div class="xs muted">MEA-Kontingent ${H(m.used)} von ${H(K)}${m.nach ? ` · inkl. <span class="badge nach">${H(m.nach)} nachbeantragt</span>` : ''}</div><div class="progress mt-s"><i style="width:${usedPct}%"></i></div></div>` : ''}
       <p class="xs muted mt-s">${m.days} Tage erfasst · Zuschläge werden je Woche berechnet</p>
     </section>`;
