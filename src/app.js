@@ -6,7 +6,8 @@
   const LOGO = '__LOGO__';
   /** Release Notes – neueste zuerst: [Version, Datum, Themen] */
   const RELEASES = [
-    ['2.2', '20.11.2026', ['Entgeltabrechnung einlesen, vergleichen & daraus lernen', 'Gehalt: Jahresansicht', 'Steuer-Klärung mit Pendlerpauschale & Tarif-Tipp', 'Zeichen je Monat: Zeitnachweis / Abrechnung', 'Jahres-Statistik bei Mehrarbeit', 'Designs Light Mode, Premium Gold, Natur & Eco', 'Design als Standard merken oder nur probieren', 'Urlaub-Kacheln kompakter, FZA mit 2 Nachkommastellen', 'Demo ohne PIN, nur Rückfrage']],
+    ['2.3', '20.11.2026', ['Neues Design „Goldene Weihnacht“', 'Gehalt: Dokumente unter der Netto-Berechnung, Export klein ganz unten', 'Einstellungen: Zeitkonten & Urlaub zusammengefasst, Synchronisation Endgeräte, Steuererklärung', 'Urlaub: größere Schrift in den Kacheln']],
+    ['2.2', '20.11.2026', ['Entgeltabrechnung einlesen, vergleichen & daraus lernen', 'Gehalt: Jahresansicht', 'Steuererklärung mit Pendlerpauschale & Tarif-Tipp', 'Zeichen je Monat: Zeitnachweis / Abrechnung', 'Jahres-Statistik bei Mehrarbeit', 'Designs Light Mode, Premium Gold, Natur & Eco', 'Design als Standard merken oder nur probieren', 'Urlaub-Kacheln kompakter, FZA mit 2 Nachkommastellen', 'Demo ohne PIN, nur Rückfrage']],
     ['2.1', '19.11.2026', ['Kontingent-Karte neu: Zahl groß in der Mitte', 'Jedes Fenster mit ✕ zum Schließen', 'Zahlenfelder: 0 verschwindet beim Antippen']],
     ['2.0', '19.11.2026', ['Neue Designs „Bold Pop“ und „Doodle“ mit eigenen Schriften', 'God Mode: Mehrarbeit zur Verrechnung auszahlen', 'Release Notes', 'Seiten wackeln nicht mehr seitlich']],
     ['1.9', '18.11.2026', ['Kurzarbeit (60/67 %)', 'Konto Mehrarbeit zur Verrechnung', 'Urlaubs-Vorgriff aufs nächste Jahr, T-Zug-Sperre', 'Demo-Modus', 'Gehalt: Mehrarbeit zum Aufklappen']],
@@ -40,6 +41,7 @@
     ['werk', 'Werkhalle', 'linear-gradient(#1b222c,#39434f 70%,#20252c 70%)'],
     ['schrank', 'Schaltschrank', 'linear-gradient(#d6d9d5,#cfd2cf)'],
     ['xmas', 'Weihnachten', 'linear-gradient(#0e1a3d,#3c5a8f)'],
+    ['noel', 'Goldene Weihnacht', 'radial-gradient(90% 60% at 50% 0,rgb(212 175 95/.35),transparent 60%),linear-gradient(#0b2419,#04100b)'],
     ['fryer', 'Airfryer', 'repeating-linear-gradient(0deg,#f8e2b5 0 14px,#f1d49c 14px 16px)'],
     ['pop', 'Bold Pop', 'linear-gradient(135deg,#fff1cf 0 60%,#ffe36e 60%)'],
     ['doodle', 'Doodle', 'repeating-linear-gradient(#fbf8ef 0 9px,#dbe6f5 9px 10px)'],
@@ -267,12 +269,21 @@
   function vglTable(zeilen) {
     return `<table class="vgl"><thead><tr><th></th><th>Abrechnung</th><th>Toki</th><th>Δ</th></tr></thead><tbody>${zeilen.map((z) => { const d = z.toki - z.real; const ok = Math.abs(d) < 0.5; return `<tr><td>${z.k}${z.info ? `<br><span class="xs muted">${z.info}</span>` : ''}</td><td class="num">${nf(z.real)}</td><td class="num">${nf(z.toki)}</td><td class="num ${ok ? 'pos' : 'neg'}">${ok ? '✓' : `${d > 0 ? '+' : '−'}${nf(Math.abs(d))}`}</td></tr>`; }).join('')}</tbody></table>`;
   }
+  function docCard(m) {
+    const z = (st.nachweise || {})[m], a = (st.abrechnungen || {})[m];
+    const when = (x) => (x && x.importiert ? new Date(x.importiert).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }) : '');
+    return `<section class="card doccard"><h2>Dokumente ${MON[Number(m.slice(5, 7)) - 1]}</h2>
+      <div class="docrow"><span>🕒 Zeitnachweis</span><span class="dstate ${z ? 'ok' : ''}">${z ? `✓ eingelesen ${when(z)}` : '– fehlt'}</span></div>
+      <div class="docrow"><span>💶 Entgeltabrechnung</span><span class="dstate ${a ? 'ok' : ''}">${a ? `✓ eingelesen ${when(a)}` : '– fehlt'}</span><label class="docup">${a ? 'neu' : 'einlesen'}<input type="file" accept=".pdf,application/pdf" data-act="slipFile"></label></div>
+      ${z ? '' : '<p class="xs muted" style="margin:4px 0 0">Zeitnachweise liest du unter Einstellungen → Datentransport ein.</p>'}
+      ${slipCard(m)}</section>`;
+  }
   function slipCard(m) {
     const a = (st.abrechnungen || {})[m];
     if (!a) return '';
     const v = C.abrechnungVergleich(st, calc, a);
     const cls = S().lohn.zeigen ? '' : 'blur';
-    return `<details class="fold slipcard" ${ui.slipOpen ? 'open' : ''} data-fold="slipOpen"><summary><span>💶 Laut Abrechnung: <b class="num ${cls}">${nf(a.netto + (a.kug || 0))} €</b> netto</span>${I.chev}</summary><div class="body ${cls}">
+    return `<details class="fold slipcard mt-s" ${ui.slipOpen ? 'open' : ''} data-fold="slipOpen" style="margin-bottom:0;box-shadow:none"><summary><span>💶 Laut Abrechnung: <b class="num ${cls}">${nf(a.netto + (a.kug || 0))} €</b> netto</span>${I.chev}</summary><div class="body ${cls}">
       <div class="kpis"><div class="kpi"><div class="k">Brutto</div><div class="v num">${nf(a.brutto, 0)}</div></div><div class="kpi"><div class="k">Steuern</div><div class="v num">${nf(a.steuer, 0)}</div></div><div class="kpi"><div class="k">SV</div><div class="v num">${nf(a.sv, 0)}</div></div></div>
       ${vglTable(v.zeilen)}
       <p class="xs muted mt-s">Toki = Ansicht „Auszahlung“ (Grundlohn ${MON[Number(m.slice(5, 7)) - 1]} + Mehrarbeit/Urlaubsgeld aus dem Vormonat).${a.restzahlung ? ` Restzahlung laut Abrechnung: ${nf(a.restzahlung)} €.` : ''}</p>
@@ -285,7 +296,7 @@
     const s = S();
     const opts = [];
     if (v.grundAnders) opts.push(['grund', `Grundgehalt auf <b>${EUR(a.grund)}</b> setzen (bisher ${EUR(Number(s.lohn.grundlohn) || 0)})`]);
-    if (v.nurZuschlag && !s.lohn.mehrNurZuschlag) opts.push(['nurZ', 'Mehrarbeit wie hier rechnen: <b>nur Zuschläge</b> auszahlen, Grundstunden gehen aufs Konto Mehrarbeit zur Verrechnung']);
+    if (v.nurZuschlag && !s.lohn.mehrNurZuschlag) opts.push(['nurZ', 'Mehrarbeit wie hier rechnen: <b>nur Zuschläge</b> auszahlen (nur relevant bei Kurzarbeit, die weniger als 3 Monate vorbei ist)']);
     const korrTxt = Math.abs(v.korr) < 0.5 ? 'Steuer & Sozialversicherung rechnet Toki auf dieses Brutto praktisch genau.' : `Auf dasselbe Brutto zieht Toki <b>${nf(Math.abs(v.korr))} € ${v.korr > 0 ? 'zu viel' : 'zu wenig'}</b> ab – das gleiche ich künftig aus.`;
     sheet(`<h3>Abrechnung ${monthName(a.month)}</h3>
       <p class="small muted">Brutto ${EUR(a.brutto)} · Netto ${EUR(a.netto)}${a.mehr.h25 + a.mehr.h50 ? ` · Mehrarbeit ${H(a.mehr.h25)} à 25 %, ${H(a.mehr.h50)} à 50 %` : ''}${a.ug ? ` · Urlaubsgeld ${D1(a.ug.tage)} Tage` : ''}</p>
@@ -330,7 +341,7 @@
     if (k.zve <= k.grundfrei) tipp = `Dein zu versteuerndes Einkommen liegt unter dem Grundfreibetrag (${EUR(k.grundfrei)}) – keine Einkommensteuer.`;
     else if (k.bisGrenze > 0) tipp = `Grenzsteuersatz ca. <b>${pct(k.grenz)}</b>: von jedem zusätzlichen Euro gehen so viel an Lohnsteuer. Der <b>Spitzensteuersatz von 42 %</b> beginnt ${k.split ? '(Splitting, StKl III/IV) ' : ''}ab ${EUR(k.grenze42)} zu versteuerndem Einkommen – bei dir noch ca. <b>${EUR(k.bisGrenze)}</b> entfernt. Bis dahin steigt die Belastung mit jedem Euro langsam weiter.`;
     else tipp = `Du liegst im <b>Spitzensteuersatz (42 %)</b> – jeder zusätzliche Euro wird mit 42 % (plus ggf. Soli/KiSt) besteuert. Werbungskosten sparen hier besonders viel.`;
-    return `<h3>Steuer-Klärung</h3>
+    return `<h3>Steuererklärung</h3>
       <div class="between" style="margin:2px 0 10px"><button class="iconbtn sm" data-stk="-1">${I.left}</button><b style="font-family:var(--font-d);font-size:24px">${y}</b><button class="iconbtn sm" data-stk="1">${I.right}</button></div>
       <p class="xs muted">Alles, was Toki für deine Einkommensteuererklärung ${y} weiß (Anlage N & Vorsorgeaufwand). Maßgeblich ist die Lohnsteuerbescheinigung deines Arbeitgebers.</p>
       <div class="notice info"><div>${k.bis ? `Januar–${MON[Number(k.bis.slice(5, 7)) - 1]}: <b>exakt</b> aus den Jahreswerten deiner Abrechnung ${monthName(k.bis)}${k.bis < `${y}-12` ? `; ab ${MON[Number(k.bis.slice(5, 7))]} Toki-Rechnung${k.gj.sum.prognose ? ' (teils Prognose)' : ''}` : ''}.` : `Noch keine Abrechnung aus ${y} eingelesen – alle Werte sind Toki-Rechnung${k.gj.sum.prognose ? ' (teils Prognose)' : ''}. Lies deine letzte Abrechnung ein, dann werden die Jahreswerte exakt.`}</div></div>
@@ -912,6 +923,7 @@
     const inkl = typeof mehrG === 'object' && mehrG.inkl;
     const kurz = typeof mehrG === 'object' && mehrG.kurz ? mehrG.kurz : null;
     const kug = n.abzug < 0 ? -n.abzug : 0;
+    const afterHero = typeof mehrG === 'object' && mehrG.afterHero ? mehrG.afterHero : '';
     const korr = typeof mehrG === 'object' && mehrG.korr ? mehrG.korr : 0, korrN = typeof mehrG === 'object' ? mehrG.korrN || 0 : 0;
     mehrG = xl + xe;
     const nOhne = mehrG > 0 ? C.netto(laufend - xl, einmal - xe, S2, mo, abzug, Math.min(basis, laufend - xl)) : n;
@@ -934,6 +946,7 @@
       <div class="legend">${parts.map(([v, c, l]) => `<span><i style="background:${c}"></i>${l} ${nf(n.gross ? (v / n.gross) * 100 : 0, 0)} %</span>`).join('')}</div>
       ${note}
     </section>
+    ${afterHero}
     <section class="card"><h2>Brutto</h2>
       <dl class="money ${cls}" style="margin-top:0">${lines.map((l) => (l.sub ? `<details class="mline ${l.cls || ''}"><summary><dt>${l.k} <span class="chev">▾</span></dt><dd>${nf(l.v)} €</dd></summary><div class="msub">${l.sub}</div></details>` : `<div class="${l.cls || ''}"><dt>${l.k}</dt><dd>${nf(l.v)} €</dd></div>`)).join('')}<div class="sum"><dt>Brutto gesamt</dt><dd>${nf(n.gross)} €</dd></div></dl>
       <h2 class="mt">Abzüge</h2>
@@ -1065,14 +1078,11 @@
       yG += ml.v; yN += C.netto(p.laufend, p.einmal, s, i).net - C.netto(p.laufend - ml.v, p.einmal, s, i).net;
     }
     return `${head}
-    <div class="between" style="margin-bottom:6px"><button class="iconbtn" data-act="nmonth" data-d="-1">${I.left}</button><b class="onbg" style="font-family:var(--font-d);font-size:26px">${monthName(m)}</b><button class="iconbtn" data-act="nmonth" data-d="1">${I.right}</button></div>
-    <div class="docs">${docBadges(m, true)}<label class="docup">＋ Abrechnung<input type="file" accept=".pdf,application/pdf" data-act="slipFile"></label></div>
-    ${slipCard(m)}
+    <div class="between" style="margin-bottom:10px"><button class="iconbtn" data-act="nmonth" data-d="-1">${I.left}</button><span class="mhead"><b class="onbg" style="font-family:var(--font-d);font-size:26px">${monthName(m)}</b><span class="docs mini">${docBadges(m)}</span></span><button class="iconbtn" data-act="nmonth" data-d="1">${I.right}</button></div>
     <div class="gmode"><span class="xs onbg">${modus === 'aktuell' ? `Grundlohn + alles, was im ${MON[mo - 1]} anfällt` : `Grundlohn ${MON[mo - 1]} + Mehrarbeit, Urlaubsgeld & Sonderzahlungen aus ${MON[Number(C.prevMonth(m).slice(5, 7)) - 1]}`}</span><div class="seg mini"><button aria-pressed="${modus === 'aktuell'}" data-act="gmode" data-v="aktuell">Aktuell</button><button aria-pressed="${modus === 'auszahlung'}" data-act="gmode" data-v="auszahlung">Auszahlung</button></div></div>
-    ${nettoResult(lines, mp.laufend, mp.einmal, s, mo, mp.abzug, calc.rate, cls, note, { l: mp.extraL, e: mp.extraE, inkl: mp.lines.some((l) => l.extra && !l.mehr), basis: mp.basis, kurz: mp.kurz, korr: s.lohn.lernen ? C.lernKorrektur(st) : 0, korrN: Math.min(3, Object.keys(st.abrechnungen || {}).length) })}
-    <section class="card"><h2>Bericht exportieren</h2><p class="small muted">Alle Werte von ${monthName(m)} (${modus === 'aktuell' ? 'Aktuell' : 'Auszahlung'}) mit Statistiken zu Mehrarbeit und Arbeitszeit.</p>
-      <div class="grid2"><button class="btn" data-act="exportPdf">📄 PDF</button><button class="btn soft" data-act="exportXlsx">📊 Excel</button></div></section>
+    ${nettoResult(lines, mp.laufend, mp.einmal, s, mo, mp.abzug, calc.rate, cls, note, { l: mp.extraL, e: mp.extraE, inkl: mp.lines.some((l) => l.extra && !l.mehr), basis: mp.basis, kurz: mp.kurz, korr: s.lohn.lernen ? C.lernKorrektur(st) : 0, korrN: Math.min(3, Object.keys(st.abrechnungen || {}).length), afterHero: docCard(m) })}
     ${yG > 0 ? `<section class="card"><h2>Mehrarbeit ${y}</h2><dl class="money ${cls}" style="margin-top:0"><div><dt>Mehrarbeit brutto</dt><dd>${nf(yG)} €</dd></div><div class="sum"><dt>davon netto ca.</dt><dd>${nf(yN)} €</dd></div></dl></section>` : ''}
+    <div class="exportmini"><span>Bericht ${monthName(m)}</span><button class="btn sm ghost" data-act="exportPdf">PDF</button><button class="btn sm ghost" data-act="exportXlsx">Excel</button></div>
     ${foot(s)}`;
   }
 
@@ -1173,7 +1183,7 @@
       <div class="subh">🌴 Urlaubsgeld je Tarifurlaubstag</div>
       <div class="grid3">${fld('Faktor', 'urlaub.ugFaktor', deNum(s.urlaub.ugFaktor), 'inputmode="decimal"')}${fld('Teiler', 'urlaub.ugTeiler', deNum(s.urlaub.ugTeiler), 'inputmode="decimal"')}<div><span class="label">pro Tag</span><div class="field calc num" id="ugTag">${nf((C.monatsentgelt(s) / (Number(s.urlaub.ugTeiler) || 21.75)) * (Number(s.urlaub.ugFaktor) || 0))} €</div></div></div>
       <div class="hint">Grundlohn ÷ Teiler × Faktor</div>`)}
-    ${sec('mehrarbeit', 'Mehrarbeit & Zeitkonto', `<div class="grid2">${fld(`Zeitkonto-Stand (h) ${info('zk')}`, 'zk.stand', deNum(s.zk.stand), 'inputmode="decimal"')}<div><label class="label">Stand vom</label><input class="field" type="date" data-set="zk.datum" value="${esc(s.zk.datum)}"></div></div>
+    ${sec('mehrarbeit', 'Zeitkonten & Urlaub', `<div class="subh" style="margin-top:0">⏱️ Zeitkonto & FZA</div><div class="grid2">${fld(`Zeitkonto-Stand (h) ${info('zk')}`, 'zk.stand', deNum(s.zk.stand), 'inputmode="decimal"')}<div><label class="label">Stand vom</label><input class="field" type="date" data-set="zk.datum" value="${esc(s.zk.datum)}"></div></div>
       <div class="notice info">${zkInfo}</div>
       <div class="grid2 mt">${fld('Maximum (h)', 'zk.max', deNum(s.zk.max), 'inputmode="decimal"')}${fld('Minimum (h)', 'zk.min', deNum(s.zk.min), 'inputmode="decimal"')}</div>
       ${sw('Samstag-Zuschlag 25 % fürs Zeitkonto', 'zk.samstagBonus', s.zk.samstagBonus, 'Samstagsstunden, die ins Zeitkonto laufen, zählen ×1,25')}
@@ -1184,8 +1194,8 @@
       <div class="subh">📉 Kurzarbeit</div>
       ${sw('Kurzarbeit', 'kurz.aktiv', s.kurz.aktiv, 'Dann kannst du Kurzarbeit in der Urlaubsplanung eintragen')}
       ${s.kurz.aktiv ? `<div><label class="label">Für welchen Monat?</label>${monthSel('kurz.monat', s.kurz.monat, shiftMonth(C.ym(today), -12), 25)}${!s.kurz.monat ? '<div class="hint neg">Bitte den Monat angeben – erst dann lässt sich Kurzarbeit eintragen.</div>' : ''}</div>
-      <div class="hint">Je Kurzarbeitstag: ${Number(s.steuer.kinderFB) >= 0.5 ? '67 %' : '60 %'} vom Tagesgehalt (${nf(C.stundenlohn(s) * C.tagessoll(s))} €) – 67 % ab einem Kinderfreibetrag von 0,5. Steht auf dem Konto Mehrarbeit zur Verrechnung noch mindestens 7 h, werden stattdessen 7 h davon genommen.</div>` : ''}`)}
-    ${sec('urlaub', 'Urlaub & Konten', `<div class="between"><span class="label" style="margin:0">Jahr wählen ${info('urlaubsjahr')}</span></div>
+      <div class="hint">Je Kurzarbeitstag: ${Number(s.steuer.kinderFB) >= 0.5 ? '67 %' : '60 %'} vom Tagesgehalt (${nf(C.stundenlohn(s) * C.tagessoll(s))} €) – 67 % ab einem Kinderfreibetrag von 0,5. Steht auf dem Konto Mehrarbeit zur Verrechnung noch mindestens 7 h, werden stattdessen 7 h davon genommen.</div>` : ''}
+      <div class="subh">🌴 Urlaub</div><div class="between"><span class="label" style="margin:0">Jahr wählen ${info('urlaubsjahr')}</span></div>
       <div class="minirow mt-s">${[curY - 1, curY, curY + 1, curY + 2].map((yy) => `<button class="chip" aria-pressed="${yy === Y}" data-act="setYear" data-y="${yy}">${yy}</button>`).join('')}</div>
       <div class="ybox mt">
         <div class="grid2">${fld(`Tarifurlaub ${Y} (Tage)`, `urlaub.jahre.${Y}.tarif`, deNum(jc.tarif ?? ''), `inputmode="decimal" placeholder="z. B. ${s.urlaub.tarifTage}"`)}${fld(`T-Zug ${Y} (Tage)`, `urlaub.jahre.${Y}.tzug`, deNum(jc.tzug ?? ''), `inputmode="decimal" placeholder="z. B. ${s.urlaub.tzugTage}"`)}</div>
@@ -1207,9 +1217,9 @@
       ${sw('Kirchensteuer', 'steuer.kirche', s.steuer.kirche)}${sw('Freiwillig gesetzlich versichert', 'steuer.freiwillig', s.steuer.freiwillig, 'Einkommen über der Versicherungspflichtgrenze: Beitrag wird abgeführt, Arbeitgeber zahlt Zuschuss – unterm Strich gleich, Anzeige wie auf deiner Abrechnung')}
       ${!s.steuer.geprueft ? '<button class="btn soft sm" data-act="steuerOk">✓ Angaben stimmen so</button>' : '<p class="xs muted">✓ Steuerdaten geprüft</p>'}
       ${sw('Aus Abrechnungen lernen', 'lohn.lernen', s.lohn.lernen, 'Gleicht die Abweichung bei Steuer & SV aus deinen eingelesenen Entgeltabrechnungen aus')}
-      ${sw('Mehrarbeit: nur Zuschläge auszahlen', 'lohn.mehrNurZuschlag', s.lohn.mehrNurZuschlag, 'Grundstunden gehen aufs Konto Mehrarbeit zur Verrechnung – so steht es z. B. in deiner Abrechnung')}
-      <button class="btn mt" data-act="steuerKlaerung">🧾 Steuer-Klärung</button>`)}
-    ${sec('konto', `${Sync.code ? '☁ ' : ''}Handy ↔ Laptop (Sync)${Sync.code ? ` <span class="syncdot ${sync.status}"></span>` : ''}`, '<div id="syncinfo">' + syncInfoHtml() + '</div>')}
+      ${sw('Mehrarbeit: nur Zuschläge auszahlen', 'lohn.mehrNurZuschlag', s.lohn.mehrNurZuschlag, 'Nur relevant bei Kurzarbeit, die weniger als 3 Monate vorbei ist: dann werden nur die Zuschläge ausgezahlt, die Grundstunden gehen aufs Konto Mehrarbeit zur Verrechnung.')}
+      <button class="btn mt" data-act="steuerKlaerung">🧾 Steuererklärung</button>`)}
+    ${sec('konto', `${Sync.code ? '☁ ' : ''}Synchronisation Endgeräte${Sync.code ? ` <span class="syncdot ${sync.status}"></span>` : ''}`, '<div id="syncinfo">' + syncInfoHtml() + '</div>')}
     ${sec('daten', 'Datentransport', `<p class="small muted">Deine Daten liegen nur in diesem Browser auf diesem Gerät. Für Handy ↔ PC: hier exportieren und am anderen Gerät importieren.</p>
       <div class="grid2"><button class="btn" data-act="export">Exportieren</button><label class="btn soft" style="position:relative">Importieren<input type="file" accept=".json,application/json" data-act="importFile" style="position:absolute;inset:0;opacity:0"></label></div>
       <button class="btn ghost mt-s" data-act="importPaste">Aus Text einfügen</button>
@@ -1373,7 +1383,7 @@
     godManualOff: () => { const g = { ...godDefaults(), ...(st.pref.god || {}) }; g.manuell = ''; st.pref.god = g; save(); render(); },
     godReset: () => { st.pref.god = godDefaults(); save(); render(); },
     godCalc: () => { render(); toast('✓ Berechnet'); },
-    goSet: (t) => { ui.setOpen = t.dataset.sec; setTab('einstellungen'); },
+    goSet: (t) => { ui.setOpen = t.dataset.sec === 'urlaub' ? 'mehrarbeit' : t.dataset.sec; setTab('einstellungen'); },
     theme: (t) => {
       const id = t.dataset.id;
       if (id === S().theme && !ui.tryTheme) return;

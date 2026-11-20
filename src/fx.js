@@ -37,6 +37,15 @@ const FX = (() => {
   const STEAM = `<svg viewBox="0 0 30 50" width="100%"><path d="M10 48c-8-10 8-14 0-24S8 6 14 2M20 48c-8-10 8-14 0-24" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" opacity=".8"/></svg>`;
 
   const css = `
+  .fx-bulb{animation:fx-bulb 2.2s ease-in-out infinite alternate;filter:drop-shadow(0 0 6px currentColor)}
+  @keyframes fx-bulb{from{opacity:.35}to{opacity:1}}
+  .fx-bokeh{position:absolute;--w:auto;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#ffe19a,rgb(212 175 95/0) 70%);animation:fx-glim 5s ease-in-out infinite alternate}
+  @keyframes fx-glim{from{transform:scale(.7);filter:blur(1px)}to{transform:scale(1.15);filter:blur(2px)}}
+  .fx-hang{position:absolute;top:0;width:46px;transform-origin:50% 0;animation:fx-swing 4.5s ease-in-out infinite alternate}
+  .fx-hang span{display:block;width:1.5px;height:var(--len);margin:0 auto;background:linear-gradient(#c9a14a,#7a5d24)}
+  .fx-hang svg{display:block;width:46px;margin-top:-4px;filter:drop-shadow(0 6px 8px rgb(0 0 0/.5))}
+  @keyframes fx-swing{from{rotate:-5deg}to{rotate:5deg}}
+  @media (prefers-reduced-motion:reduce){.fx-bulb,.fx-bokeh,.fx-hang{animation:none}}
   .fx-pop{position:absolute;animation:fx-bob 7s ease-in-out infinite alternate}
   @keyframes fx-bob{from{translate:0 0;rotate:0deg}to{translate:0 14px;rotate:var(--r,6deg)}}
   .fx-buddy{animation:fx-hop 3.2s ease-in-out infinite}
@@ -361,6 +370,56 @@ const FX = (() => {
   function gold(back) {
     back.style.background = 'radial-gradient(120% 60% at 80% -10%,rgb(212 175 95/.14),transparent 60%),radial-gradient(90% 50% at -10% 110%,rgb(212 175 95/.08),transparent 60%),#0b0b0c';
   }
+
+  // ---------- Goldene Weihnacht: dunkel, edel, verspielt ----------
+  const BAUBLE = (c1, c2, id) => `<svg viewBox="0 0 60 80"><defs><radialGradient id="bb${id}" cx="35%" cy="55%" r="65%"><stop offset="0" stop-color="${c2}"/><stop offset=".55" stop-color="${c1}"/><stop offset="1" stop-color="#1a0a06"/></radialGradient></defs>
+    <rect x="23" y="10" width="14" height="9" rx="2" fill="#c9a14a"/><path d="M27 10 Q30 2 33 10" fill="none" stroke="#c9a14a" stroke-width="2"/>
+    <circle cx="30" cy="46" r="27" fill="url(#bb${id})"/><path d="M8 42 Q30 52 52 42" fill="none" stroke="#e6c97f" stroke-width="2" opacity=".8"/><path d="M6 50 Q30 60 54 50" fill="none" stroke="#e6c97f" stroke-width="1.2" stroke-dasharray="2 3" opacity=".7"/>
+    <ellipse cx="21" cy="36" rx="6" ry="9" fill="#fff" opacity=".22" transform="rotate(25 21 36)"/></svg>`;
+  function noel(back, front) {
+    back.style.background = 'radial-gradient(120% 70% at 50% -10%,rgb(212 175 95/.16),transparent 55%),radial-gradient(80% 50% at 100% 100%,rgb(150 25 35/.22),transparent 60%),linear-gradient(#071a12,#04100b 60%,#030b08)';
+    let html = '';
+    // Lichterkette oben
+    const W = 1000, bulbs = [];
+    for (let i = 0; i <= 24; i++) { const x = (i / 24) * W, y = 26 + Math.sin((i / 24) * Math.PI * 3) * 12 + (i % 2 ? 6 : 0); bulbs.push([x, y]); }
+    const cols = ['#ffd36e', '#ff4b4b', '#7dff9a', '#fff4d6', '#ffb347'];
+    html += `<svg viewBox="0 0 ${W} 70" preserveAspectRatio="none" style="position:absolute;left:0;top:0;width:100%;height:58px"><path d="M0 18 ${bulbs.map(([x, y]) => `L${x} ${y - 6}`).join(' ')}" fill="none" stroke="#2b3a2f" stroke-width="2"/>${bulbs.map(([x, y], i) => `<ellipse class="fx-bulb" cx="${x}" cy="${y + 4}" rx="6" ry="9" fill="${cols[i % cols.length]}" style="animation-delay:${(i % 5) * 0.4}s;color:${cols[i % cols.length]}"/>`).join('')}</svg>`;
+    // Goldener Bokeh-Schimmer
+    for (let i = 0; i < 26; i++) html += `<i class="fx-bokeh" style="left:${rnd(0, 100)}%;top:${rnd(8, 92)}%;width:${rnd(6, 26)}px;height:var(--w);animation-delay:${rnd(0, 6)}s;opacity:${rnd(.15, .45)}"></i>`;
+    // Hängende Kugeln
+    html += `<div class="fx-hang" style="left:4vw;--len:72px;animation-delay:-1s"><span></span>${BAUBLE('#9e1b2a', '#ff6b6b', 'a')}</div>`;
+    html += `<div class="fx-hang" style="right:6vw;--len:120px;animation-delay:-2.4s"><span></span>${BAUBLE('#a07a2c', '#ffe19a', 'b')}</div>`;
+    html += `<div class="fx-hang" style="right:26vw;--len:44px;animation-delay:-.6s;transform:scale(.7)"><span></span>${BAUBLE('#1f6b45', '#7dd6a0', 'c')}</div>`;
+    // Tannenzweige unten
+    html += `<svg viewBox="0 0 400 120" preserveAspectRatio="none" style="position:absolute;left:0;bottom:0;width:100%;height:16vh;opacity:.9"><path d="M0 120 L0 60 Q30 40 60 70 Q80 30 120 66 Q150 44 180 76 Q200 50 230 80 Q260 46 300 72 Q330 40 360 70 Q385 52 400 64 L400 120Z" fill="#0b2a1b"/><path d="M0 120 L0 86 Q40 66 80 92 Q120 70 160 96 Q200 74 240 98 Q280 72 320 96 Q360 76 400 92 L400 120Z" fill="#06180f"/>
+      ${[40, 120, 210, 300, 370].map((x, i) => `<circle cx="${x}" cy="${78 + (i % 2) * 8}" r="5" fill="${['#c9a14a', '#b3202f', '#e6c97f', '#b3202f', '#c9a14a'][i]}"/>`).join('')}</svg>`;
+    back.innerHTML = html;
+    // sanfter Schnee
+    front.innerHTML = '<canvas style="position:absolute;inset:0;width:100%;height:100%"></canvas>';
+    const cv = front.querySelector('canvas'), ctx = cv.getContext('2d');
+    let Wd, Hd, flakes;
+    const size = () => {
+      const dpr = Math.min(2, window.devicePixelRatio || 1); Wd = window.innerWidth; Hd = window.innerHeight;
+      cv.width = Wd * dpr; cv.height = Hd * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      flakes = Array.from({ length: Math.min(90, Math.round((Wd * Hd) / 11000)) }, () => ({ x: rnd(0, Wd), y: rnd(-Hd, Hd), r: rnd(.8, 2.6), vy: rnd(.3, .9), ph: rnd(0, 6.28) }));
+    };
+    const frame = () => {
+      ctx.clearRect(0, 0, Wd, Hd);
+      for (const f of flakes) {
+        f.y += f.vy; f.ph += 0.015; f.x += Math.sin(f.ph) * 0.35;
+        if (f.y > Hd + 5) { f.y = -5; f.x = rnd(0, Wd); }
+        ctx.globalAlpha = 0.55 + f.r / 7; ctx.fillStyle = f.r > 2.2 ? '#f3e2b0' : '#fff';
+        ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, 6.283); ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      raf = requestAnimationFrame(frame);
+    };
+    size();
+    const onR = () => size();
+    window.addEventListener('resize', onR);
+    cleanup.push(() => window.removeEventListener('resize', onR));
+    if (!reduce()) raf = requestAnimationFrame(frame);
+  }
   function set(theme) {
     ensureStyle();
     stop();
@@ -368,6 +427,7 @@ const FX = (() => {
     back.innerHTML = ''; back.style.background = ''; front.innerHTML = '';
     if (theme === 'arena') arena(back, front);
     else if (theme === 'xmas') xmas(back, front);
+    else if (theme === 'noel') noel(back, front);
     else if (theme === 'fryer') fryer(back);
     else if (theme === 'neon') neon(back);
     else if (theme === 'pop') pop(back);
@@ -387,6 +447,7 @@ const FX = (() => {
     werk: '<div style="position:absolute;left:0;right:0;top:0;height:6px;background:repeating-linear-gradient(90deg,#f2c200 0 8px,#1b1b1b 8px 16px)"></div><div style="position:absolute;left:10px;bottom:6px;width:46px;height:30px;border-radius:4px;background:#d9dde2"><div style="margin:5px;width:22px;height:16px;border-radius:2px;background:#0d141c;box-shadow:inset 0 -6px 10px #ffd36b88"></div></div>',
     schrank: '<div style="position:absolute;inset:6px 8px auto;height:8px;background:#b9bdb8;border-radius:2px"></div><div style="position:absolute;left:10px;top:20px;display:flex;gap:2px">' + ['#8c9196', '#8c9196', '#3c6fd1', '#e6c229', '#8c9196'].map((c) => `<i style="display:block;width:7px;height:22px;border-radius:1px;background:${c}"></i>`).join('') + '</div><div style="position:absolute;right:10px;bottom:6px;width:22px;height:22px;border-radius:50%;background:#f2c200;display:grid;place-items:center"><i style="display:block;width:14px;height:14px;border-radius:50%;background:#c4161c"></i></div>',
     pop: '<div style="position:absolute;right:-14px;top:-14px;width:46px;height:46px;border-radius:50%;background:#ff2e88;border:3px solid #121212"></div><div style="position:absolute;left:10px;bottom:-8px;width:30px;height:30px;background:#2d5bff;border:3px solid #121212;transform:rotate(18deg)"></div><div style="position:absolute;left:12px;top:10px;font:22px \'Toki Archivo\',Impact,sans-serif;color:#121212;background:linear-gradient(transparent 55%,#ffe36e 55%)">POP!</div>',
+    noel: `<div style="position:absolute;left:14px;top:-2px;width:26px">${BAUBLE('#9e1b2a', '#ff6b6b', 'pa')}</div><div style="position:absolute;right:16px;top:6px;width:20px">${BAUBLE('#a07a2c', '#ffe19a', 'pb')}</div><div style="position:absolute;left:0;right:0;bottom:6px;text-align:center;font:italic 600 19px 'Toki PlayfairI',Georgia,serif;color:#e6c97f">Frohe Weihnacht</div>`,
     doodle: `<div style="position:absolute;right:6px;bottom:-6px;width:40px">${BUDDY}</div><div style="position:absolute;left:10px;top:8px;width:26px;opacity:.7">${DOODLES.sun}</div>`,
     dark: '<div style="position:absolute;left:10px;top:12px;right:40%;height:8px;border-radius:4px;background:#3a3c42"></div><div style="position:absolute;left:10px;top:26px;right:55%;height:8px;border-radius:4px;background:#8fd1c1"></div>',
   }[id] || '');

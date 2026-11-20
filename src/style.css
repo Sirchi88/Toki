@@ -844,3 +844,54 @@ dl.money .msub dt{font-size:12.5px;color:var(--muted)}
 dl.money .msub dd{font-size:15px;font-weight:700;margin:0}
 /* Netto Grundgehalt / Mehrarbeit größer */
 .nsplit b{font-size:clamp(22px,7vw,28px)}
+/* Urlaub-Kacheln: größere Schrift */
+.bal .tn{font-size:13.5px}
+.bal .v{font-size:clamp(25px,7.6vw,31px)}
+.bal .v small{font-size:13px}
+/* Gehalt: Dokumente & Export */
+.mhead{display:flex;flex-direction:column;align-items:center;gap:2px}
+.doccard h2{margin-bottom:6px}
+.docrow{display:flex;align-items:center;gap:8px;padding:7px 0;border-top:1px solid var(--border);font-size:14px;font-weight:600}
+.docrow>span:first-child{flex:1}
+.dstate{font-size:12px;color:var(--muted)}.dstate.ok{color:var(--success);font-weight:700}
+.exportmini{display:flex;align-items:center;justify-content:center;gap:8px;margin:4px 0 12px;font-size:12px;color:var(--onbg,var(--muted));opacity:.85}
+.exportmini .btn.sm{height:30px;min-height:30px;padding:0 12px;font-size:12px;width:auto}
+
+/* =====================================================================
+   Design „Goldene Weihnacht“ – dunkel, edel, verspielt
+   ===================================================================== */
+@font-face{font-family:'Toki Playfair';src:url(__FONT_playfair-700__) format('woff');font-weight:100 900;font-display:swap}
+@font-face{font-family:'Toki PlayfairI';src:url(__FONT_playfair-italic-600__) format('woff');font-weight:100 900;font-style:normal;font-display:swap}
+body[data-theme=noel]{color-scheme:dark;--bg:#04100b;--card:rgb(10 34 24/.86);--fg:#f6ecd6;--muted:#b9ab8a;--primary:#d9b45e;--on-primary:#1c1306;--secondary:rgb(255 255 255/.05);--accent:rgb(179 32 47/.32);--border:rgb(217 180 94/.3);
+  --success:#8fd6a5;--danger:#ff6b6b;--warn:#f2c46b;--onbg:#f6ecd6;--c-zk:#d9b45e;--c-tarif:#e0573f;--c-krank:#ff5a5a;
+  --radius:20px;--shadow:0 0 0 1px rgb(217 180 94/.08),0 16px 34px -16px rgb(0 0 0/.9);
+  --font-d:'Toki Playfair',Georgia,serif;--font-b:'Toki Manrope',system-ui,sans-serif}
+body[data-theme=noel] #app{padding-top:calc(env(safe-area-inset-top) + 48px)}
+body[data-theme=noel] h1{font-family:'Toki PlayfairI',Georgia,serif;font-weight:400;font-size:46px;letter-spacing:0;color:#f3e2b0;text-shadow:0 2px 18px rgb(217 180 94/.35)}
+body[data-theme=noel] h1::after{content:'✦';font-size:.42em;margin-left:8px;color:#d9b45e;vertical-align:super}
+body[data-theme=noel] .brand span{font-family:var(--font-d);letter-spacing:.14em;color:#f3e2b0}
+body[data-theme=noel] .card,body[data-theme=noel] details.fold{border:1px solid rgb(217 180 94/.32);background:linear-gradient(160deg,rgb(16 46 32/.92),rgb(6 22 15/.92));backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);position:relative;overflow:hidden}
+body[data-theme=noel] .card::before{content:'';position:absolute;top:0;right:22px;width:14px;height:100%;background:linear-gradient(90deg,rgb(179 32 47/.0),rgb(179 32 47/.55) 30% 70%,rgb(179 32 47/0));opacity:.55;pointer-events:none}
+body[data-theme=noel] .card:nth-of-type(odd)::before{right:auto;left:22px;background:linear-gradient(90deg,rgb(217 180 94/0),rgb(217 180 94/.35) 30% 70%,rgb(217 180 94/0))}
+body[data-theme=noel] .card>*{position:relative}
+body[data-theme=noel] .card h2{font-family:'Toki PlayfairI',Georgia,serif;font-weight:400;font-size:19px;text-transform:none;letter-spacing:.01em;color:#e6c97f}
+body[data-theme=noel] .card h3,body[data-theme=noel] .sheet h3{font-family:'Toki PlayfairI',Georgia,serif;font-weight:400;color:#f3e2b0}
+body[data-theme=noel] .field,body[data-theme=noel] .datebtn{background:rgb(0 0 0/.28);border-color:rgb(217 180 94/.32);color:#f6ecd6}
+body[data-theme=noel] .worked{background:radial-gradient(120% 140% at 50% 0,rgb(179 32 47/.55),rgb(70 10 18/.75));border:1px solid rgb(217 180 94/.45)}
+body[data-theme=noel] .worked .v,body[data-theme=noel] .tile .v,body[data-theme=noel] .amp .v,body[data-theme=noel] .big-r,body[data-theme=noel] .hero .v,body[data-theme=noel] .kpi .v,body[data-theme=noel] .bal .v,body[data-theme=noel] .ktrio b,body[data-theme=noel] .field.big{color:#f0d48a}
+body[data-theme=noel] .worked .k{color:#f6dcdc}
+body[data-theme=noel] .amp,body[data-theme=noel] .tile,body[data-theme=noel] .kpi,body[data-theme=noel] .bal .b{background:rgb(0 0 0/.25);border:1px solid rgb(217 180 94/.25)}
+body[data-theme=noel] .btn:not(.ghost):not(.soft):not(.danger){background:linear-gradient(100deg,#8a6a2a,#e8cd86 45%,#b38c3e 75%,#8a6a2a);color:#1c1306;border:0;font-weight:800;letter-spacing:.02em}
+body[data-theme=noel] .btn.soft{background:rgb(179 32 47/.35);color:#f6ecd6;border:1px solid rgb(217 180 94/.3)}
+body[data-theme=noel] .btn.ghost{border-color:rgb(217 180 94/.45);color:#e6c97f}
+body[data-theme=noel] .seg{background:rgb(0 0 0/.3);border:1px solid rgb(217 180 94/.25)}
+body[data-theme=noel] .seg button[aria-pressed=true]{background:#8f1b28;color:#fff3d6;box-shadow:inset 0 0 0 1px rgb(217 180 94/.45)}
+body[data-theme=noel] .progress i{background:repeating-linear-gradient(-45deg,#b3202f 0 8px,#f3e2b0 8px 16px)}
+body[data-theme=noel] .chart .c b{background:#b3202f}body[data-theme=noel] .chart .c b.zk{background:#d9b45e}
+body[data-theme=noel] .ktrio .mid{background:rgb(179 32 47/.35);border:1px solid rgb(217 180 94/.3)}
+body[data-theme=noel] nav.tabs .in{background:rgb(6 22 15/.92);border:1px solid rgb(217 180 94/.35);border-radius:24px;box-shadow:0 -6px 30px -12px rgb(217 180 94/.35)}
+body[data-theme=noel] nav.tabs button{color:#b9ab8a}
+body[data-theme=noel] nav.tabs button[aria-current=page]{background:linear-gradient(#8f1b28,#6a1220);color:#fff3d6;box-shadow:inset 0 0 0 1px rgb(217 180 94/.5)}
+body[data-theme=noel] .sheet{background:linear-gradient(#0c2a1c,#06170f);border-top:1px solid rgb(217 180 94/.4)}
+body[data-theme=noel] .toast{background:#0c2a1c;color:#f3e2b0;border:1px solid rgb(217 180 94/.5)}
+body[data-theme=noel] .notice.warn{background:rgb(217 180 94/.12);border-color:rgb(217 180 94/.4)}
