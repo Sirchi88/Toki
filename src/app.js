@@ -6,6 +6,7 @@
   const LOGO = '__LOGO__';
   /** Release Notes – neueste zuerst: [Version, Datum, Themen] */
   const RELEASES = [
+    ['2.5', '20.11.2026', ['Dokumente zum Einklappen', 'Großer Upload-Knopf, mehrere PDFs auf einmal']],
     ['2.4', '20.11.2026', ['Urlaub-Kacheln nur noch mit dem Wichtigsten', 'Gehalt: ein Einlesen-Knopf erkennt Zeitnachweis oder Abrechnung', 'Größere Monatsnamen, kräftigere Dokument-Zeichen']],
     ['2.3', '20.11.2026', ['Neues Design „Goldene Weihnacht“', 'Gehalt: Dokumente unter der Netto-Berechnung, Export klein ganz unten', 'Einstellungen: Zeitkonten & Urlaub zusammengefasst, Synchronisation Endgeräte, Steuererklärung', 'Urlaub: größere Schrift in den Kacheln']],
     ['2.2', '20.11.2026', ['Entgeltabrechnung einlesen, vergleichen & daraus lernen', 'Gehalt: Jahresansicht', 'Steuererklärung mit Pendlerpauschale & Tarif-Tipp', 'Zeichen je Monat: Zeitnachweis / Abrechnung', 'Jahres-Statistik bei Mehrarbeit', 'Designs Light Mode, Premium Gold, Natur & Eco', 'Design als Standard merken oder nur probieren', 'Urlaub-Kacheln kompakter, FZA mit 2 Nachkommastellen', 'Demo ohne PIN, nur Rückfrage']],
@@ -256,7 +257,12 @@
     document.body.appendChild(s);
     onMount && onMount(s.firstElementChild);
   }
-  function closeSheet() { const s = document.getElementById('scrim'); if (s) s.remove(); if (sheetOnClose) { const f = sheetOnClose; sheetOnClose = null; f(); } }
+  function closeSheet() {
+    const s = document.getElementById('scrim'); if (s) s.remove(); if (sheetOnClose) { const f = sheetOnClose; sheetOnClose = null; f(); }
+    // Mehrfach-Upload: nächstes Dokument, sobald das Fenster zu ist
+    if (docQueue.length) setTimeout(() => { if (!document.getElementById('scrim') && docQueue.length) docImport(docQueue.shift()); }, 250);
+  }
+  const docQueue = [];
   function confirmBox(title, text, okLabel, onOk, danger = true) {
     sheet(`<h3>${esc(title)}</h3><p class="muted">${text}</p><div class="grid2 mt"><button class="btn ghost" data-act="close">Abbrechen</button><button class="btn ${danger ? 'danger' : ''}" id="okb">${esc(okLabel)}</button></div>`,
       (el) => el.querySelector('#okb').addEventListener('click', () => { closeSheet(); onOk(); }));
@@ -273,11 +279,12 @@
   function docCard(m) {
     const z = (st.nachweise || {})[m], a = (st.abrechnungen || {})[m];
     const when = (x) => (x && x.importiert ? new Date(x.importiert).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }) : '');
-    return `<section class="card doccard"><h2>Dokumente ${MON[Number(m.slice(5, 7)) - 1]}</h2>
+    return `<details class="fold doccard" ${ui.docOpen === false ? '' : 'open'} data-fold="docOpen"><summary><span>Dokumente ${MON[Number(m.slice(5, 7)) - 1]} <span class="docs mini" style="display:inline-flex;vertical-align:middle">${docBadges(m)}</span></span>${I.chev}</summary><div class="body">
       <div class="docrow"><span>🕒 Zeitnachweis</span><span class="dstate ${z ? 'ok' : ''}">${z ? `✓ eingelesen ${when(z)}` : '– fehlt'}</span></div>
       <div class="docrow"><span>💶 Entgeltabrechnung</span><span class="dstate ${a ? 'ok' : ''}">${a ? `✓ eingelesen ${when(a)}` : '– fehlt'}</span></div>
-      <label class="btn soft sm docbtn">📄 Einlesen<input type="file" accept=".pdf,application/pdf" data-act="docFile"></label>
-      ${slipCard(m)}</section>`;
+      <label class="btn docbtn">⬆ Upload<input type="file" accept=".pdf,application/pdf" multiple data-act="docFile"></label>
+      <p class="xs muted docnote">Monat und Art (Zeitnachweis oder Abrechnung) werden automatisch erkannt. Mehrere PDFs auf einmal möglich – sie kommen nacheinander zur Prüfung.</p>
+      ${slipCard(m)}</div></details>`;
   }
   function slipCard(m) {
     const a = (st.abrechnungen || {})[m];
@@ -1549,7 +1556,11 @@
       else { const g = { ...godDefaults(), ...(st.pref.god || {}) }; g.kasse = name; if (k) g.kvZusatz = k[1]; else if (!name) g.kvZusatz = 2.9; st.pref.god = g; }
       save(); render(); return;
     }
-    if (t.dataset.act === 'docFile') { const f = t.files && t.files[0]; if (f) f.arrayBuffer().then(docImport); t.value = ''; return; }
+    if (t.dataset.act === 'docFile') {
+      const fs = [...(t.files || [])]; t.value = '';
+      if (fs.length) Promise.all(fs.map((f) => f.arrayBuffer())).then((bufs) => { docQueue.push(...bufs.slice(1)); docImport(bufs[0]); });
+      return;
+    }
     if (t.dataset.act === 'slipFile') { const f = t.files && t.files[0]; if (f) f.arrayBuffer().then(slipImport); t.value = ''; return; }
     if (t.dataset.act === 'pdfFile') { const f = t.files && t.files[0]; if (f) f.arrayBuffer().then(pdfImport); t.value = ''; return; }
     if (t.dataset.act === 'importFile') { const f = t.files && t.files[0]; if (f) f.text().then(doImport); t.value = ''; return; }
