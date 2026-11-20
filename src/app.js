@@ -6,6 +6,7 @@
   const LOGO = '__LOGO__';
   /** Release Notes – neueste zuerst: [Version, Datum, Themen] */
   const RELEASES = [
+    ['2.4', '20.11.2026', ['Urlaub-Kacheln nur noch mit dem Wichtigsten', 'Gehalt: ein Einlesen-Knopf erkennt Zeitnachweis oder Abrechnung', 'Größere Monatsnamen, kräftigere Dokument-Zeichen']],
     ['2.3', '20.11.2026', ['Neues Design „Goldene Weihnacht“', 'Gehalt: Dokumente unter der Netto-Berechnung, Export klein ganz unten', 'Einstellungen: Zeitkonten & Urlaub zusammengefasst, Synchronisation Endgeräte, Steuererklärung', 'Urlaub: größere Schrift in den Kacheln']],
     ['2.2', '20.11.2026', ['Entgeltabrechnung einlesen, vergleichen & daraus lernen', 'Gehalt: Jahresansicht', 'Steuererklärung mit Pendlerpauschale & Tarif-Tipp', 'Zeichen je Monat: Zeitnachweis / Abrechnung', 'Jahres-Statistik bei Mehrarbeit', 'Designs Light Mode, Premium Gold, Natur & Eco', 'Design als Standard merken oder nur probieren', 'Urlaub-Kacheln kompakter, FZA mit 2 Nachkommastellen', 'Demo ohne PIN, nur Rückfrage']],
     ['2.1', '19.11.2026', ['Kontingent-Karte neu: Zahl groß in der Mitte', 'Jedes Fenster mit ✕ zum Schließen', 'Zahlenfelder: 0 verschwindet beim Antippen']],
@@ -274,8 +275,8 @@
     const when = (x) => (x && x.importiert ? new Date(x.importiert).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }) : '');
     return `<section class="card doccard"><h2>Dokumente ${MON[Number(m.slice(5, 7)) - 1]}</h2>
       <div class="docrow"><span>🕒 Zeitnachweis</span><span class="dstate ${z ? 'ok' : ''}">${z ? `✓ eingelesen ${when(z)}` : '– fehlt'}</span></div>
-      <div class="docrow"><span>💶 Entgeltabrechnung</span><span class="dstate ${a ? 'ok' : ''}">${a ? `✓ eingelesen ${when(a)}` : '– fehlt'}</span><label class="docup">${a ? 'neu' : 'einlesen'}<input type="file" accept=".pdf,application/pdf" data-act="slipFile"></label></div>
-      ${z ? '' : '<p class="xs muted" style="margin:4px 0 0">Zeitnachweise liest du unter Einstellungen → Datentransport ein.</p>'}
+      <div class="docrow"><span>💶 Entgeltabrechnung</span><span class="dstate ${a ? 'ok' : ''}">${a ? `✓ eingelesen ${when(a)}` : '– fehlt'}</span></div>
+      <label class="btn soft sm docbtn">📄 Einlesen<input type="file" accept=".pdf,application/pdf" data-act="docFile"></label>
       ${slipCard(m)}</section>`;
   }
   function slipCard(m) {
@@ -288,6 +289,14 @@
       ${vglTable(v.zeilen)}
       <p class="xs muted mt-s">Toki = Ansicht „Auszahlung“ (Grundlohn ${MON[Number(m.slice(5, 7)) - 1]} + Mehrarbeit/Urlaubsgeld aus dem Vormonat).${a.restzahlung ? ` Restzahlung laut Abrechnung: ${nf(a.restzahlung)} €.` : ''}</p>
       <button class="btn ghost sm mt-s" data-act="slipDel" data-m="${m}">Abrechnung entfernen</button></div></details>`;
+  }
+  /** Ein Knopf für beide Dokumente: erkennt Zeitnachweis oder Entgeltabrechnung selbst */
+  async function docImport(buf) {
+    let rows;
+    try { rows = await PdfText.lines(buf); } catch (e) { sheet(`<h3>PDF nicht lesbar</h3><p class="muted">${esc(e.message || String(e))}</p><button class="btn mt" data-act="close">OK</button>`); return; }
+    const txt = rows.map((r) => r.items.map((i) => i.s).join(' ')).join('\n');
+    if (/Gesamtbrutto|Gesamt-Brutto|Verdienstabrechnung|Entgeltabrechnung/i.test(txt) && !/Beschreibung[\s\S]*Istz/i.test(txt)) return slipImport(buf);
+    try { C.parseZeitnachweis(rows); return pdfImport(buf); } catch { return slipImport(buf); }
   }
   async function slipImport(buf) {
     let a, v;
@@ -768,7 +777,7 @@
     const tarifBasis = v.hasStand ? v.stand : (v.anspruch ?? cfg.tarif) + (v.carryIn || 0);
     const tarifGen = v.hasStand ? (v.taken || 0) - (v.vorStand || 0) : v.taken || 0;
     const zkDays = v.zkDays || 0, fzaDays = v.fzaDays || 0;
-    const tile = (cls, name, val, sub, side = '') => `<div class="b ${cls}"><div class="tn"><span class="tdot ${cls}"></span>${name}</div><div class="v num">${val}</div><div class="s">${sub}</div>${side ? `<div class="side">${side}</div>` : ''}</div>`;
+    const tile = (cls, name, val, sub, side = '') => `<div class="b ${cls}"><div class="tn"><span class="tdot ${cls}"></span>${name}</div><div class="v num">${val}</div>${sub ? `<div class="s">${sub}</div>` : ''}${side ? `<div class="side">${side}</div>` : ''}</div>`;
     const m = ui.cal;
     // Einträge des Jahres
     const items = [];
@@ -817,16 +826,17 @@
           return `<div class="tl ${past ? 'past' : ''}"><span class="tlr">${it.from === it.to ? `${WD[C.dow(it.from)]} ${dShort(it.from)}` : `${WD[C.dow(it.from)]} ${dShort(it.from)} – ${WD[C.dow(it.to)]} ${dShort(it.to)}`}${now ? ' <span class="badge" style="background:var(--success);color:#fff">läuft</span>' : ''}${extra.length ? `<small>${extra.join(' · ')}</small>` : ''}</span><b class="tln">${D1(it.n)} T</b>${it.id ? `<button class="del" data-act="delAbs" data-id="${it.id}" aria-label="Löschen">✕</button>` : '<span style="width:30px"></span>'}</div>`;
         }).join('')}</details>`;
     }).join('');
+    const bisHeute = (type) => { let n = 0; for (const [d, x] of calc.absMap) if (x.type === type && !x.fromEntry && d.startsWith(String(y)) && d <= today) n += x.units || 1; return n; };
     const verpl = calc.zkVerplant > 0 ? `<b class="neg">${H(calc.zkVerplant, 0)} verplant</b>` : '';
     return `<div class="between"><h1>Urlaub</h1><div class="row yearnav"><button class="iconbtn" data-act="vyear" data-d="-1">${I.left}</button><b>${y}</b><button class="iconbtn" data-act="vyear" data-d="1">${I.right}</button></div></div>
     <div class="bal">
-      ${tile('tarif', 'Tarifurlaub', `${D1(tf.frei)} <small>T frei</small>`, `${D1(tarifGen)} von ${D1(tarifBasis)} genommen${v.einbehalten > 0 ? `<br><b class="neg">${D1(v.einbehalten)} T für ${y - 1} einbehalten</b>` : ''}`, v.vorgriff > 0 ? `<b class="neg">${D1(v.vorgriff)} T Vorgriff auf ${y + 1}</b>` : tf.carry > 0 ? `inkl. ${D1(tf.carry)} T Vorjahr bis 31.03.` : v.verfallen > 0 && y <= curY ? `${D1(v.verfallen)} T verfallen` : '')}
-      ${tile('zk', 'Zeitkonto', sH(calc.zk), `${D1(zkDays)} ${zkDays === 1 ? 'Tag' : 'Tage'} genommen${calc.zkVerplant > 0 ? `<br>${verpl} (${D1(calc.zkVerplantTage)} T) → ${sH(calc.zkPlanned)}` : ''}`, `≈ ${Math.max(0, Math.floor(calc.zkPlanned / calc.soll))} T frei`)}
-      ${tile('fza', 'FZA-Konto', H(calc.fza, 2), `${D1(fzaDays)} ${fzaDays === 1 ? 'Tag' : 'Tage'} genommen`, `≈ ${Math.max(0, Math.floor(calc.fzaPlanned / calc.soll))} T frei`)}
-      ${tile('tzug', 'T-Zug', `${D1(v.tzugRest ?? cfg.tzug)} <small>T frei</small>`, `${D1(v.tzug || 0)} von ${D1(v.tzugMax ?? cfg.tzug)} genommen`, `nur ${y}`)}
-      ${tile('sonder', 'Sonderurlaub', `${D1(v.sonder || 0)} <small>T</small>`, 'genommen')}
-      ${tile('krank', 'Krank', `${D1(v.krank || 0)} <small>T</small>`, `in ${y} · bezahlt mit ${D1(calc.soll)} h/Tag`)}
-      ${s.kurz.aktiv || v.kurz ? tile('kurz', 'Kurzarbeit', `${D1(v.kurz || 0)} <small>T</small>`, `in ${y}${s.kurz.aktiv && s.kurz.monat ? ` · aktiv ${monthName(s.kurz.monat)}` : ''}`) : ''}
+      ${tile('tarif', 'Tarifurlaub', D1(Math.max(0, tf.frei)), '')}
+      ${tile('zk', 'Zeitkonto', `${calc.zk < 0 ? '−' : ''}${H(Math.abs(calc.zk))}`, calc.zkVerplant > 0 ? `<span class="plan">${H(calc.zkVerplant)} geplant</span>` : '')}
+      ${tile('fza', 'FZA-Konto', `${calc.fza < 0 ? '−' : ''}${H(Math.abs(calc.fza))}`, '')}
+      ${tile('tzug', 'T-Zug', D1(Math.max(0, v.tzugRest ?? cfg.tzug)), '')}
+      ${tile('sonder', 'Sonderurlaub', D1(bisHeute('sonder')), '')}
+      ${tile('krank', 'Krank', D1(bisHeute('krank')), '')}
+      ${s.kurz.aktiv || v.kurz ? tile('kurz', 'Kurzarbeit', D1(bisHeute('kurz')), '') : ''}
     </div>
     <section class="card">
       <div class="cal-head"><button class="iconbtn" data-act="cal" data-d="-1">${I.left}</button><h3>${monthName(m)}</h3><button class="iconbtn" data-act="cal" data-d="1">${I.right}</button></div>
@@ -1078,8 +1088,8 @@
       yG += ml.v; yN += C.netto(p.laufend, p.einmal, s, i).net - C.netto(p.laufend - ml.v, p.einmal, s, i).net;
     }
     return `${head}
-    <div class="between" style="margin-bottom:10px"><button class="iconbtn" data-act="nmonth" data-d="-1">${I.left}</button><span class="mhead"><b class="onbg" style="font-family:var(--font-d);font-size:26px">${monthName(m)}</b><span class="docs mini">${docBadges(m)}</span></span><button class="iconbtn" data-act="nmonth" data-d="1">${I.right}</button></div>
-    <div class="gmode"><span class="xs onbg">${modus === 'aktuell' ? `Grundlohn + alles, was im ${MON[mo - 1]} anfällt` : `Grundlohn ${MON[mo - 1]} + Mehrarbeit, Urlaubsgeld & Sonderzahlungen aus ${MON[Number(C.prevMonth(m).slice(5, 7)) - 1]}`}</span><div class="seg mini"><button aria-pressed="${modus === 'aktuell'}" data-act="gmode" data-v="aktuell">Aktuell</button><button aria-pressed="${modus === 'auszahlung'}" data-act="gmode" data-v="auszahlung">Auszahlung</button></div></div>
+    <div class="between" style="margin-bottom:10px"><button class="iconbtn" data-act="nmonth" data-d="-1">${I.left}</button><span class="mhead"><b class="onbg mname">${monthName(m)}</b><span class="docs mini">${docBadges(m)}</span></span><button class="iconbtn" data-act="nmonth" data-d="1">${I.right}</button></div>
+    <div class="gmode"><div class="seg mini"><button aria-pressed="${modus === 'aktuell'}" data-act="gmode" data-v="aktuell">Aktuell</button><button aria-pressed="${modus === 'auszahlung'}" data-act="gmode" data-v="auszahlung">Auszahlung</button></div></div>
     ${nettoResult(lines, mp.laufend, mp.einmal, s, mo, mp.abzug, calc.rate, cls, note, { l: mp.extraL, e: mp.extraE, inkl: mp.lines.some((l) => l.extra && !l.mehr), basis: mp.basis, kurz: mp.kurz, korr: s.lohn.lernen ? C.lernKorrektur(st) : 0, korrN: Math.min(3, Object.keys(st.abrechnungen || {}).length), afterHero: docCard(m) })}
     ${yG > 0 ? `<section class="card"><h2>Mehrarbeit ${y}</h2><dl class="money ${cls}" style="margin-top:0"><div><dt>Mehrarbeit brutto</dt><dd>${nf(yG)} €</dd></div><div class="sum"><dt>davon netto ca.</dt><dd>${nf(yN)} €</dd></div></dl></section>` : ''}
     <div class="exportmini"><span>Bericht ${monthName(m)}</span><button class="btn sm ghost" data-act="exportPdf">PDF</button><button class="btn sm ghost" data-act="exportXlsx">Excel</button></div>
@@ -1539,6 +1549,7 @@
       else { const g = { ...godDefaults(), ...(st.pref.god || {}) }; g.kasse = name; if (k) g.kvZusatz = k[1]; else if (!name) g.kvZusatz = 2.9; st.pref.god = g; }
       save(); render(); return;
     }
+    if (t.dataset.act === 'docFile') { const f = t.files && t.files[0]; if (f) f.arrayBuffer().then(docImport); t.value = ''; return; }
     if (t.dataset.act === 'slipFile') { const f = t.files && t.files[0]; if (f) f.arrayBuffer().then(slipImport); t.value = ''; return; }
     if (t.dataset.act === 'pdfFile') { const f = t.files && t.files[0]; if (f) f.arrayBuffer().then(pdfImport); t.value = ''; return; }
     if (t.dataset.act === 'importFile') { const f = t.files && t.files[0]; if (f) f.text().then(doImport); t.value = ''; return; }
