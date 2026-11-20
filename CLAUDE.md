@@ -21,11 +21,14 @@
   - God Mode: Haken „Mehrarbeit zur Verrechnung auszahlen“ rechnet den aktuellen Kontostand als Einmalzahlung (Block Mehrarbeit) mit ein.
   - Release Notes (`RELEASES` oben in `src/app.js`, neueste zuerst) unter Einstellungen → Datentransport – bei jedem Release kurz ergänzen, Version erscheint im Fuß.
   - Entgeltabrechnung-PDF (`Core.parseAbrechnung`, lokal gelesen): gespeichert werden nur Zahlen in `st.abrechnungen[Monat]` (nie Namen/IDs/IBAN). Vergleich mit Toki-Ansicht „Auszahlung“ (`abrechnungVergleich`); Lern-Korrektur = Mittel der Abweichung bei Steuer+SV der letzten 3 Abrechnungen (`lernKorrektur`, Schalter `lohn.lernen`). Erkennt „nur Zuschläge“ (`lohn.mehrNurZuschlag`) und abweichendes Grundgehalt als Vorschlag. Zeitnachweis-Import merkt sich `st.nachweise[Monat]` und übernimmt MEAV als Konto Mehrarbeit zur Verrechnung. Zeichen 🕒/💶 je Monat im Gehalt.
+  - Gehalt-Monat: oben nur kleine Zeichen 🕒/💶 unter dem Monatsnamen; Karte „Dokumente“ (Status + Abrechnung einlesen + Vergleich) direkt unter der Netto-Karte; Bericht-Export klein ganz unten.
+  - Einstellungen: „Zeitkonten & Urlaub“ (früher zwei Punkte), „Synchronisation Endgeräte“, Knopf „Steuererklärung“. Hinweis bei „nur Zuschläge“: nur relevant bei Kurzarbeit, die weniger als 3 Monate vorbei ist. MEAV/ZK/FZA aus dem Zeitnachweis nur übernehmen, wenn der Nachweis nicht älter als der gespeicherte Stand ist (aktueller Wert zählt).
+  - Design „Goldene Weihnacht“ (`noel`): dunkelgrün/gold/rot, Lichterkette, hängende Kugeln, Schnee, Playfair Display.
   - Gehalt hat Reiter Monat | Jahr | God. Jahr = `Core.gehaltJahr` (Abrechnung wenn vorhanden, sonst Toki „Auszahlung“, künftige Monate als Prognose).
-  - Steuer-Klärung (Einstellungen → Steuer): `Core.steuerKlaerung` – Jahreswerte der letzten Abrechnung exakt, danach Toki; Entfernungspauschale 0,38 €/km ab km 1 × Arbeitstage, Werbungskostenpauschale 1.230 €, Tarif-Tipp (42 % ab 69.879 € bzw. 139.758 € Splitting). Werte jährlich prüfen.
+  - Steuererklärung (Einstellungen → Steuer): `Core.steuerKlaerung` – Jahreswerte der letzten Abrechnung exakt, danach Toki; Entfernungspauschale 0,38 €/km ab km 1 × Arbeitstage, Werbungskostenpauschale 1.230 €, Tarif-Tipp (42 % ab 69.879 € bzw. 139.758 € Splitting). Werte jährlich prüfen.
   - Reiter Mehrarbeit → Jahr: Statistik-Karte (`Core.yearStats`).
   - Designs: Klick fragt „Standard-Design“ (gespeichert) oder „Probieren“ (`ui.tryTheme`, nicht gespeichert, Leiste oben). Beim Wechsel wird `meta[theme-color]` ersetzt und `html` eingefärbt (Statusleiste). Designs Light Mode (`light`), Premium Gold (`gold`), Natur & Eco (`eco`) mit Oswald/Manrope.
-  - Urlaub-Kacheln kompakt (3 je Reihe); FZA-Stunden mit 2 Nachkommastellen.
+  - Urlaub-Kacheln kompakt (3 je Reihe), Überschrift und Zahl groß lesbar; FZA-Stunden mit 2 Nachkommastellen.
   - Jedes Fenster (`sheet()`) hat oben rechts ein ✕. Zahlenfelder: eine stehende 0 verschwindet beim Antippen, sonst wird der Inhalt markiert (direkt überschreiben).
   - Kontingent-Karte (Reiter Mehrarbeit): Geleistet | MEA-Kontingent groß in der Mitte (antippen = korrigieren) | Offen.
   - Seiten dürfen nie seitlich verschiebbar sein: Eingabefelder ≥ 16 px (sonst zoomt iOS), nichts breiter als der Bildschirm.
