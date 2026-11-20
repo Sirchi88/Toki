@@ -269,6 +269,62 @@ test('Demo-Daten: ganzes Jahr, gemischt, mit 6 Tagen Kurzarbeit im August', () =
   assert.ok(Object.keys(st.entries).some((d) => d.startsWith('2026-12')));
 });
 
+test('Entgeltabrechnung: Kennzahlen lesen, vergleichen, lernen', () => {
+  const R = (y, ...a) => ({ y, items: a.map(([x, s]) => ({ x, s })) });
+  const rows = [R(800, [282, 'Abrechnungszeitraum']), R(790, [282, 'März 2026']),
+    R(700, [65, 'Bezeichnung'], [259, 'Tg./St.'], [319, 'Faktor'], [404, 'Monatswert'], [498, 'Jahreswert']),
+    R(690, [63, '1850'], [89, 'ERA Entgelt gesamt'], [230, 'LSG'], [415, '3.000,00']),
+    R(680, [63, '4110'], [89, 'Mehrarb. Zuschlag 25%'], [230, 'LSG'], [281, '4,00'], [341, '4,31'], [421, '17,24']),
+    R(670, [63, '/10E'], [89, 'Gesamtbrutto (EBeschV)'], [406, '3.017,24'], [505, '9.017,24']),
+    R(660, [63, 'Y$04'], [89, 'Steuer-Brutto, lfd.'], [406, '3.017,24'], [505, '9.017,24']),
+    R(650, [63, 'Y$32'], [89, 'Lohnsteuer, lfd.'], [405, '300,00 -'], [499, '900,00']),
+    R(640, [63, 'Y$11'], [89, 'Rentenversicherung, lfd.'], [405, '280,60 -'], [499, '841,80']),
+    R(630, [63, 'Y$12'], [89, 'Arbeitslosenvers., lfd.'], [407, '39,22 -'], [503, '117,66']),
+    R(620, [63, 'Y$13'], [89, 'Krankenversicherung'], [405, '260,00 -'], [499, '780,00']),
+    R(610, [63, 'Y$14'], [89, 'Pflegeversicherung'], [405, '54,00 -'], [499, '162,00']),
+    R(600, [63, '/55E'], [89, 'Gesetzl. Netto (EBeschV)'], [406, '2.083,42'])];
+  const a = C.parseAbrechnung(rows);
+  assert.strictEqual(a.month, '2026-03');
+  assert.deepStrictEqual([a.grund, a.brutto, a.lst, a.rv, a.av, a.kv, a.pv], [3000, 3017.24, 300, 280.6, 39.22, 260, 54]);
+  assert.deepStrictEqual([a.mehr.h25, a.mehr.z25, a.mehr.base], [4, 17.24, 0]);
+  assert.ok(Math.abs(a.netto - 2083.42) < 1e-9 && Math.abs(a.sv - 633.82) < 1e-9);
+  assert.deepStrictEqual([a.jahr.lst, a.jahr.rv], [900, 841.8]);
+  const S = base(); S.lohn.grundlohn = 2900;
+  const st = { settings: S, entries: {}, absences: [], kontingent: {}, nach: [], abrechnungen: {} };
+  const v = C.abrechnungVergleich(st, C.compute(st, '2026-03-31'), a);
+  assert.ok(v.grundAnders && v.nurZuschlag && Number.isFinite(v.korr));
+  st.abrechnungen['2026-03'] = { ...a, korr: 12 };
+  assert.strictEqual(C.lernKorrektur(st), 12);
+  const g = C.gehaltJahr(st, C.compute(st, '2026-06-30'), 2026, '2026-06-30');
+  assert.strictEqual(g.months[2].echt, true);
+  assert.strictEqual(g.sum.echt, 1);
+  const k = C.steuerKlaerung(st, C.compute(st, '2026-06-30'), 2026, '2026-06-30');
+  assert.strictEqual(k.bis, '2026-03');
+  assert.ok(Math.abs(k.sum.lst - (900 + g.months.slice(3).reduce((x, r) => x + r.lst, 0))) < 1e-6);
+});
+
+test('Mehrarbeit nur Zuschläge: Grundvergütung wird nicht ausgezahlt', () => {
+  const S = base(); S.lohn.mehrNurZuschlag = true;
+  const st = { settings: S, entries: {}, absences: [], kontingent: { '2026-06': 20 }, nach: [] };
+  st.entries['2026-06-08'] = ent('07:00', '17:45');
+  const c = C.compute(st, '2026-06-30');
+  const l = C.monthPay(st, c, '2026-06').lines.find((x) => x.mehr);
+  const mm = c.months.get('2026-06');
+  assert.ok(l.nurZ && Math.abs(l.v - (mm.pay.z25 + mm.pay.z50)) < 1e-9);
+});
+
+test('Jahres-Statistik: Arbeitstage, stärkste Woche, Krankheitstage', () => {
+  const S = base();
+  const st = { settings: S, entries: {}, absences: [{ id: 'k', from: '2026-03-09', to: '2026-03-10', type: 'krank' }], kontingent: {}, nach: [] };
+  st.entries['2026-02-02'] = ent('07:00', '15:45'); st.entries['2026-02-03'] = ent('07:00', '17:45'); st.entries['2026-02-09'] = ent('07:00', '15:00');
+  const c = C.compute(st, '2026-12-31');
+  const t = C.yearStats(st, c, 2026, C.vacation(st, '2026-12-31'));
+  assert.strictEqual(t.arbeitstage, 3);
+  assert.strictEqual(t.topWeek.kw, 6);
+  assert.strictEqual(t.longest.date, '2026-02-03');
+  assert.strictEqual(t.krank, 2);
+});
+
 (async () => {
   for (const [name, fn] of tests) { await fn(); passed++; console.log(`✓ ${name}`); }
   console.log(`\n${passed} Tests bestanden.`);

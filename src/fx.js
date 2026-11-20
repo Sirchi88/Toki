@@ -346,6 +346,21 @@ const FX = (() => {
     front.innerHTML = `<div class="fx-buddy" style="position:absolute;right:max(6px,calc(50vw - 250px));bottom:calc(env(safe-area-inset-bottom) + 74px);width:50px">
       <div class="fx-say" style="position:absolute;right:40px;bottom:58px;transform-origin:right bottom;white-space:nowrap;background:#fffef8;border:2px solid #2b2b2b;border-radius:16px 16px 4px 16px;padding:3px 9px;font:16px 'Toki Patrick','Comic Sans MS',cursive;color:#2b2b2b;box-shadow:1px 2px 0 #2b2b2b">${say}</div>${BUDDY}</div>`;
   }
+
+  // ---------- Natur & Eco: weiche Blätter-Flächen ----------
+  function eco(back) {
+    back.style.background = '#ebe2ce';
+    back.innerHTML = `<svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%">
+      <path d="M240 -20C330 10 420 40 420 140S360 260 300 230 220 120 240 -20Z" fill="#a9b99a" opacity=".75"/>
+      <path d="M-40 560C40 520 140 560 150 650S90 820 -40 820Z" fill="#7b5d43" opacity=".85"/>
+      <path d="M330 640C380 610 430 650 430 720S380 820 300 820 290 680 330 640Z" fill="#8fa383" opacity=".7"/>
+      <path d="M-30 120C30 100 80 150 60 210S-20 260 -40 230Z" fill="#c9b994" opacity=".6"/>
+    </svg>`;
+  }
+  // ---------- Premium Gold: feiner Glanz ----------
+  function gold(back) {
+    back.style.background = 'radial-gradient(120% 60% at 80% -10%,rgb(212 175 95/.14),transparent 60%),radial-gradient(90% 50% at -10% 110%,rgb(212 175 95/.08),transparent 60%),#0b0b0c';
+  }
   function set(theme) {
     ensureStyle();
     stop();
@@ -356,6 +371,8 @@ const FX = (() => {
     else if (theme === 'fryer') fryer(back);
     else if (theme === 'neon') neon(back);
     else if (theme === 'pop') pop(back);
+    else if (theme === 'eco') eco(back);
+    else if (theme === 'gold') gold(back);
     else if (theme === 'doodle') doodle(back, front);
     else if (theme === 'werk') werkhalle(back);
     else if (theme === 'schrank') schaltschrank(back);

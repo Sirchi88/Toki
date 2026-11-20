@@ -3,4 +3,6 @@ Die eingebetteten Schriften stehen unter der SIL Open Font License 1.1:
 - Bricolage Grotesque (Ateliertriay)
 - Patrick Hand (Patrick Wagesreiter)
 - Gochi Hand (Huerta Tipográfica)
+- Oswald (Vernon Adams u. a.)
+- Manrope (Mikhail Sharanda)
 Untergruppen (Latein/Deutsch), unverändert sonst. Lizenztexte: OFL-*.txt
