@@ -6,6 +6,7 @@
   const LOGO = '__LOGO__';
   /** Release Notes – neueste zuerst: [Version, Datum, Themen] */
   const RELEASES = [
+    ['2.2', '20.11.2026', ['Entgeltabrechnung einlesen, vergleichen & daraus lernen', 'Gehalt: Jahresansicht', 'Steuer-Klärung mit Pendlerpauschale & Tarif-Tipp', 'Zeichen je Monat: Zeitnachweis / Abrechnung', 'Jahres-Statistik bei Mehrarbeit', 'Designs Light Mode, Premium Gold, Natur & Eco', 'Design als Standard merken oder nur probieren', 'Urlaub-Kacheln kompakter, FZA mit 2 Nachkommastellen', 'Demo ohne PIN, nur Rückfrage']],
     ['2.1', '19.11.2026', ['Kontingent-Karte neu: Zahl groß in der Mitte', 'Jedes Fenster mit ✕ zum Schließen', 'Zahlenfelder: 0 verschwindet beim Antippen']],
     ['2.0', '19.11.2026', ['Neue Designs „Bold Pop“ und „Doodle“ mit eigenen Schriften', 'God Mode: Mehrarbeit zur Verrechnung auszahlen', 'Release Notes', 'Seiten wackeln nicht mehr seitlich']],
     ['1.9', '18.11.2026', ['Kurzarbeit (60/67 %)', 'Konto Mehrarbeit zur Verrechnung', 'Urlaubs-Vorgriff aufs nächste Jahr, T-Zug-Sperre', 'Demo-Modus', 'Gehalt: Mehrarbeit zum Aufklappen']],
@@ -22,10 +23,13 @@
     const settings = C.merge(C.defaults(), d.settings || {});
     if (!THEME_IDS.includes(settings.theme)) settings.theme = 'standard';
     const absences = (d.absences || []).map((a) => (a.created ? a : { ...a, created: Date.now() }));
-    return { meta: d.meta || {}, settings, entries: d.entries || {}, absences, kontingent: d.kontingent || {}, nach: d.nach || [], pref: d.pref || {} };
+    return { meta: d.meta || {}, settings, entries: d.entries || {}, absences, kontingent: d.kontingent || {}, nach: d.nach || [], pref: d.pref || {}, abrechnungen: d.abrechnungen || {}, nachweise: d.nachweise || {} };
   };
   const THEMES = [
     ['dark', 'Dark', 'linear-gradient(135deg,#2a2c31 0 50%,#1b1c20 50%)'],
+    ['light', 'Light Mode', 'linear-gradient(135deg,#ffffff 0 55%,#2fae78 55%)'],
+    ['gold', 'Premium Gold', 'linear-gradient(135deg,#151516 0 55%,#d4af5f 55% 70%,#151516 70%)'],
+    ['eco', 'Natur & Eco', 'radial-gradient(circle at 85% 10%,#a9b99a 0 28%,transparent 29%),radial-gradient(circle at 5% 100%,#7b5d43 0 30%,transparent 31%),#ebe2ce'],
     ['standard', 'Standard', 'linear-gradient(135deg,oklch(55% .15 45) 0 50%,oklch(97% .015 80) 50%)'],
     ['sw', 'Schwarz/Weiß', 'linear-gradient(135deg,#111 0 50%,#fff 50%)'],
     ['blau', 'Blau', 'linear-gradient(135deg,oklch(50% .18 255) 0 50%,oklch(98% .01 250) 50%)'],
@@ -41,6 +45,7 @@
     ['doodle', 'Doodle', 'repeating-linear-gradient(#fbf8ef 0 9px,#dbe6f5 9px 10px)'],
   ];
   const THEME_IDS = THEMES.map((t) => t[0]);
+  const themeName = (id) => (THEMES.find((x) => x[0] === id) || [])[1] || id;
   // Demo-Modus: erfundene Daten unter eigenem Schlüssel, echte Daten bleiben unberührt, kein Sync
   const DEMO_KEY = 'toki-demo';
   let demo = false;
@@ -252,6 +257,99 @@
   function confirmBox(title, text, okLabel, onOk, danger = true) {
     sheet(`<h3>${esc(title)}</h3><p class="muted">${text}</p><div class="grid2 mt"><button class="btn ghost" data-act="close">Abbrechen</button><button class="btn ${danger ? 'danger' : ''}" id="okb">${esc(okLabel)}</button></div>`,
       (el) => el.querySelector('#okb').addEventListener('click', () => { closeSheet(); onOk(); }));
+  }
+
+  // ---------- Hochgeladene Dokumente je Monat ----------
+  function docBadges(m, labels = false) {
+    const z = (st.nachweise || {})[m], a = (st.abrechnungen || {})[m];
+    return `<span class="doc ${z ? 'on' : ''}" title="Zeitnachweis ${z ? 'eingelesen' : 'fehlt'}">🕒${labels ? ` Zeitnachweis ${z ? '✓' : '–'}` : ''}</span><span class="doc ${a ? 'on' : ''}" title="Entgeltabrechnung ${a ? 'eingelesen' : 'fehlt'}">💶${labels ? ` Abrechnung ${a ? '✓' : '–'}` : ''}</span>`;
+  }
+  function vglTable(zeilen) {
+    return `<table class="vgl"><thead><tr><th></th><th>Abrechnung</th><th>Toki</th><th>Δ</th></tr></thead><tbody>${zeilen.map((z) => { const d = z.toki - z.real; const ok = Math.abs(d) < 0.5; return `<tr><td>${z.k}${z.info ? `<br><span class="xs muted">${z.info}</span>` : ''}</td><td class="num">${nf(z.real)}</td><td class="num">${nf(z.toki)}</td><td class="num ${ok ? 'pos' : 'neg'}">${ok ? '✓' : `${d > 0 ? '+' : '−'}${nf(Math.abs(d))}`}</td></tr>`; }).join('')}</tbody></table>`;
+  }
+  function slipCard(m) {
+    const a = (st.abrechnungen || {})[m];
+    if (!a) return '';
+    const v = C.abrechnungVergleich(st, calc, a);
+    const cls = S().lohn.zeigen ? '' : 'blur';
+    return `<details class="fold slipcard" ${ui.slipOpen ? 'open' : ''} data-fold="slipOpen"><summary><span>💶 Laut Abrechnung: <b class="num ${cls}">${nf(a.netto + (a.kug || 0))} €</b> netto</span>${I.chev}</summary><div class="body ${cls}">
+      <div class="kpis"><div class="kpi"><div class="k">Brutto</div><div class="v num">${nf(a.brutto, 0)}</div></div><div class="kpi"><div class="k">Steuern</div><div class="v num">${nf(a.steuer, 0)}</div></div><div class="kpi"><div class="k">SV</div><div class="v num">${nf(a.sv, 0)}</div></div></div>
+      ${vglTable(v.zeilen)}
+      <p class="xs muted mt-s">Toki = Ansicht „Auszahlung“ (Grundlohn ${MON[Number(m.slice(5, 7)) - 1]} + Mehrarbeit/Urlaubsgeld aus dem Vormonat).${a.restzahlung ? ` Restzahlung laut Abrechnung: ${nf(a.restzahlung)} €.` : ''}</p>
+      <button class="btn ghost sm mt-s" data-act="slipDel" data-m="${m}">Abrechnung entfernen</button></div></details>`;
+  }
+  async function slipImport(buf) {
+    let a, v;
+    try { a = C.parseAbrechnung(await PdfText.lines(buf)); v = C.abrechnungVergleich(st, calc, a); }
+    catch (e) { sheet(`<h3>PDF nicht lesbar</h3><p class="muted">${esc(e.message || String(e))}</p><button class="btn mt" data-act="close">OK</button>`); return; }
+    const s = S();
+    const opts = [];
+    if (v.grundAnders) opts.push(['grund', `Grundgehalt auf <b>${EUR(a.grund)}</b> setzen (bisher ${EUR(Number(s.lohn.grundlohn) || 0)})`]);
+    if (v.nurZuschlag && !s.lohn.mehrNurZuschlag) opts.push(['nurZ', 'Mehrarbeit wie hier rechnen: <b>nur Zuschläge</b> auszahlen, Grundstunden gehen aufs Konto Mehrarbeit zur Verrechnung']);
+    const korrTxt = Math.abs(v.korr) < 0.5 ? 'Steuer & Sozialversicherung rechnet Toki auf dieses Brutto praktisch genau.' : `Auf dasselbe Brutto zieht Toki <b>${nf(Math.abs(v.korr))} € ${v.korr > 0 ? 'zu viel' : 'zu wenig'}</b> ab – das gleiche ich künftig aus.`;
+    sheet(`<h3>Abrechnung ${monthName(a.month)}</h3>
+      <p class="small muted">Brutto ${EUR(a.brutto)} · Netto ${EUR(a.netto)}${a.mehr.h25 + a.mehr.h50 ? ` · Mehrarbeit ${H(a.mehr.h25)} à 25 %, ${H(a.mehr.h50)} à 50 %` : ''}${a.ug ? ` · Urlaubsgeld ${D1(a.ug.tage)} Tage` : ''}</p>
+      ${vglTable(v.zeilen)}
+      <h4 style="margin:12px 0 6px">Was ich daraus lerne</h4>
+      <p class="small">${korrTxt}</p>
+      ${opts.map(([k, t]) => `<label class="switch"><span class="small">${t}</span><input type="checkbox" class="slipopt" data-k="${k}" checked></label>`).join('')}
+      ${(st.abrechnungen || {})[a.month] ? '<p class="xs muted">Für diesen Monat ist schon eine Abrechnung gespeichert – sie wird ersetzt.</p>' : ''}
+      <p class="xs muted mt-s">Das PDF wird nur auf deinem Gerät gelesen. Gespeichert werden nur die Zahlen (keine Namen, keine Steuer-ID, keine Bankdaten).</p>
+      <div class="grid2 mt"><button class="btn ghost" data-act="close">Nur prüfen</button><button class="btn" id="slipOk">Speichern & lernen</button></div>`,
+    (el) => el.querySelector('#slipOk').addEventListener('click', () => {
+      const on = (k) => { const c = el.querySelector(`.slipopt[data-k="${k}"]`); return c && c.checked; };
+      if (on('grund')) s.lohn.grundlohn = a.grund;
+      if (on('nurZ')) s.lohn.mehrNurZuschlag = true;
+      const keep = { ...a }; delete keep.lines;
+      st.abrechnungen = { ...(st.abrechnungen || {}), [a.month]: { ...keep, korr: v.korr, importiert: Date.now() } };
+      ui.nmonth = a.month; ui.nmode = 'ist'; ui.gmode = 'auszahlung';
+      save(); closeSheet(); render();
+      toast(`✓ Abrechnung ${monthName(a.month)} gespeichert`, 2600, 'ok');
+    }));
+  }
+  function gehaltJahrView() {
+    const y = ui.gyear || Number(ui.nmonth.slice(0, 4));
+    const g = C.gehaltJahr(st, calc, y, today);
+    const t = g.sum, cls = S().lohn.zeigen ? '' : 'blur';
+    const rows = g.months.map((r) => `<button class="gjrow ${r.prognose ? 'prog' : ''}" data-act="gotoMonth" data-m="${r.m}"><span class="gm"><b>${MON[Number(r.m.slice(5, 7)) - 1]}</b><span class="docs mini">${docBadges(r.m)}</span></span><span class="gv"><small>Brutto</small><b class="num">${nf(r.brutto, 0)}</b></span><span class="gv"><small>Netto${r.echt ? ' ✓' : r.prognose ? ' ~' : ''}</small><b class="num">${nf(r.netto, 0)}</b></span></button>`).join('');
+    return `<div class="between" style="margin-bottom:10px"><button class="iconbtn" data-act="gyear" data-d="-1">${I.left}</button><b class="onbg" style="font-family:var(--font-d);font-size:26px">${y}</b><button class="iconbtn" data-act="gyear" data-d="1">${I.right}</button></div>
+    <section class="card ${cls}"><div class="hero"><div class="s">Netto ${y}${t.prognose ? ' (inkl. Prognose)' : ''}</div><div class="v num">${nf(t.netto, 0)} €</div><div class="s">Brutto ${nf(t.brutto, 0)} € · ${t.echt} ${t.echt === 1 ? 'Monat' : 'Monate'} laut Abrechnung</div></div>
+      <div class="kpis"><div class="kpi"><div class="k">Steuern</div><div class="v num">${nf(t.steuer, 0)}</div></div><div class="kpi"><div class="k">Sozialvers.</div><div class="v num">${nf(t.sv, 0)}</div></div><div class="kpi hl"><div class="k">Mehrarbeit</div><div class="v num">${nf(t.mehr, 0)}</div></div></div>
+      <dl class="money" style="margin-top:12px">
+        <div><dt>Lohnsteuer</dt><dd>${nf(t.lst)} €</dd></div><div><dt>Solidaritätszuschlag</dt><dd>${nf(t.soli)} €</dd></div><div><dt>Kirchensteuer</dt><dd>${nf(t.kist)} €</dd></div>
+        <div><dt>Rentenversicherung</dt><dd>${nf(t.rv)} €</dd></div><div><dt>Arbeitslosenversicherung</dt><dd>${nf(t.av)} €</dd></div><div><dt>Krankenversicherung</dt><dd>${nf(t.kv)} €</dd></div><div><dt>Pflegeversicherung</dt><dd>${nf(t.pv)} €</dd></div>
+        <div class="grp"><dt>Mehrarbeit (brutto)</dt><dd>${nf(t.mehr)} €</dd></div><div><dt>Urlaubsgeld</dt><dd>${nf(t.ug)} €</dd></div><div><dt>Sonderzahlungen</dt><dd>${nf(t.sonder)} €</dd></div>${t.kug ? `<div><dt>Kurzarbeitergeld</dt><dd>${nf(t.kug)} €</dd></div>` : ''}
+      </dl></section>
+    <section class="card"><h2>Monate</h2><div class="gjlist ${cls}">${rows}</div><p class="xs muted mt-s">✓ = laut Abrechnung · ~ = Prognose · 🕒 Zeitnachweis · 💶 Abrechnung eingelesen. Monate ohne Abrechnung in der Ansicht „Auszahlung“.</p></section>`;
+  }
+  function steuerHtml(y) {
+    const k = C.steuerKlaerung(st, calc, y, today);
+    const t = k.sum;
+    const pct = (x) => `${nf(x * 100, 0)} %`;
+    let tipp;
+    if (k.zve <= k.grundfrei) tipp = `Dein zu versteuerndes Einkommen liegt unter dem Grundfreibetrag (${EUR(k.grundfrei)}) – keine Einkommensteuer.`;
+    else if (k.bisGrenze > 0) tipp = `Grenzsteuersatz ca. <b>${pct(k.grenz)}</b>: von jedem zusätzlichen Euro gehen so viel an Lohnsteuer. Der <b>Spitzensteuersatz von 42 %</b> beginnt ${k.split ? '(Splitting, StKl III/IV) ' : ''}ab ${EUR(k.grenze42)} zu versteuerndem Einkommen – bei dir noch ca. <b>${EUR(k.bisGrenze)}</b> entfernt. Bis dahin steigt die Belastung mit jedem Euro langsam weiter.`;
+    else tipp = `Du liegst im <b>Spitzensteuersatz (42 %)</b> – jeder zusätzliche Euro wird mit 42 % (plus ggf. Soli/KiSt) besteuert. Werbungskosten sparen hier besonders viel.`;
+    return `<h3>Steuer-Klärung</h3>
+      <div class="between" style="margin:2px 0 10px"><button class="iconbtn sm" data-stk="-1">${I.left}</button><b style="font-family:var(--font-d);font-size:24px">${y}</b><button class="iconbtn sm" data-stk="1">${I.right}</button></div>
+      <p class="xs muted">Alles, was Toki für deine Einkommensteuererklärung ${y} weiß (Anlage N & Vorsorgeaufwand). Maßgeblich ist die Lohnsteuerbescheinigung deines Arbeitgebers.</p>
+      <div class="notice info"><div>${k.bis ? `Januar–${MON[Number(k.bis.slice(5, 7)) - 1]}: <b>exakt</b> aus den Jahreswerten deiner Abrechnung ${monthName(k.bis)}${k.bis < `${y}-12` ? `; ab ${MON[Number(k.bis.slice(5, 7))]} Toki-Rechnung${k.gj.sum.prognose ? ' (teils Prognose)' : ''}` : ''}.` : `Noch keine Abrechnung aus ${y} eingelesen – alle Werte sind Toki-Rechnung${k.gj.sum.prognose ? ' (teils Prognose)' : ''}. Lies deine letzte Abrechnung ein, dann werden die Jahreswerte exakt.`}</div></div>
+      <h4 class="stkh">Arbeitslohn & Steuern</h4><dl class="money">
+        <div><dt>Bruttoarbeitslohn</dt><dd>${EUR(t.steuerBrutto)}</dd></div><div><dt>Lohnsteuer</dt><dd>${EUR(t.lst)}</dd></div><div><dt>Solidaritätszuschlag</dt><dd>${EUR(t.soli)}</dd></div><div><dt>Kirchensteuer</dt><dd>${EUR(t.kist)}</dd></div>
+        ${t.kug ? `<div><dt>Kurzarbeitergeld <small>steuerfrei, aber Progressionsvorbehalt (Anlage N)</small></dt><dd>${EUR(t.kug)}</dd></div>` : ''}</dl>
+      <h4 class="stkh">Vorsorge (Arbeitnehmer-Anteile)</h4><dl class="money">
+        <div><dt>Rentenversicherung</dt><dd>${EUR(t.rv)}</dd></div><div><dt>Krankenversicherung</dt><dd>${EUR(t.kv)}</dd></div><div><dt>Pflegeversicherung</dt><dd>${EUR(t.pv)}</dd></div><div><dt>Arbeitslosenversicherung</dt><dd>${EUR(t.av)}</dd></div></dl>
+      <h4 class="stkh">Werbungskosten</h4>
+      <div class="grid2"><div><label class="label">Arbeitsweg einfach (km)</label><input class="field" id="stkKm" inputmode="decimal" value="${k.km ? deNum(k.km) : ''}" placeholder="z. B. 18"></div><div><span class="label">Arbeitstage ${y}</span><div class="field calc num">${k.arbeitstage}</div></div></div>
+      <dl class="money"><div><dt>Entfernungspauschale <small>${k.arbeitstage} Tage × ${D1(k.km)} km × 0,38 €</small></dt><dd>${EUR(k.pendler)}</dd></div>
+        <div><dt>Kontoführung <small>üblicher Pauschalbetrag</small></dt><dd>${EUR(16)}</dd></div>
+        <div class="sum"><dt>über der Werbungskostenpauschale (${EUR(k.wkPausch)})</dt><dd>${EUR(k.wkMehr)}</dd></div></dl>
+      <p class="xs muted">${k.wkMehr > 0 ? `Lohnt sich: ca. ${EUR(k.wkMehr)} mehr Werbungskosten als die Pauschale → grob ${EUR(k.wkMehr * k.grenz)} Steuer zurück.` : 'Ohne weitere Kosten (Arbeitsmittel, Fortbildung, Gewerkschaft, Arbeitskleidung …) reicht die Pauschale – sammle Belege!'}</p>
+      <h4 class="stkh">Weitere Angaben</h4><dl class="money">
+        <div><dt>Krankheitstage</dt><dd>${D1((vac[y] || {}).krank || 0)}</dd></div><div><dt>Urlaubstage genommen</dt><dd>${D1((vac[y] || {}).taken || 0)}</dd></div>${(vac[y] || {}).kurz ? `<div><dt>Kurzarbeitstage</dt><dd>${D1(vac[y].kurz)}</dd></div>` : ''}</dl>
+      <h4 class="stkh">💡 Tipp</h4><p class="small">${tipp}</p>
+      <p class="xs muted">Zu versteuerndes Einkommen grob geschätzt: ${EUR(k.zve)}. Werte 2026: Grundfreibetrag 12.348 € (Splitting 24.696 €), 42 % ab 69.879 € (Splitting 139.758 €), Entfernungspauschale 0,38 €/km ab dem 1. km. Keine Steuerberatung.</p>
+      <button class="btn mt" data-act="close">Schließen</button>`;
   }
 
   // ---------- Zeitnachweis-PDF einlesen (nur lokal, nichts wird hochgeladen) ----------
@@ -531,7 +629,28 @@
       <div class="legend"><span><i style="background:var(--primary)"></i>Mehrarbeit</span><span><i style="background:var(--c-zk)"></i>ins Zeitkonto</span></div>
       ${zusTable({ h25: tot.h25, h50: tot.h50, base: tot.pay - tot.z25 - tot.z50, z25: tot.z25, z50: tot.z50, total: tot.pay }, tot.mehr, tot.nach)}
       <p class="xs muted mt-s">${tot.days} Arbeitstage erfasst</p>
-    </section>`;
+    </section>
+    ${statsCard(y)}`;
+  }
+  function statsCard(y) {
+    const t = C.yearStats(st, calc, y, vac);
+    if (!t.arbeitstage && !t.krank && !t.urlaub) return '';
+    const clk = (m) => (m === null || m === undefined ? '–' : `${String(Math.floor(m / 60) % 24).padStart(2, '0')}:${String(Math.round(m % 60)).padStart(2, '0')}`);
+    const st1 = (icon, k, v, sub = '') => `<div class="stat"><div class="sk"><span class="si">${icon}</span>${k}</div><div class="sv num">${v}</div>${sub ? `<div class="ss">${sub}</div>` : ''}</div>`;
+    return `<section class="card"><h2>Statistik ${y}</h2><div class="stats">
+      ${st1('📅', 'Arbeitstage', `${t.arbeitstage}`, `von ${t.sollTage} möglichen · ${t.feiertage} Feiertage`)}
+      ${st1('⏱️', 'Ø pro Arbeitstag', H(t.schnitt), `${clk(t.beginn)} – ${clk(t.ende)} im Schnitt`)}
+      ${t.topWeek ? st1('🏆', 'Stärkste Woche', H(t.topWeek.hours), `KW ${t.topWeek.kw} · ${dShort(t.topWeek.monday)}–${dShort(t.topWeek.sunday)}`) : ''}
+      ${t.longest ? st1('💪', 'Längster Tag', H(t.longest.hours), `${WD[C.dow(t.longest.date)]} ${dShort(t.longest.date)}`) : ''}
+      ${t.topMonth ? st1('🔥', 'Meiste Mehrarbeit', H(t.topMonth.mehr), MON[Number(t.topMonth.month.slice(5, 7)) - 1]) : ''}
+      ${t.earliest ? st1('🌅', 'Frühester Start', clk(t.earliest.min), `${WD[C.dow(t.earliest.date)]} ${dShort(t.earliest.date)}`) : ''}
+      ${t.latest ? st1('🌙', 'Spätester Feierabend', clk(t.latest.min), `${WD[C.dow(t.latest.date)]} ${dShort(t.latest.date)}`) : ''}
+      ${st1('🛠️', 'Samstage', `${t.samstage}`, `${H(t.samstagH)} gearbeitet`)}
+      ${st1('🤒', 'Krankheitstage', D1(t.krank), 'in Summe')}
+      ${st1('🌴', 'Frei genommen', D1(t.urlaub), 'Urlaub, ZK, FZA, T-Zug, Sonder')}
+      ${t.kurz ? st1('📉', 'Kurzarbeit', D1(t.kurz), 'Tage') : ''}
+      ${st1('☕', 'Pausen gesamt', H(t.pauseH), `${t.over9} Tage über 9 h${t.capped ? ` · ${t.capped}× 10-h-Deckel` : ''}`)}
+    </div></section>`;
   }
   function pageMehrarbeit() {
     const s = S();
@@ -593,7 +712,7 @@
     const v = vac[y] || {};
     if (type === 'tarif') return `${D1(tarifFrei(y).frei)} Tage frei`;
     if (type === 'zk') return `${sH(calc.zkPlanned)} ≈ ${Math.floor(calc.zkPlanned / calc.soll)} Tage`;
-    if (type === 'fza') return `${H(calc.fzaPlanned, 1)} ≈ ${Math.floor(calc.fzaPlanned / calc.soll)} Tage`;
+    if (type === 'fza') return `${H(calc.fzaPlanned, 2)} ≈ ${Math.floor(calc.fzaPlanned / calc.soll)} Tage`;
     if (type === 'tzug') return `${D1(v.tzugRest ?? C.yearCfg(S(), y).tzug)} Tage frei`;
     if (type === 'krank') return `${D1(v.krank || 0)} Tage in ${y}`;
     if (type === 'kurz') return S().kurz.monat ? `nur ${monthName(S().kurz.monat)}` : 'Monat fehlt';
@@ -692,7 +811,7 @@
     <div class="bal">
       ${tile('tarif', 'Tarifurlaub', `${D1(tf.frei)} <small>T frei</small>`, `${D1(tarifGen)} von ${D1(tarifBasis)} genommen${v.einbehalten > 0 ? `<br><b class="neg">${D1(v.einbehalten)} T für ${y - 1} einbehalten</b>` : ''}`, v.vorgriff > 0 ? `<b class="neg">${D1(v.vorgriff)} T Vorgriff auf ${y + 1}</b>` : tf.carry > 0 ? `inkl. ${D1(tf.carry)} T Vorjahr bis 31.03.` : v.verfallen > 0 && y <= curY ? `${D1(v.verfallen)} T verfallen` : '')}
       ${tile('zk', 'Zeitkonto', sH(calc.zk), `${D1(zkDays)} ${zkDays === 1 ? 'Tag' : 'Tage'} genommen${calc.zkVerplant > 0 ? `<br>${verpl} (${D1(calc.zkVerplantTage)} T) → ${sH(calc.zkPlanned)}` : ''}`, `≈ ${Math.max(0, Math.floor(calc.zkPlanned / calc.soll))} T frei`)}
-      ${tile('fza', 'FZA-Konto', H(calc.fza, 1), `${D1(fzaDays)} ${fzaDays === 1 ? 'Tag' : 'Tage'} genommen`, `≈ ${Math.max(0, Math.floor(calc.fzaPlanned / calc.soll))} T frei`)}
+      ${tile('fza', 'FZA-Konto', H(calc.fza, 2), `${D1(fzaDays)} ${fzaDays === 1 ? 'Tag' : 'Tage'} genommen`, `≈ ${Math.max(0, Math.floor(calc.fzaPlanned / calc.soll))} T frei`)}
       ${tile('tzug', 'T-Zug', `${D1(v.tzugRest ?? cfg.tzug)} <small>T frei</small>`, `${D1(v.tzug || 0)} von ${D1(v.tzugMax ?? cfg.tzug)} genommen`, `nur ${y}`)}
       ${tile('sonder', 'Sonderurlaub', `${D1(v.sonder || 0)} <small>T</small>`, 'genommen')}
       ${tile('krank', 'Krank', `${D1(v.krank || 0)} <small>T</small>`, `in ${y} · bezahlt mit ${D1(calc.soll)} h/Tag`)}
@@ -732,7 +851,7 @@
       if (f.type === 'tzug') { const free = (vac[y] || {}).tzugRest ?? C.yearCfg(s, y).tzug; if (from.slice(0, 4) !== to.slice(0, 4)) err.push('T-Zug-Tage gelten nur innerhalb eines Kalenderjahres.'); if (n > free + 1e-9) err.push(`Das geht nicht: Nur noch ${D1(Math.max(0, free))} T-Zug-${free === 1 ? 'Tag' : 'Tage'} in ${y} frei – ins Minus geht T-Zug nicht.`); }
       if (f.type === 'kurz') { if (!s.kurz.monat) err.push('Für Kurzarbeit fehlt der Monat (Einstellungen → Mehrarbeit & Zeitkonto).'); else if (days.some((d) => d.slice(0, 7) !== s.kurz.monat)) err.push(`Kurzarbeit ist nur für ${monthName(s.kurz.monat)} eingestellt.`); }
       if (f.type === 'zk' && calc.zkPlanned - n * calc.soll < s.zk.min) warn.push(`Zeitkonto ginge unter ${s.zk.min} h (${sH(calc.zkPlanned - n * calc.soll)}).`);
-      if (f.type === 'fza' && calc.fzaPlanned - n * calc.soll < 0) warn.push(`FZA-Konto reicht nicht (${H(calc.fzaPlanned - n * calc.soll, 1)}).`);
+      if (f.type === 'fza' && calc.fzaPlanned - n * calc.soll < 0) warn.push(`FZA-Konto reicht nicht (${H(calc.fzaPlanned - n * calc.soll, 2)}).`);
       const hard = clash.length > 0 || !days.length || err.length > 0;
       el.innerHTML = `<h3>Urlaub eintragen</h3>
         <p class="small"><b>${from === to ? dLong(from) : `${dLong(from)} – ${dLong(to)}`}</b><br><span class="muted">${D1(n)} Urlaubstag${n === 1 ? '' : 'e'} (ohne Wochenende & Feiertage${days.some((d) => C.halfDay(d, s)) ? ', Heiligabend/Silvester als ½ Tag' : ''})</span></p>
@@ -793,8 +912,10 @@
     const inkl = typeof mehrG === 'object' && mehrG.inkl;
     const kurz = typeof mehrG === 'object' && mehrG.kurz ? mehrG.kurz : null;
     const kug = n.abzug < 0 ? -n.abzug : 0;
+    const korr = typeof mehrG === 'object' && mehrG.korr ? mehrG.korr : 0, korrN = typeof mehrG === 'object' ? mehrG.korrN || 0 : 0;
     mehrG = xl + xe;
     const nOhne = mehrG > 0 ? C.netto(laufend - xl, einmal - xe, S2, mo, abzug, Math.min(basis, laufend - xl)) : n;
+    if (korr) { n.net += korr; if (nOhne !== n) nOhne.net += korr; }
     const netMehr = n.net - nOhne.net;
     const n25 = C.netto(laufend + rate * 1.25, einmal, S2, mo, abzug, basis), n50 = C.netto(laufend + rate * 1.5, einmal, S2, mo, abzug, basis);
     const net25 = n25.net - n.net, net50 = n50.net - n.net;
@@ -827,6 +948,7 @@
         <div><dt>Rentenvers. <small>${nf(n.rates.rv * 100, 1)} % von ${nf(n.rvBase, 0)} €</small></dt><dd>−${nf(n.sv.rv)} €</dd></div>
         <div><dt>Arbeitslosenvers. <small>${nf(n.rates.av * 100, 1)} %</small></dt><dd>−${nf(n.sv.av)} €</dd></div>
         ${kug ? `<div class="sum"><dt>Netto aus Lohn</dt><dd>${nf(n.net - kug)} €</dd></div><div><dt>Kurzarbeitergeld <small>${kurz ? `${kurz.tage} ${kurz.tage === 1 ? 'Tag' : 'Tage'} × ${nf(kurz.tag)} € × ${nf(kurz.pct * 100, 0)} %` : ''} · steuer- & SV-frei</small></dt><dd>+${nf(kug)} €</dd></div>` : ''}
+        ${korr ? `<div><dt>Korrektur aus deinen Abrechnungen <small>gelernt aus ${korrN} ${korrN === 1 ? 'Abrechnung' : 'Abrechnungen'}</small></dt><dd>${korr > 0 ? '+' : '−'}${nf(Math.abs(korr))} €</dd></div>` : ''}
         <div class="sum"><dt>Netto</dt><dd>${nf(n.net)} €</dd></div>
       </dl>
       <details class="mini mt"><summary>So wird gerechnet</summary>
@@ -860,7 +982,7 @@
     const s = S(), show = s.lohn.zeigen;
     const cls = show ? '' : 'blur';
     const head = `<div class="between"><h1>Gehalt</h1><button class="iconbtn" data-act="eye" title="Lohn ein-/ausblenden">${show ? I.eye : I.eyeoff}</button></div>
-      <div class="seg" style="margin-bottom:14px"><button aria-pressed="${ui.nmode === 'ist'}" data-act="nmode" data-v="ist">Mein Monat</button><button aria-pressed="${ui.nmode === 'god'}" data-act="nmode" data-v="god">⚡ God Mode</button></div>`;
+      <div class="seg" style="margin-bottom:14px"><button aria-pressed="${ui.nmode === 'ist'}" data-act="nmode" data-v="ist">Monat</button><button aria-pressed="${ui.nmode === 'jahr'}" data-act="nmode" data-v="jahr">Jahr</button><button aria-pressed="${ui.nmode === 'god'}" data-act="nmode" data-v="god">⚡ God</button></div>`;
     const foot = (S2) => `<p class="xs muted onbg" style="text-align:center;padding:0 10px">Näherung nach Lohnsteuer-Tarif und SV-Werten 2026 (StKl ${['I', 'II', 'III', 'IV', 'V', 'VI'][S2.steuer.klasse - 1]}, ${C.LAENDER[S2.arbeit.land]}${S2.steuer.kirche ? ', mit KiSt' : ''}). Keine Gewähr – maßgeblich ist deine Lohnabrechnung.${S2.steuer.klasse >= 5 ? ' StKl V/VI nur grob angenähert.' : ''}</p>`;
     if (ui.nmode === 'god') {
       const g = { ...godDefaults(), ...(st.pref.god || {}) };
@@ -907,6 +1029,7 @@
       ${nettoResult(lines, laufend, einmal, S2, 6, 0, rate, '', '', { l: manual ? 0 : mea, e: mavE, inkl: !!mavE, basis: laufend - (manual ? 0 : mea) })}
       ${foot(S2)}`;
     }
+    if (ui.nmode === 'jahr') return `${head}${gehaltJahrView()}${foot(s)}`;
     const m = ui.nmonth;
     const gl = Number(s.lohn.grundlohn) || 0;
     if (!gl) return `${head}<section class="card"><p>Trag zuerst deinen <b>Grundlohn</b> und deine Steuerdaten ein – dann rechne ich dir jeden Monat dein Netto aus. Oder spiel im <b>God Mode</b> mit freien Werten.</p><button class="btn" data-act="goSet" data-sec="verdienst">Zu den Einstellungen</button></section>`;
@@ -914,10 +1037,10 @@
     const mp = C.monthPay(st, calc, m, modus);
     const mo = Number(m.slice(5, 7));
     const kp = C.kurzPlan(st, calc.absMap);
-    const mavRow = kp.rest > 0 ? `<div class="mav"><dt>Mehrarbeit zur Verrechnung <small>Konto, noch nicht ausbezahlt</small></dt><dd>${H(kp.rest)} · ${nf(kp.rest * calc.rate)} €</dd></div>` : '';
+    const mavRow = kp.rest > 0 ? `<div class="mav"><dt>Mehrarbeit zur Verrechnung (Konto, noch nicht ausbezahlt)</dt><dd>${H(kp.rest)} · ${nf(kp.rest * calc.rate)} €</dd></div>` : '';
     const lines = mp.lines.map((l) => ({
       k: esc(l.k), v: l.v, cls: l.extra ? 'hl25' : '',
-      sub: l.mehr ? `<div><dt>${H(l.mehr.mehr)} × ${nf(calc.rate)} € Stundenlohn</dt><dd>${nf(l.mehr.pay.base)} €</dd></div><div><dt>Zuschlag 25 % <small>${H(l.mehr.pay.h25)}</small></dt><dd>${nf(l.mehr.pay.z25)} €</dd></div><div><dt>Zuschlag 50 % <small>${H(l.mehr.pay.h50)}</small></dt><dd>${nf(l.mehr.pay.z50)} €</dd></div>${mavRow}` : '',
+      sub: l.mehr ? `${l.nurZ ? `<div><dt>Grundstunden ${H(l.mehr.mehr)}</dt><dd>→ Konto zur Verrechnung</dd></div>` : `<div><dt>Grundvergütung ${H(l.mehr.mehr)} × ${nf(calc.rate)} €</dt><dd>${nf(l.mehr.pay.base)} €</dd></div>`}<div><dt>Zuschlag 25 % · ${H(l.mehr.pay.h25)}</dt><dd>${nf(l.mehr.pay.z25)} €</dd></div><div><dt>Zuschlag 50 % · ${H(l.mehr.pay.h50)}</dt><dd>${nf(l.mehr.pay.z50)} €</dd></div>${mavRow}` : '',
     }));
     if (mavRow && !mp.lines.some((l) => l.mehr)) lines.push({ k: 'Mehrarbeit', v: 0, cls: 'hl25', sub: `<div><dt>In diesem Monat keine bezahlte Mehrarbeit</dt><dd></dd></div>${mavRow}` });
     // fehlende Angaben
@@ -942,9 +1065,11 @@
       yG += ml.v; yN += C.netto(p.laufend, p.einmal, s, i).net - C.netto(p.laufend - ml.v, p.einmal, s, i).net;
     }
     return `${head}
-    <div class="between" style="margin-bottom:10px"><button class="iconbtn" data-act="nmonth" data-d="-1">${I.left}</button><b class="onbg" style="font-family:var(--font-d);font-size:26px">${monthName(m)}</b><button class="iconbtn" data-act="nmonth" data-d="1">${I.right}</button></div>
+    <div class="between" style="margin-bottom:6px"><button class="iconbtn" data-act="nmonth" data-d="-1">${I.left}</button><b class="onbg" style="font-family:var(--font-d);font-size:26px">${monthName(m)}</b><button class="iconbtn" data-act="nmonth" data-d="1">${I.right}</button></div>
+    <div class="docs">${docBadges(m, true)}<label class="docup">＋ Abrechnung<input type="file" accept=".pdf,application/pdf" data-act="slipFile"></label></div>
+    ${slipCard(m)}
     <div class="gmode"><span class="xs onbg">${modus === 'aktuell' ? `Grundlohn + alles, was im ${MON[mo - 1]} anfällt` : `Grundlohn ${MON[mo - 1]} + Mehrarbeit, Urlaubsgeld & Sonderzahlungen aus ${MON[Number(C.prevMonth(m).slice(5, 7)) - 1]}`}</span><div class="seg mini"><button aria-pressed="${modus === 'aktuell'}" data-act="gmode" data-v="aktuell">Aktuell</button><button aria-pressed="${modus === 'auszahlung'}" data-act="gmode" data-v="auszahlung">Auszahlung</button></div></div>
-    ${nettoResult(lines, mp.laufend, mp.einmal, s, mo, mp.abzug, calc.rate, cls, note, { l: mp.extraL, e: mp.extraE, inkl: mp.lines.some((l) => l.extra && !l.mehr), basis: mp.basis, kurz: mp.kurz })}
+    ${nettoResult(lines, mp.laufend, mp.einmal, s, mo, mp.abzug, calc.rate, cls, note, { l: mp.extraL, e: mp.extraE, inkl: mp.lines.some((l) => l.extra && !l.mehr), basis: mp.basis, kurz: mp.kurz, korr: s.lohn.lernen ? C.lernKorrektur(st) : 0, korrN: Math.min(3, Object.keys(st.abrechnungen || {}).length) })}
     <section class="card"><h2>Bericht exportieren</h2><p class="small muted">Alle Werte von ${monthName(m)} (${modus === 'aktuell' ? 'Aktuell' : 'Auszahlung'}) mit Statistiken zu Mehrarbeit und Arbeitszeit.</p>
       <div class="grid2"><button class="btn" data-act="exportPdf">📄 PDF</button><button class="btn soft" data-act="exportXlsx">📊 Excel</button></div></section>
     ${yG > 0 ? `<section class="card"><h2>Mehrarbeit ${y}</h2><dl class="money ${cls}" style="margin-top:0"><div><dt>Mehrarbeit brutto</dt><dd>${nf(yG)} €</dd></div><div class="sum"><dt>davon netto ca.</dt><dd>${nf(yN)} €</dd></div></dl></section>` : ''}
@@ -1030,7 +1155,7 @@
     const zkInfo = s.zk.datum ? `Stand am ${dShort(s.zk.datum)}${s.zk.datum.slice(0, 4)}: <b>${sH(Number(s.zk.stand) || 0)}</b> → heute: <b>${sH(calc.zk)}</b>` : 'Stand eintragen – das Datum wird automatisch auf heute gesetzt.';
     return `${demoTop}<h1>Einstellungen</h1>
     ${!storageOk ? '<div class="notice danger" style="margin-bottom:14px">Dein Browser erlaubt hier kein dauerhaftes Speichern. Sichere deine Daten unter „Datentransport“.</div>' : ''}
-    ${sec('design', 'Design', `<div class="themes">${THEMES.map(([id, l, bg]) => `<button class="th" aria-pressed="${s.theme === id}" data-act="theme" data-id="${id}"><div class="pv" style="background:${bg}">${FX.preview(id)}</div><div class="nm">${l}</div></button>`).join('')}</div>`)}
+    ${sec('design', 'Design', `<div class="themes">${THEMES.map(([id, l, bg]) => `<button class="th" aria-pressed="${curTheme() === id}" data-act="theme" data-id="${id}"><div class="pv" style="background:${bg}">${FX.preview(id)}</div><div class="nm">${l}${s.theme === id ? ' <span class="xs">★</span>' : ui.tryTheme === id ? ' <span class="xs">(Probe)</span>' : ''}</div></button>`).join('')}</div>`)}
     ${sec('arbeit', 'Arbeitszeit & Feiertage', `<div class="grid2"><div><label class="label">Wochenstunden</label><input class="field" data-set="arbeit.wochenstunden" value="${esc(deNum(s.arbeit.wochenstunden))}" inputmode="decimal"><div class="hint" id="tsoll">= ${D1(C.tagessoll(s))} Std./Tag</div></div><div></div>${fld('Brotzeit (min)', 'arbeit.brotzeit', s.arbeit.brotzeit, 'inputmode="numeric"')}${fld('Mittag (min)', 'arbeit.mittag', s.arbeit.mittag, 'inputmode="numeric"')}</div>
       <div class="mt"><label class="label">Bundesland (Feiertage)</label><select class="field" data-set="arbeit.land" data-struct="1">${Object.entries(C.LAENDER).map(([k, l]) => `<option value="${k}" ${s.arbeit.land === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
       ${s.arbeit.land === 'BY' ? sw('Mariä Himmelfahrt (15.08.) frei', 'arbeit.mariae', s.arbeit.mariae, 'gilt in überwiegend katholischen Gemeinden') : ''}
@@ -1080,11 +1205,15 @@
       ${fld('Kinderfreibeträge', 'steuer.kinderFB', deNum(s.steuer.kinderFB), 'inputmode="decimal"', 'laut Abrechnung, z. B. 0,5 / 1')}${fld('Kinder (Pflegevers.)', 'steuer.kinderPV', s.steuer.kinderPV, 'inputmode="numeric"', Number(s.steuer.kinderFB) > 0 && !Number(s.steuer.kinderPV) ? '⚠️ Kinder hier eintragen – sonst rechnet Toki den Kinderlosen-Zuschlag' : 'Anzahl Kinder – senkt den Pflegebeitrag')}</div>
       <div class="grid2">${fld(`Geburtsjahr ${info('alter')}`, 'steuer.geburtsjahr', s.steuer.geburtsjahr || '', 'inputmode="numeric" placeholder="z. B. 1990"')}<div></div></div>
       ${sw('Kirchensteuer', 'steuer.kirche', s.steuer.kirche)}${sw('Freiwillig gesetzlich versichert', 'steuer.freiwillig', s.steuer.freiwillig, 'Einkommen über der Versicherungspflichtgrenze: Beitrag wird abgeführt, Arbeitgeber zahlt Zuschuss – unterm Strich gleich, Anzeige wie auf deiner Abrechnung')}
-      ${!s.steuer.geprueft ? '<button class="btn soft sm" data-act="steuerOk">✓ Angaben stimmen so</button>' : '<p class="xs muted">✓ Steuerdaten geprüft</p>'}`)}
+      ${!s.steuer.geprueft ? '<button class="btn soft sm" data-act="steuerOk">✓ Angaben stimmen so</button>' : '<p class="xs muted">✓ Steuerdaten geprüft</p>'}
+      ${sw('Aus Abrechnungen lernen', 'lohn.lernen', s.lohn.lernen, 'Gleicht die Abweichung bei Steuer & SV aus deinen eingelesenen Entgeltabrechnungen aus')}
+      ${sw('Mehrarbeit: nur Zuschläge auszahlen', 'lohn.mehrNurZuschlag', s.lohn.mehrNurZuschlag, 'Grundstunden gehen aufs Konto Mehrarbeit zur Verrechnung – so steht es z. B. in deiner Abrechnung')}
+      <button class="btn mt" data-act="steuerKlaerung">🧾 Steuer-Klärung</button>`)}
     ${sec('konto', `${Sync.code ? '☁ ' : ''}Handy ↔ Laptop (Sync)${Sync.code ? ` <span class="syncdot ${sync.status}"></span>` : ''}`, '<div id="syncinfo">' + syncInfoHtml() + '</div>')}
     ${sec('daten', 'Datentransport', `<p class="small muted">Deine Daten liegen nur in diesem Browser auf diesem Gerät. Für Handy ↔ PC: hier exportieren und am anderen Gerät importieren.</p>
       <div class="grid2"><button class="btn" data-act="export">Exportieren</button><label class="btn soft" style="position:relative">Importieren<input type="file" accept=".json,application/json" data-act="importFile" style="position:absolute;inset:0;opacity:0"></label></div>
       <button class="btn ghost mt-s" data-act="importPaste">Aus Text einfügen</button>
+      <label class="btn soft mt-s" style="position:relative;width:100%">💶 Entgeltabrechnung (PDF) einlesen<input type="file" accept=".pdf,application/pdf" data-act="slipFile" style="position:absolute;inset:0;opacity:0"></label>
       <button class="btn ghost mt-s" data-act="releases">📝 Release Notes</button>
       <label class="btn soft mt-s" style="position:relative;width:100%">📄 Zeitnachweis (PDF) einlesen<input type="file" accept=".pdf,application/pdf" data-act="pdfFile" style="position:absolute;inset:0;opacity:0"></label>
       <button class="btn danger mt" data-act="reset">Alle Daten löschen</button>`)}
@@ -1099,20 +1228,27 @@
     recompute();
     const y = window.scrollY;
     const s = S();
-    document.body.dataset.theme = s.theme;
+    document.body.dataset.theme = curTheme();
     const page = { feierabend: pageFeierabend, mehrarbeit: pageMehrarbeit, urlaub: pageUrlaub, netto: pageNetto, einstellungen: pageSettings }[ui.tab] || pageFeierabend;
     const onSet = ui.tab === 'einstellungen';
-    root.innerHTML = `${demo ? '<div class="demobar">🎬 DEMO-MODUS · erfundene Daten <button data-act="demoExit">Beenden</button></div>' : ''}<div class="top"><div class="brand"><img src="${LOGO}" alt=""><span>TOKI</span></div><button class="iconbtn gearbtn ${onSet ? 'on' : ''}" data-act="tab" data-tab="${onSet ? ui.lastTab || 'feierabend' : 'einstellungen'}" title="${onSet ? 'Einstellungen schließen' : 'Einstellungen'}" aria-label="Einstellungen">${onSet ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>' : I.gear}</button></div><div class="page page-${ui.tab}">${page()}</div>`;
+    root.innerHTML = `${demo ? '<div class="demobar">🎬 DEMO-MODUS · erfundene Daten <button data-act="demoExit">Beenden</button></div>' : ''}${ui.tryTheme ? `<div class="trybar"><span>🎨 Probe: ${esc(themeName(ui.tryTheme))}</span><span class="bb"><button data-act="themeBack">Zurück</button><button class="go" data-act="themeKeep">Als Standard</button></span></div>` : ''}<div class="top"><div class="brand"><img src="${LOGO}" alt=""><span>TOKI</span></div><button class="iconbtn gearbtn ${onSet ? 'on' : ''}" data-act="tab" data-tab="${onSet ? ui.lastTab || 'feierabend' : 'einstellungen'}" title="${onSet ? 'Einstellungen schließen' : 'Einstellungen'}" aria-label="Einstellungen">${onSet ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>' : I.gear}</button></div><div class="page page-${ui.tab}">${page()}</div>`;
     document.getElementById('nav').innerHTML = `<div class="in">${NAV.map(([id, l, ic]) => `<button data-act="tab" data-tab="${id}" ${ui.tab === id ? 'aria-current="page"' : ''}>${ic}<span>${l}</span></button>`).join('')}</div>`;
     if (keepScroll) window.scrollTo(0, y);
     applyTheme();
   }
   let lastTheme = null;
+  function curTheme() { return ui.tryTheme && THEME_IDS.includes(ui.tryTheme) ? ui.tryTheme : S().theme; }
   function applyTheme() {
-    if (lastTheme === S().theme) return;
-    lastTheme = S().theme;
-    const meta = document.querySelector('meta[name=theme-color]');
-    if (meta) meta.content = getComputedStyle(document.body).getPropertyValue('--bg').trim() || '#b4521f';
+    if (lastTheme === curTheme()) return;
+    lastTheme = curTheme();
+    // Statusleiste/Notch-Bereich: Meta-Tag neu setzen (Safari übernimmt Änderungen sonst nicht zuverlässig) und html einfärben
+    const cs = getComputedStyle(document.body);
+    const bg = cs.getPropertyValue('--bg').trim() || '#17181c';
+    const old = document.querySelector('meta[name=theme-color]');
+    const meta = document.createElement('meta'); meta.name = 'theme-color'; meta.content = bg;
+    if (old) old.replaceWith(meta); else document.head.appendChild(meta);
+    document.documentElement.style.background = bg;
+    document.documentElement.style.colorScheme = cs.colorScheme && cs.colorScheme !== 'normal' ? cs.colorScheme : 'light';
     requestAnimationFrame(() => FX.set(lastTheme));
   }
 
@@ -1140,23 +1276,21 @@
     syncNow: () => syncNow(true),
     kEdit: () => { ui.kEdit = true; render(); const i = document.getElementById('kont'); if (i) { i.focus(); i.select(); } },
     kDone: () => { ui.kEdit = false; render(); },
-    demoLogin: () => {
-      sheet(`<h3>Demobereich</h3><p class="small muted">Anmelden, um die Demo zu starten.</p>
-        <label class="label" for="dName">Name</label><input class="field" id="dName" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="next">
-        <label class="label mt-s" for="dPw">Passwort</label><input class="field" id="dPw" type="password" inputmode="numeric" autocomplete="current-password" enterkeyhint="go">
-        <div id="dErr"></div>
-        <div class="grid2 mt"><button class="btn ghost" data-act="close">Abbrechen</button><button class="btn" id="dOk">Anmelden</button></div>`, (el) => {
-        const go = () => {
-          if (el.querySelector('#dName').value.trim().toLowerCase() === 'dani' && el.querySelector('#dPw').value.trim() === '8989') { closeSheet(); setDemo(true); }
-          else el.querySelector('#dErr').innerHTML = '<div class="notice danger mt-s">Name oder Passwort falsch.</div>';
-        };
-        el.querySelector('#dOk').addEventListener('click', go);
-        el.querySelector('#dPw').addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
-        el.querySelector('#dName').addEventListener('keydown', (e) => { if (e.key === 'Enter') el.querySelector('#dPw').focus(); });
-        setTimeout(() => el.querySelector('#dName').focus(), 60);
-      });
-    },
+    demoLogin: () => confirmBox('Demo-Modus', 'Wirklich in den fiktiven Demo-Modus wechseln? Deine echten Daten bleiben unberührt und kommen beim Verlassen zurück.', 'Ja, Demo starten', () => setDemo(true), false),
     demoExit: () => setDemo(false),
+    gyear: (t) => { ui.gyear = (ui.gyear || Number(ui.nmonth.slice(0, 4))) + Number(t.dataset.d); render(); },
+    gotoMonth: (t) => { ui.nmonth = t.dataset.m; ui.nmode = 'ist'; render(); window.scrollTo({ top: 0 }); },
+    slipDel: (t) => confirmBox('Abrechnung entfernen', `Gespeicherte Werte der Abrechnung ${monthName(t.dataset.m)} löschen?`, 'Entfernen', () => { delete st.abrechnungen[t.dataset.m]; save(); render(); }),
+    steuerKlaerung: () => {
+      let y = Number(today.slice(0, 4));
+      const draw = () => { const el = document.querySelector('.sheet'); if (!el) return; const x = el.querySelector('.sheetx'); el.innerHTML = steuerHtml(y); if (x) el.prepend(x); bind(el); };
+      const bind = (el) => {
+        el.querySelectorAll('[data-stk]').forEach((b) => b.addEventListener('click', () => { y += Number(b.dataset.stk); draw(); }));
+        const km = el.querySelector('#stkKm');
+        if (km) km.addEventListener('change', () => { S().steuer.km = num(km.value); save(); draw(); });
+      };
+      sheet(steuerHtml(y), bind);
+    },
     releases: () => sheet(`<h3>Release Notes</h3><div class="rel">${RELEASES.map(([v, d, items]) => `<div class="relv"><div class="relh"><b>v${v}</b><span>${d}</span></div><ul>${items.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>`).join('')}</div><button class="btn mt" data-act="close">Schließen</button>`),
     vacMail: () => {
       const s = S();
@@ -1240,7 +1374,18 @@
     godReset: () => { st.pref.god = godDefaults(); save(); render(); },
     godCalc: () => { render(); toast('✓ Berechnet'); },
     goSet: (t) => { ui.setOpen = t.dataset.sec; setTab('einstellungen'); },
-    theme: (t) => { S().theme = t.dataset.id; ui.setOpen = null; save(); render(); window.scrollTo({ top: 0, behavior: 'smooth' }); },
+    theme: (t) => {
+      const id = t.dataset.id;
+      if (id === S().theme && !ui.tryTheme) return;
+      sheet(`<h3>${esc(themeName(id))}</h3><div class="th" style="pointer-events:none;margin:6px 0 12px"><div class="pv" style="background:${(THEMES.find((x) => x[0] === id) || [])[2]};height:90px">${FX.preview(id)}</div></div>
+        <p class="small muted">Als Standard-Design merken (gilt auch nach jedem Neustart) oder erst mal nur probieren?</p>
+        <div class="grid2 mt"><button class="btn ghost" id="thTry">Probieren</button><button class="btn" id="thStd">Standard-Design</button></div>`, (el) => {
+        el.querySelector('#thTry').addEventListener('click', () => { ui.tryTheme = id === S().theme ? null : id; ui.setOpen = null; closeSheet(); render(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+        el.querySelector('#thStd').addEventListener('click', () => { S().theme = id; ui.tryTheme = null; ui.setOpen = null; save(); closeSheet(); render(); window.scrollTo({ top: 0, behavior: 'smooth' }); toast(`✓ ${themeName(id)} ist jetzt dein Standard-Design`, 2200, 'ok'); });
+      });
+    },
+    themeKeep: () => { S().theme = ui.tryTheme; ui.tryTheme = null; save(); render(); toast('✓ Als Standard-Design gemerkt', 2000, 'ok'); },
+    themeBack: () => { ui.tryTheme = null; render(); },
     secClose: (t) => { ui.setOpen = null; render(); const el = document.querySelector(`details[data-sec="${t.dataset.sec}"]`); if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' }); },
     setYear: (t) => { ui.setYear = Number(t.dataset.y); render(); },
     steuerOk: () => { S().steuer.geprueft = true; save(); render(); },
@@ -1267,7 +1412,7 @@
   let pvT;
   function showPreview() {
     closePreview();
-    const name = (THEMES.find((x) => x[0] === S().theme) || [])[1] || '';
+    const name = themeName(curTheme());
     const pv = document.createElement('div'); pv.id = 'pv'; pv.className = 'pvwrap';
     pv.innerHTML = `<div class="pvbar"><span>👁 Vorschau · <b>${esc(name)}</b></span><span class="xs">tippen zum Schließen</span></div><div class="pvframe"><div class="pvapp"><div class="top"><div class="brand"><img src="${LOGO}" alt=""><span>TOKI</span></div></div>${pageFeierabend()}</div></div>`;
     const fr = pv.querySelector('.pvframe');
@@ -1384,6 +1529,7 @@
       else { const g = { ...godDefaults(), ...(st.pref.god || {}) }; g.kasse = name; if (k) g.kvZusatz = k[1]; else if (!name) g.kvZusatz = 2.9; st.pref.god = g; }
       save(); render(); return;
     }
+    if (t.dataset.act === 'slipFile') { const f = t.files && t.files[0]; if (f) f.arrayBuffer().then(slipImport); t.value = ''; return; }
     if (t.dataset.act === 'pdfFile') { const f = t.files && t.files[0]; if (f) f.arrayBuffer().then(pdfImport); t.value = ''; return; }
     if (t.dataset.act === 'importFile') { const f = t.files && t.files[0]; if (f) f.text().then(doImport); t.value = ''; return; }
     if (!applyField(t)) return;

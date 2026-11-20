@@ -93,7 +93,7 @@ const Core = (() => {
     theme: 'dark',
     arbeit: { wochenstunden: 35, brotzeit: 15, mittag: 30, land: 'BY', mariae: true, halb24: false, halb31: false },
     lohn: {
-      grundlohn: 0, stundenlohn: 0, zeigen: true, auszahlung: 'folgemonat', nettoAbzug: 0,
+      grundlohn: 0, stundenlohn: 0, zeigen: true, auszahlung: 'folgemonat', nettoAbzug: 0, mehrNurZuschlag: false, lernen: true,
       sonder: [{ id: 'weihnachtsgeld', name: 'Weihnachtsgeld', art: 'einmalig', monat: 11, modus: 'betrag', wert: 0 }],
     },
     zk: { stand: 0, datum: '', samstagBonus: true, max: 35, min: -35 },
@@ -102,7 +102,7 @@ const Core = (() => {
     kurz: { aktiv: false, monat: '' },
     urlaub: { tarifTage: 30, ugFaktor: 0.5, ugTeiler: 21.75, fzaStand: 0, fzaDatum: '', tzugTage: 8, jahre: {} },
     mail: { anrede: '', an: '', name: '' },
-    steuer: { klasse: 1, kirche: true, kinderFB: 0, kinderPV: 0, geburtsjahr: 0, kasse: '', kvZusatz: 2.9, freiwillig: false, geprueft: false },
+    steuer: { klasse: 1, kirche: true, kinderFB: 0, kinderPV: 0, geburtsjahr: 0, kasse: '', kvZusatz: 2.9, freiwillig: false, geprueft: false, km: 0 },
   });
   const merge = (base, over) => {
     if (Array.isArray(base)) return Array.isArray(over) ? over : base;
@@ -597,7 +597,10 @@ const Core = (() => {
       else if (Number(s.monat) === (extra ? srcMo : mo)) lines.push({ k: (s.name || 'Sonderzahlung') + (extra ? aus : ''), v: val, laufend: false, extra });
     }
     const mm = calc.months.get(src);
-    if (mm && mm.pay.total) lines.push({ k: 'Mehrarbeit' + aus, v: mm.pay.total, laufend: true, mehr: mm, extra: true });
+    // Arbeitgeber zahlt evtl. nur die Zuschläge aus (Grundstunden → Konto Mehrarbeit zur Verrechnung) – aus der Abrechnung gelernt
+    const nurZ = !!S.lohn.mehrNurZuschlag;
+    const mPay = mm ? (nurZ ? mm.pay.z25 + mm.pay.z50 : mm.pay.total) : 0;
+    if (mPay) lines.push({ k: 'Mehrarbeit' + (nurZ ? ' (Zuschläge)' : '') + aus, v: mPay, laufend: true, mehr: mm, nurZ, extra: true });
     let tu = 0;
     for (const [d, a] of calc.absMap) if (a.type === 'tarif' && ym(d) === src) tu += a.units;
     const ugTag = (g / (Number(S.urlaub.ugTeiler) || 21.75)) * (Number(S.urlaub.ugFaktor) || 0);
@@ -694,6 +697,208 @@ const Core = (() => {
     return st;
   };
 
+  /** Jahres-Statistik (Arbeitstage, Rekorde, Abwesenheiten) */
+  const yearStats = (st, calc, y, vac) => {
+    const S = st.settings, opt = holOpt(S), Y = String(y);
+    const ent = Object.entries(st.entries).filter(([d]) => d.startsWith(Y)).sort();
+    const sollTage = range(`${Y}-01-01`, `${Y}-12-31`).filter((d) => isWorkday(d, opt)).length;
+    const feiertage = [...holidays(y, opt).keys()].filter((d) => d.startsWith(Y) && dow(d) >= 1 && dow(d) <= 5).length;
+    let longest = null, earliest = null, latest = null, sumH = 0, sumStart = 0, sumEnd = 0, sat = 0, satH = 0, over9 = 0, capped = 0, pause = 0;
+    for (const [d, e] of ent) {
+      const a = toMin(e.start); let b = toMin(e.end); if (b < a) b += 1440;
+      sumH += e.hours; sumStart += a; sumEnd += b; pause += Number(e.pause) || 0;
+      if (!longest || e.hours > longest.hours) longest = { date: d, hours: e.hours };
+      if (!earliest || a < earliest.min) earliest = { date: d, min: a };
+      if (!latest || b > latest.min) latest = { date: d, min: b };
+      if (dow(d) === 6) { sat++; satH += e.hours; }
+      if (e.hours > 9) over9++;
+      if (e.capped) capped++;
+    }
+    const n = ent.length;
+    let topWeek = null;
+    for (const w of calc.weeks) {
+      const h = w.days.filter((x) => x.date.startsWith(Y) && x.entry).reduce((acc, x) => acc + x.entry.hours, 0);
+      if (h > 0 && (!topWeek || h > topWeek.hours)) topWeek = { kw: w.kw, monday: w.monday, sunday: w.sunday, hours: h };
+    }
+    let topMonth = null;
+    for (const m of calc.months.values()) if (m.month.startsWith(Y) && m.mehr > 0 && (!topMonth || m.mehr > topMonth.mehr)) topMonth = { month: m.month, mehr: m.mehr };
+    const v = (vac && vac[y]) || {};
+    const urlaub = (v.taken || 0) + (v.tzug || 0) + (v.sonder || 0) + (v.zkDays || 0) + (v.fzaDays || 0);
+    return {
+      arbeitstage: n, sollTage, feiertage, samstage: sat, samstagH: satH, stunden: sumH,
+      schnitt: n ? sumH / n : 0, beginn: n ? Math.round(sumStart / n) : null, ende: n ? Math.round(sumEnd / n) : null,
+      longest, earliest, latest, topWeek, topMonth, over9, capped, pauseH: pause / 60,
+      krank: v.krank || 0, kurz: v.kurz || 0, urlaub,
+    };
+  };
+
+  // ---------- Entgeltabrechnung (PDF des Arbeitgebers) ----------
+  const MONATE_LANG = ['januar', 'februar', 'märz', 'april', 'mai', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'dezember'];
+  /**
+   * Entgeltabrechnung (Zeilen mit Textstücken {x, s}) → Kennzahlen des Monats.
+   * Werte-Spalten (Tg./St., Faktor, Monatswert, Jahreswert) über die Kopfzeile, sonst Standard-Positionen.
+   */
+  const parseAbrechnung = (rows) => {
+    const seen = new Set();
+    rows = rows.map((r) => ({ ...r, items: r.items.filter((i) => { const k = `${Math.round(i.x)}|${Math.round(r.y)}|${i.s}`; if (seen.has(k)) return false; seen.add(k); return true; }) }));
+    let month = null, cols = null;
+    for (let i = 0; i < rows.length && !month; i++) {
+      const t = rows[i].items.map((x) => x.s).join(' ');
+      if (/Abrechnungszeitraum|Abrechnungsmonat/i.test(t) || i > 0) {
+        const m = new RegExp(`(${MONATE_LANG.join('|')}|maerz)\\s+(20\\d\\d)`, 'i').exec(t);
+        if (m) { const idx = MONATE_LANG.indexOf(m[1].toLowerCase().replace('maerz', 'märz')); month = `${m[2]}-${String(idx + 1).padStart(2, '0')}`; }
+      }
+    }
+    const num = (s) => { const t = String(s || '').trim(); const neg = /-\s*$/.test(t) || /^-/.test(t); const v = deZahl(t.replace(/-\s*$/, '').replace(/^-/, '').trim()); return v === null ? null : neg ? -v : v; };
+    const out = { month, lines: [] };
+    for (const r of rows) {
+      const its = r.items;
+      const t = its.map((x) => x.s).join(' ');
+      if (/Monatswert/.test(t) && /Jahreswert/.test(t)) {
+        const f = (re) => (its.find((x) => re.test(x.s)) || {}).x;
+        cols = { tg: f(/Tg\.|St\./), faktor: f(/Faktor/), monat: f(/Monatswert/), jahr: f(/Jahreswert/) };
+        continue;
+      }
+      const label = its.filter((x) => num(x.s) === null && !/^[\/A-Z0-9#$]{3,4}$/.test(x.s.trim()) && !/^[ELSGZ]{2,5}$/.test(x.s.trim())).map((x) => x.s.trim()).join(' ').trim();
+      const nums = its.filter((x) => num(x.s) !== null);
+      if (!label || !nums.length) continue;
+      const C2 = cols || { tg: 259, faktor: 319, monat: 404, jahr: 498 };
+      const slot = (x) => { const cand = Object.entries(C2).filter(([, hx]) => hx !== undefined && hx <= x + 6).sort((a, b) => b[1] - a[1]); return cand.length ? cand[0][0] : 'monat'; };
+      const v = {}; for (const n of nums) v[slot(n.x)] = num(n.s);
+      out.lines.push({ label, ...v });
+    }
+    const find = (re) => out.lines.find((l) => re.test(l.label));
+    const val = (re, k = 'monat') => { const l = find(re); return l && l[k] !== undefined ? Math.abs(l[k]) : 0; };
+    const z25 = find(/Mehrarb\w*\.?\s*Zuschl\w*\.?\s*25/i), z50 = find(/Mehrarb\w*\.?\s*Zuschl\w*\.?\s*50/i);
+    const base = out.lines.find((l) => /Mehrarb/i.test(l.label) && !/Zus|Nacht/i.test(l.label));
+    const ug = find(/Urlaubsgeld/i);
+    const kvFrei = val(/Beitrag freiw\.?\s*KV/i), pvFrei = val(/Beitrag freiw\.?\s*PV/i), kvZ = val(/AG-Zuschuss KV/i), pvZ = val(/AG-Zuschuss PV/i);
+    const r = {
+      month,
+      grund: val(/Entgelt gesamt/i) || val(/Grundentgelt|Grundgehalt|Gehalt/i),
+      brutto: val(/Gesamtbrutto|Gesamt-Brutto/i), bruttoJahr: val(/Gesamtbrutto|Gesamt-Brutto/i, 'jahr'),
+      stEZ: val(/Steuer-?Brutto,?\s*EZ/i), stL: val(/Steuer-?Brutto,?\s*lfd/i), stJahr: val(/Steuer-?Brutto,?\s*lfd/i, 'jahr') + val(/Steuer-?Brutto,?\s*EZ/i, 'jahr'),
+      lst: val(/Lohnsteuer,?\s*EZ/i) + val(/Lohnsteuer,?\s*lfd/i) || val(/^Lohnsteuer/i),
+      lstJahr: val(/Lohnsteuer,?\s*EZ/i, 'jahr') + val(/Lohnsteuer,?\s*lfd/i, 'jahr'),
+      soli: val(/Solidarit/i), kist: val(/Kirchensteuer/i),
+      rv: val(/Rentenvers\w*,?\s*EZ/i) + val(/Rentenvers\w*,?\s*lfd/i) || val(/Rentenvers/i),
+      av: val(/Arbeitslosenv\w*\.?,?\s*EZ/i) + val(/Arbeitslosenv\w*\.?,?\s*lfd/i) || val(/Arbeitslosenv/i),
+      kv: kvFrei ? kvFrei - kvZ : val(/Krankenvers/i), pv: pvFrei ? pvFrei - pvZ : val(/Pflegevers/i),
+      freiwillig: !!kvFrei,
+      gesetzlNetto: val(/Gesetzl\w*\.?\s*Netto/i),
+      restzahlung: val(/Restzahlung/i),
+      vlAG: val(/Verm\S*\s*AG|VWL|vermögenswirks/i),
+      kug: val(/Kurzarbeitergeld/i),
+      mehr: { h25: z25 ? Math.abs(z25.tg || 0) : 0, h50: z50 ? Math.abs(z50.tg || 0) : 0, z25: z25 ? Math.abs(z25.monat || 0) : 0, z50: z50 ? Math.abs(z50.monat || 0) : 0, base: base ? Math.abs(base.monat || 0) : 0, baseH: base ? Math.abs(base.tg || 0) : 0, satz: (z25 && z25.faktor) || 0 },
+      ug: ug ? { tage: Math.abs(ug.tg || 0), tag: Math.abs(ug.faktor || 0), eur: Math.abs(ug.monat || 0) } : null,
+      weihnacht: val(/Weihnacht/i),
+    };
+    const vj = (re) => val(re, 'jahr');
+    r.jahr = {
+      brutto: r.bruttoJahr, steuerBrutto: r.stJahr, lst: r.lstJahr, soli: vj(/Solidarit/i), kist: vj(/Kirchensteuer/i),
+      rv: vj(/Rentenvers\w*,?\s*EZ/i) + vj(/Rentenvers\w*,?\s*lfd/i), av: vj(/Arbeitslosenv\w*\.?,?\s*EZ/i) + vj(/Arbeitslosenv\w*\.?,?\s*lfd/i),
+      kv: kvFrei ? vj(/Beitrag freiw\.?\s*KV/i) - vj(/AG-Zuschuss KV/i) : vj(/Krankenvers/i), pv: pvFrei ? vj(/Beitrag freiw\.?\s*PV/i) - vj(/AG-Zuschuss PV/i) : vj(/Pflegevers/i),
+    };
+    r.steuer = r.lst + r.soli + r.kist;
+    r.sv = r.rv + r.av + r.kv + r.pv;
+    // Netto wie in Toki: gesetzliches Netto + AG-Zuschüsse − freiwillige Beiträge (bzw. Brutto − Steuern − SV)
+    r.netto = r.gesetzlNetto ? r.gesetzlNetto + kvZ + pvZ - kvFrei - pvFrei : r.brutto - r.steuer - r.sv;
+    if (!month || !r.brutto) throw new Error('Das sieht nicht nach einer Entgeltabrechnung aus – ich finde Monat oder Gesamtbrutto nicht.');
+    return r;
+  };
+
+  /** Vergleich Abrechnung ↔ Toki (Ansicht „Auszahlung“) und Lern-Korrektur der Abzüge */
+  const abrechnungVergleich = (st, calc, a) => {
+    const S = st.settings, mo = Number(a.month.slice(5, 7));
+    const mp = monthPay(st, calc, a.month, 'auszahlung');
+    const t = netto(mp.laufend, mp.einmal, S, mo, mp.abzug, mp.basis);
+    // Toki-Abzüge auf exakt das Brutto der Abrechnung → reine Modell-Abweichung bei Steuer/SV
+    const mehrEur = a.mehr.z25 + a.mehr.z50 + a.mehr.base;
+    const lauf = a.stL || a.brutto - a.stEZ, ein = a.stEZ;
+    const t2 = netto(lauf, ein, S, mo, 0, Math.max(0, lauf - mehrEur));
+    const realAbz = a.steuer + a.sv, tokiAbz = t2.taxSum + t2.svSum;
+    const mehrToki = mp.lines.filter((l) => l.mehr).reduce((x, l) => x + l.v, 0);
+    const ugToki = mp.lines.filter((l) => /^Urlaubsgeld/.test(l.k)).reduce((x, l) => x + l.v, 0);
+    return {
+      zeilen: [
+        { k: 'Grundgehalt', toki: Number(S.lohn.grundlohn) || 0, real: a.grund },
+        { k: 'Mehrarbeit', toki: mehrToki, real: mehrEur, info: a.mehr.base ? '' : 'laut Abrechnung nur Zuschläge' },
+        { k: 'Urlaubsgeld', toki: ugToki, real: a.ug ? a.ug.eur : 0 },
+        { k: 'Brutto', toki: t.gross, real: a.brutto },
+        { k: 'Steuern', toki: t.taxSum, real: a.steuer },
+        { k: 'Sozialversicherung', toki: t.svSum, real: a.sv },
+        { k: 'Netto', toki: t.net, real: a.netto },
+      ],
+      korr: tokiAbz - realAbz, // > 0: Toki zieht zu viel ab
+      nurZuschlag: !a.mehr.base && (a.mehr.z25 + a.mehr.z50) > 0,
+      grundAnders: a.grund > 0 && Math.abs(a.grund - (Number(S.lohn.grundlohn) || 0)) > 0.5,
+    };
+  };
+  /** Lern-Korrektur: Mittel der letzten (bis zu 3) Abweichungen bei den Abzügen */
+  const lernKorrektur = (st) => {
+    const list = Object.values(st.abrechnungen || {}).filter((a) => Number.isFinite(a.korr)).sort((a, b) => (a.month < b.month ? 1 : -1)).slice(0, 3);
+    return list.length ? list.reduce((x, a) => x + a.korr, 0) / list.length : 0;
+  };
+
+  /** Jahres-Gehalt: je Monat Abrechnung (falls eingelesen) sonst Toki-Rechnung (Ansicht „Auszahlung“) */
+  const gehaltJahr = (st, calc, y, today = todayIso()) => {
+    const S = st.settings, months = [];
+    const sum = { brutto: 0, steuerBrutto: 0, lst: 0, soli: 0, kist: 0, rv: 0, av: 0, kv: 0, pv: 0, steuer: 0, sv: 0, netto: 0, kug: 0, mehr: 0, ug: 0, sonder: 0, echt: 0, prognose: 0 };
+    for (let i = 1; i <= 12; i++) {
+      const m = `${y}-${String(i).padStart(2, '0')}`;
+      const a = (st.abrechnungen || {})[m];
+      let r;
+      if (a) {
+        r = { m, echt: true, brutto: a.brutto, steuerBrutto: a.stL + a.stEZ, lst: a.lst, soli: a.soli, kist: a.kist, rv: a.rv, av: a.av, kv: a.kv, pv: a.pv, steuer: a.steuer, sv: a.sv, netto: a.netto + (a.kug || 0), kug: a.kug || 0,
+          mehr: a.mehr.z25 + a.mehr.z50 + a.mehr.base, ug: a.ug ? a.ug.eur : 0, sonder: a.weihnacht || 0 };
+      } else {
+        const mp = monthPay(st, calc, m, 'auszahlung');
+        const n = netto(mp.laufend, mp.einmal, S, i, mp.abzug, mp.basis);
+        const korr = S.lohn.lernen ? lernKorrektur(st) : 0;
+        const ln = (re) => mp.lines.filter((l) => re(l)).reduce((x, l) => x + l.v, 0);
+        r = { m, echt: false, brutto: n.gross, steuerBrutto: n.gross, lst: n.lst, soli: n.soli, kist: n.kist, rv: n.sv.rv, av: n.sv.av, kv: n.sv.kv, pv: n.sv.pv, steuer: n.taxSum, sv: n.svSum, netto: n.net + korr, kug: mp.kug || 0,
+          mehr: ln((l) => l.mehr), ug: ln((l) => /^Urlaubsgeld/.test(l.k)), sonder: ln((l) => !l.mehr && !l.mav && !l.kurz && !/^Urlaubsgeld|^Grundgehalt/.test(l.k)) };
+      }
+      r.prognose = !r.echt && m > ym(today);
+      months.push(r);
+      for (const k of Object.keys(sum)) if (typeof r[k] === 'number') sum[k] += r[k];
+      if (r.echt) sum.echt++; if (r.prognose) sum.prognose++;
+    }
+    return { y, months, sum };
+  };
+
+  /** Daten für die Steuererklärung (Anlage N/Vorsorge) + grober Tarif-Tipp */
+  const steuerKlaerung = (st, calc, y, today = todayIso()) => {
+    const S = st.settings, T = S.steuer;
+    const gj = gehaltJahr(st, calc, y, today);
+    const Y = String(y);
+    const arbeitstage = Object.keys(st.entries).filter((d) => d.startsWith(Y)).length;
+    const km = Number(T.km) || 0;
+    const pendler = km * 0.38 * arbeitstage;
+    const wkPausch = P.anPausch;
+    const slips = Object.values(st.abrechnungen || {}).filter((a) => a.month.startsWith(Y)).sort((a, b) => (a.month < b.month ? 1 : -1));
+    const last = slips[0] || null;
+    // Bis zur letzten Abrechnung zählen deren Jahreswerte (exakt), danach Toki/weitere Abrechnungen
+    const sum = { ...gj.sum };
+    let bis = null;
+    if (last && last.jahr && last.jahr.steuerBrutto) {
+      bis = last.month;
+      const after = gj.months.filter((r) => r.m > last.month);
+      const add = (k) => after.reduce((x, r) => x + (r[k] || 0), 0);
+      for (const k of ['steuerBrutto', 'lst', 'soli', 'kist', 'rv', 'av', 'kv', 'pv']) sum[k] = (last.jahr[k] || 0) + add(k);
+      sum.brutto = (last.jahr.brutto || 0) + add('brutto');
+      sum.steuer = sum.lst + sum.soli + sum.kist; sum.sv = sum.rv + sum.av + sum.kv + sum.pv;
+    }
+    const sj = steuerJahr(sum.steuerBrutto, S);
+    const split = Number(T.klasse) === 3 || Number(T.klasse) === 4;
+    const grenze42 = split ? 139758 : 69879, grundfrei = split ? 24696 : 12348;
+    return {
+      y, gj, sum, bis, arbeitstage, km, pendler, wkPausch, wkMehr: Math.max(0, pendler + 16 - wkPausch), // 16 € Kontoführung (üblich anerkannt)
+      kug: gj.sum.kug, krank: 0, last,
+      zve: sj.zve, grenz: sj.grenz, grenze42, grundfrei, split, bisGrenze: grenze42 - sj.zve,
+    };
+  };
+
   // ---------- Zeitnachweis (PDF des Arbeitgebers) ----------
   const deZahl = (s) => { const t = String(s || '').trim().replace(/\./g, '').replace(',', '.'); return /^-?\d+(\.\d+)?$/.test(t) ? Number(t) : null; };
   const deDatum = (s) => { const m = /(\d{2})\.(\d{2})\.(\d{4})/.exec(s || ''); return m ? `${m[3]}-${m[2]}-${m[1]}` : null; };
@@ -718,7 +923,7 @@ const Core = (() => {
   const parseZeitnachweis = (rows) => {
     const txt = (r) => r.items.map((i) => i.s).join(' ');
     let from = null, to = null, head = null; const days = []; let summary = false;
-    const out = { from: null, to: null, month: null, days, zk: null, fza: null, kontingent: null, verbraucht: null, ist: null };
+    const out = { from: null, to: null, month: null, days, zk: null, fza: null, mav: null, kontingent: null, verbraucht: null, ist: null };
     for (const r of rows) {
       const line = txt(r);
       if (!from && /Zeitraum/.test(line)) { const ds = line.match(/\d{2}\.\d{2}\.\d{4}/g) || []; from = deDatum(ds[0]); to = deDatum(ds[1]); continue; }
@@ -744,7 +949,7 @@ const Core = (() => {
       if (dn !== null) {
         const date = `${from.slice(0, 8)}${String(dn).padStart(2, '0')}`;
         if (date < from || date > to) continue;
-        days.push({ date, segs: seg.desc || seg.von ? [seg] : [], ist: deZahl(cells['Istz.']), soll: deZahl(cells.Sollz), zkt: deZahl(cells.ZKT), zktK: deZahl(cells['ZKT K']), ma: deZahl(cells.MA), fzaK: deZahl(cells['FZA K']), holiday: '' });
+        days.push({ date, segs: seg.desc || seg.von ? [seg] : [], ist: deZahl(cells['Istz.']), soll: deZahl(cells.Sollz), zkt: deZahl(cells.ZKT), zktK: deZahl(cells['ZKT K']), ma: deZahl(cells.MA), meav: deZahl(cells.MEAV), fzaK: deZahl(cells['FZA K']), holiday: '' });
       } else if (days.length && (seg.desc || seg.von)) {
         const d = days[days.length - 1];
         if (!seg.von && !seg.bis && !d.segs.length) d.holiday = seg.desc; else d.segs.push(seg);
@@ -754,6 +959,7 @@ const Core = (() => {
     Object.assign(out, { from, to, month: ym(from) });
     const last = days.filter((d) => d.zktK !== null).pop(); if (last) out.zk = { date: to, value: last.zktK };
     const lastF = days.filter((d) => d.fzaK !== null).pop(); if (lastF) out.fza = { date: to, value: lastF.fzaK };
+    const lastM = days.filter((d) => d.meav !== null && d.meav !== undefined).pop(); if (lastM) out.mav = { date: to, value: lastM.meav };
     // Tage auswerten
     for (const d of days) {
       const work = d.segs.filter((s) => s.von && s.bis);
@@ -808,6 +1014,7 @@ const Core = (() => {
     const konten = [];
     if (pdf.zk) konten.push({ k: 'Zeitkonto', toki: k.zk, pdf: pdf.zk.value, uebernehmen: !st.settings.zk.datum || pdf.to >= st.settings.zk.datum });
     if (pdf.fza) konten.push({ k: 'FZA-Konto', toki: k.fza, pdf: pdf.fza.value, uebernehmen: !st.settings.urlaub.fzaDatum || pdf.to >= st.settings.urlaub.fzaDatum });
+    if (pdf.mav) konten.push({ k: 'Mehrarbeit zur Verrechnung (MEAV)', toki: kurzPlan(st).rest, pdf: pdf.mav.value, uebernehmen: !(st.settings.mav || {}).datum || pdf.to >= st.settings.mav.datum });
     if (pdf.kontingent !== null) konten.push({ k: 'MEA-Kontingent', toki: st.kontingent && st.kontingent[pdf.month] !== undefined ? Number(st.kontingent[pdf.month]) : null, pdf: pdf.kontingent, uebernehmen: true });
     if (pdf.verbraucht !== null) konten.push({ k: 'Mehrarbeit (verbraucht)', toki: k.mehr, pdf: pdf.verbraucht, info: true });
     return { pdf, diffs, konten, cnt };
@@ -845,14 +1052,16 @@ const Core = (() => {
       if (k.k === 'Zeitkonto') Object.assign(S.zk, { stand: k.pdf, datum: pdf.to, setAt: now });
       if (k.k === 'FZA-Konto') Object.assign(S.urlaub, { fzaStand: k.pdf, fzaDatum: pdf.to, fzaSetAt: now });
       if (k.k === 'MEA-Kontingent') st.kontingent[pdf.month] = k.pdf;
+      if (/^Mehrarbeit zur Verrechnung/.test(k.k)) Object.assign(S.mav, { stunden: k.pdf, datum: pdf.to });
     }
+    st.nachweise = { ...(st.nachweise || {}), [pdf.month]: { importiert: now, tage: pdf.days.filter((p) => p.work).length } };
     return st;
   };
 
   return {
     toMin, fmtClock, leaveAt, workedRaw, capDay, MAX_DAY, D, iso, addDays, dow, monday, isoWeek, ym, todayIso, range,
     LAENDER, easter, holidays, holidayName, isWorkday, workdaysBetween, defaults, merge, tagessoll, stundenlohn, holOpt,
-    TYPES, specialPause, presence, absenceDays, halfDay, dayNeed, yearCfg, dayTarget, zuschlag, compute, vacation, est, steuerJahr, netto, monthPay, monatsentgelt, sonderGruppe, prevMonth, KASSEN, P, parseZeitnachweis, importPlan, applyImport, kontenAm, kurzPlan, mavRollover, demoState,
+    TYPES, specialPause, presence, absenceDays, halfDay, dayNeed, yearCfg, dayTarget, zuschlag, compute, vacation, est, steuerJahr, netto, monthPay, monatsentgelt, sonderGruppe, prevMonth, KASSEN, P, parseZeitnachweis, parseAbrechnung, abrechnungVergleich, lernKorrektur, gehaltJahr, steuerKlaerung, yearStats, importPlan, applyImport, kontenAm, kurzPlan, mavRollover, demoState,
   };
 })();
 if (typeof module !== 'undefined') module.exports = Core;
