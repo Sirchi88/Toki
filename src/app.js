@@ -6,6 +6,7 @@
   const LOGO = '__LOGO__';
   /** Release Notes – neueste zuerst: [Version, Datum, Themen] */
   const RELEASES = [
+    ['2.6', '20.11.2026', ['Hinweis bei neuer Version – ein Tipp aktualisiert die App']],
     ['2.5', '20.11.2026', ['Dokumente zum Einklappen', 'Großer Upload-Knopf, mehrere PDFs auf einmal']],
     ['2.4', '20.11.2026', ['Urlaub-Kacheln nur noch mit dem Wichtigsten', 'Gehalt: ein Einlesen-Knopf erkennt Zeitnachweis oder Abrechnung', 'Größere Monatsnamen, kräftigere Dokument-Zeichen']],
     ['2.3', '20.11.2026', ['Neues Design „Goldene Weihnacht“', 'Gehalt: Dokumente unter der Netto-Berechnung, Export klein ganz unten', 'Einstellungen: Zeitkonten & Urlaub zusammengefasst, Synchronisation Endgeräte, Steuererklärung', 'Urlaub: größere Schrift in den Kacheln']],
@@ -1591,5 +1592,20 @@
   render(false);
   if (login && typeof login === 'string') { if (login !== Sync.code) connectCode(login, false); else syncNow(false); }
   else { if (login && login.error) toast(`⚠ ${login.error}`, 4000); if (Sync.code) syncNow(false); }
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') syncNow(false); });
+  // Update-Check: Startbildschirm-Apps und Browser halten die Seite gern im Cache – neue Version erkennen und anbieten
+  const vnum = (v) => v.split('.').map(Number).reduce((a, x) => a * 1000 + x, 0);
+  let updShown = false;
+  function checkUpdate() {
+    if (updShown || !/^https?:$/.test(location.protocol) || /claude|anthropic/.test(location.hostname)) return;
+    fetch(`${location.pathname}?v=${Date.now()}`, { cache: 'no-store' }).then((r) => (r.ok ? r.text() : '')).then((t) => {
+      const m = /const RELEASES = \[\s*\['(\d+\.\d+)'/.exec(t);
+      if (!m || vnum(m[1]) <= vnum(RELEASES[0][0])) return;
+      updShown = true;
+      const b = document.createElement('button'); b.className = 'updbar'; b.textContent = `✨ Neue Version ${m[1]} – tippen zum Aktualisieren`;
+      b.addEventListener('click', () => location.replace(`${location.pathname}?u=${Date.now()}${location.hash}`));
+      document.body.appendChild(b);
+    }).catch(() => {});
+  }
+  setTimeout(checkUpdate, 1500);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { syncNow(false); checkUpdate(); } });
 })();
