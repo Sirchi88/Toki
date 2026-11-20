@@ -929,6 +929,7 @@ body[data-theme=noel] .notice.warn{background:rgb(217 180 94/.12);border-color:r
 .doccard>summary .docs.mini{margin:0 0 0 6px}
 .docbtn{display:flex;align-items:center;justify-content:center;width:100%;max-width:320px;margin:12px auto 0;min-height:52px;font-size:17px}
 .docnote{text-align:center;margin:6px 0 0}
+.updbar{position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 10px);z-index:200;border:0;border-radius:999px;padding:10px 16px;background:var(--primary);color:var(--on-primary);font:inherit;font-weight:800;font-size:14px;box-shadow:0 8px 24px -8px rgb(0 0 0/.5);cursor:pointer;max-width:92vw}
 </style>
 </head>
 <body data-theme="standard">
@@ -2977,6 +2978,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
   const LOGO = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjE1IDMgOTAgODgiPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJ0ZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzM2Yjk4MiIvPjxzdG9wIG9mZnNldD0iLjU1IiBzdG9wLWNvbG9yPSIjMmE5YzZiIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWQ3NjUwIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJ0eCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzJjOWY2YyIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzFlN2E1MSIvPjwvbGluZWFyR3JhZGllbnQ+CjxmaWx0ZXIgaWQ9InNoIiB4PSItMjAlIiB5PSItMjAlIiB3aWR0aD0iMTQwJSIgaGVpZ2h0PSIxNDAlIj48ZmVEcm9wU2hhZG93IGR4PSIwIiBkeT0iMS41IiBzdGREZXZpYXRpb249IjEuNiIgZmxvb2QtY29sb3I9IiMwMDAiIGZsb29kLW9wYWNpdHk9Ii4zNSIvPjwvZmlsdGVyPgo8ZmlsdGVyIGlkPSJpbiI+PGZlT2Zmc2V0IGR5PSIxLjIiLz48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIxIi8+PGZlQ29tcG9zaXRlIG9wZXJhdG9yPSJvdXQiIGluPSJTb3VyY2VHcmFwaGljIi8+PGZlQ29tcG9uZW50VHJhbnNmZXI+PGZlRnVuY0EgdHlwZT0ibGluZWFyIiBzbG9wZT0iLjciLz48L2ZlQ29tcG9uZW50VHJhbnNmZXI+PGZlQmxlbmQgaW4yPSJTb3VyY2VHcmFwaGljIiBtb2RlPSJub3JtYWwiLz48L2ZpbHRlcj4KPC9kZWZzPgo8ZyBmaWx0ZXI9InVybCgjc2gpIj4KPHJlY3QgeD0iMTkiIHk9IjYiIHdpZHRoPSI4MiIgaGVpZ2h0PSI4MCIgcng9IjE1IiBmaWxsPSJ1cmwoI3RnKSIvPgo8cmVjdCB4PSIxOS42IiB5PSI2LjYiIHdpZHRoPSI4MC44IiBoZWlnaHQ9Ijc4LjgiIHJ4PSIxNC40IiBmaWxsPSJub25lIiBzdHJva2U9IiM3ZmYwYmQiIHN0cm9rZS1vcGFjaXR5PSIuMjIiIHN0cm9rZS13aWR0aD0iMS4yIi8+CjwvZz4KPHBhdGggZD0iTTM3LjUgMjFIODAuNVYzNEg2NS41VjY5SDUyLjVWMzRIMzcuNVoiIGZpbGw9IiMxZDIwMjUiIGZpbHRlcj0idXJsKCNpbikiLz4KPC9zdmc+Cg==';
   /** Release Notes – neueste zuerst: [Version, Datum, Themen] */
   const RELEASES = [
+    ['2.6', '20.11.2026', ['Hinweis bei neuer Version – ein Tipp aktualisiert die App']],
     ['2.5', '20.11.2026', ['Dokumente zum Einklappen', 'Großer Upload-Knopf, mehrere PDFs auf einmal']],
     ['2.4', '20.11.2026', ['Urlaub-Kacheln nur noch mit dem Wichtigsten', 'Gehalt: ein Einlesen-Knopf erkennt Zeitnachweis oder Abrechnung', 'Größere Monatsnamen, kräftigere Dokument-Zeichen']],
     ['2.3', '20.11.2026', ['Neues Design „Goldene Weihnacht“', 'Gehalt: Dokumente unter der Netto-Berechnung, Export klein ganz unten', 'Einstellungen: Zeitkonten & Urlaub zusammengefasst, Synchronisation Endgeräte, Steuererklärung', 'Urlaub: größere Schrift in den Kacheln']],
@@ -4562,7 +4564,22 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
   render(false);
   if (login && typeof login === 'string') { if (login !== Sync.code) connectCode(login, false); else syncNow(false); }
   else { if (login && login.error) toast(`⚠ ${login.error}`, 4000); if (Sync.code) syncNow(false); }
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') syncNow(false); });
+  // Update-Check: Startbildschirm-Apps und Browser halten die Seite gern im Cache – neue Version erkennen und anbieten
+  const vnum = (v) => v.split('.').map(Number).reduce((a, x) => a * 1000 + x, 0);
+  let updShown = false;
+  function checkUpdate() {
+    if (updShown || !/^https?:$/.test(location.protocol) || /claude|anthropic/.test(location.hostname)) return;
+    fetch(`${location.pathname}?v=${Date.now()}`, { cache: 'no-store' }).then((r) => (r.ok ? r.text() : '')).then((t) => {
+      const m = /const RELEASES = \[\s*\['(\d+\.\d+)'/.exec(t);
+      if (!m || vnum(m[1]) <= vnum(RELEASES[0][0])) return;
+      updShown = true;
+      const b = document.createElement('button'); b.className = 'updbar'; b.textContent = `✨ Neue Version ${m[1]} – tippen zum Aktualisieren`;
+      b.addEventListener('click', () => location.replace(`${location.pathname}?u=${Date.now()}${location.hash}`));
+      document.body.appendChild(b);
+    }).catch(() => {});
+  }
+  setTimeout(checkUpdate, 1500);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { syncNow(false); checkUpdate(); } });
 })();
 </script>
 </body>
