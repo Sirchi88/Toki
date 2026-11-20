@@ -914,3 +914,5 @@ body[data-theme=noel] .notice.warn{background:rgb(217 180 94/.12);border-color:r
 .docbtn{display:flex;align-items:center;justify-content:center;width:100%;max-width:320px;margin:12px auto 0;min-height:52px;font-size:17px}
 .docnote{text-align:center;margin:6px 0 0}
 .updbar{position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 10px);z-index:200;border:0;border-radius:999px;padding:10px 16px;background:var(--primary);color:var(--on-primary);font:inherit;font-weight:800;font-size:14px;box-shadow:0 8px 24px -8px rgb(0 0 0/.5);cursor:pointer;max-width:92vw}
+.docview{border:1px solid var(--primary);background:transparent;color:var(--primary);border-radius:999px;padding:3px 9px;font-size:12px;font-weight:700;cursor:pointer;margin-left:6px}
+.pdfview{width:100%;height:62vh;border:1px solid var(--border);border-radius:12px;background:#fff;margin-top:6px}

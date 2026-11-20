@@ -102,6 +102,8 @@ const Core = (() => {
     kurz: { aktiv: false, monat: '' },
     urlaub: { tarifTage: 30, ugFaktor: 0.5, ugTeiler: 21.75, fzaStand: 0, fzaDatum: '', tzugTage: 8, jahre: {} },
     mail: { anrede: '', an: '', name: '' },
+    // PDFs lokal auf diesem Gerät aufbewahren (nicht synchronisiert)
+    dokumente: { zeit: false, lohn: false },
     steuer: { klasse: 1, kirche: true, kinderFB: 0, kinderPV: 0, geburtsjahr: 0, kasse: '', kvZusatz: 2.9, freiwillig: false, geprueft: false, km: 0 },
   });
   const merge = (base, over) => {
