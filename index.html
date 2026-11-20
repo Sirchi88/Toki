@@ -930,6 +930,8 @@ body[data-theme=noel] .notice.warn{background:rgb(217 180 94/.12);border-color:r
 .docbtn{display:flex;align-items:center;justify-content:center;width:100%;max-width:320px;margin:12px auto 0;min-height:52px;font-size:17px}
 .docnote{text-align:center;margin:6px 0 0}
 .updbar{position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 10px);z-index:200;border:0;border-radius:999px;padding:10px 16px;background:var(--primary);color:var(--on-primary);font:inherit;font-weight:800;font-size:14px;box-shadow:0 8px 24px -8px rgb(0 0 0/.5);cursor:pointer;max-width:92vw}
+.docview{border:1px solid var(--primary);background:transparent;color:var(--primary);border-radius:999px;padding:3px 9px;font-size:12px;font-weight:700;cursor:pointer;margin-left:6px}
+.pdfview{width:100%;height:62vh;border:1px solid var(--border);border-radius:12px;background:#fff;margin-top:6px}
 </style>
 </head>
 <body data-theme="standard">
@@ -1057,6 +1059,8 @@ const Core = (() => {
     kurz: { aktiv: false, monat: '' },
     urlaub: { tarifTage: 30, ugFaktor: 0.5, ugTeiler: 21.75, fzaStand: 0, fzaDatum: '', tzugTage: 8, jahre: {} },
     mail: { anrede: '', an: '', name: '' },
+    // PDFs lokal auf diesem Gerät aufbewahren (nicht synchronisiert)
+    dokumente: { zeit: false, lohn: false },
     steuer: { klasse: 1, kirche: true, kinderFB: 0, kinderPV: 0, geburtsjahr: 0, kasse: '', kvZusatz: 2.9, freiwillig: false, geprueft: false, km: 0 },
   });
   const merge = (base, over) => {
@@ -2978,6 +2982,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
   const LOGO = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjE1IDMgOTAgODgiPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJ0ZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzM2Yjk4MiIvPjxzdG9wIG9mZnNldD0iLjU1IiBzdG9wLWNvbG9yPSIjMmE5YzZiIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWQ3NjUwIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJ0eCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzJjOWY2YyIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzFlN2E1MSIvPjwvbGluZWFyR3JhZGllbnQ+CjxmaWx0ZXIgaWQ9InNoIiB4PSItMjAlIiB5PSItMjAlIiB3aWR0aD0iMTQwJSIgaGVpZ2h0PSIxNDAlIj48ZmVEcm9wU2hhZG93IGR4PSIwIiBkeT0iMS41IiBzdGREZXZpYXRpb249IjEuNiIgZmxvb2QtY29sb3I9IiMwMDAiIGZsb29kLW9wYWNpdHk9Ii4zNSIvPjwvZmlsdGVyPgo8ZmlsdGVyIGlkPSJpbiI+PGZlT2Zmc2V0IGR5PSIxLjIiLz48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIxIi8+PGZlQ29tcG9zaXRlIG9wZXJhdG9yPSJvdXQiIGluPSJTb3VyY2VHcmFwaGljIi8+PGZlQ29tcG9uZW50VHJhbnNmZXI+PGZlRnVuY0EgdHlwZT0ibGluZWFyIiBzbG9wZT0iLjciLz48L2ZlQ29tcG9uZW50VHJhbnNmZXI+PGZlQmxlbmQgaW4yPSJTb3VyY2VHcmFwaGljIiBtb2RlPSJub3JtYWwiLz48L2ZpbHRlcj4KPC9kZWZzPgo8ZyBmaWx0ZXI9InVybCgjc2gpIj4KPHJlY3QgeD0iMTkiIHk9IjYiIHdpZHRoPSI4MiIgaGVpZ2h0PSI4MCIgcng9IjE1IiBmaWxsPSJ1cmwoI3RnKSIvPgo8cmVjdCB4PSIxOS42IiB5PSI2LjYiIHdpZHRoPSI4MC44IiBoZWlnaHQ9Ijc4LjgiIHJ4PSIxNC40IiBmaWxsPSJub25lIiBzdHJva2U9IiM3ZmYwYmQiIHN0cm9rZS1vcGFjaXR5PSIuMjIiIHN0cm9rZS13aWR0aD0iMS4yIi8+CjwvZz4KPHBhdGggZD0iTTM3LjUgMjFIODAuNVYzNEg2NS41VjY5SDUyLjVWMzRIMzcuNVoiIGZpbGw9IiMxZDIwMjUiIGZpbHRlcj0idXJsKCNpbikiLz4KPC9zdmc+Cg==';
   /** Release Notes – neueste zuerst: [Version, Datum, Themen] */
   const RELEASES = [
+    ['2.7', '20.11.2026', ['PDFs auf Wunsch auf dem Gerät speichern und unter „Dokumente“ anschauen']],
     ['2.6', '20.11.2026', ['Hinweis bei neuer Version – ein Tipp aktualisiert die App']],
     ['2.5', '20.11.2026', ['Dokumente zum Einklappen', 'Großer Upload-Knopf, mehrere PDFs auf einmal']],
     ['2.4', '20.11.2026', ['Urlaub-Kacheln nur noch mit dem Wichtigsten', 'Gehalt: ein Einlesen-Knopf erkennt Zeitnachweis oder Abrechnung', 'Größere Monatsnamen, kräftigere Dokument-Zeichen']],
@@ -3241,6 +3246,35 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
       (el) => el.querySelector('#okb').addEventListener('click', () => { closeSheet(); onOk(); }));
   }
 
+  // ---------- PDF-Ablage nur auf diesem Gerät (IndexedDB, kein Sync) ----------
+  const Ablage = (() => {
+    let dbp = null; const keys = new Set();
+    const db = () => (dbp ||= new Promise((res, rej) => { try { const r = indexedDB.open('toki-dokumente', 1); r.onupgradeneeded = () => r.result.createObjectStore('pdf'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); } catch (e) { rej(e); } }));
+    const tx = (mode, fn) => db().then((d) => new Promise((res, rej) => { const t = d.transaction('pdf', mode); const out = fn(t.objectStore('pdf')); t.oncomplete = () => res(out && out.result); t.onerror = () => rej(t.error); }));
+    return {
+      keys,
+      init: () => tx('readonly', (o) => o.getAllKeys()).then((k) => { (k || []).forEach((x) => keys.add(x)); }).catch(() => {}),
+      has: (art, m) => keys.has(`${demo ? 'demo-' : ''}${art}-${m}`),
+      put: (art, m, buf) => tx('readwrite', (o) => o.put(new Blob([buf], { type: 'application/pdf' }), `${demo ? 'demo-' : ''}${art}-${m}`)).then(() => keys.add(`${demo ? 'demo-' : ''}${art}-${m}`)).catch(() => toast('⚠ PDF konnte auf diesem Gerät nicht gespeichert werden', 3000)),
+      get: (art, m) => tx('readonly', (o) => o.get(`${demo ? 'demo-' : ''}${art}-${m}`)),
+      del: (art, m) => tx('readwrite', (o) => o.delete(`${demo ? 'demo-' : ''}${art}-${m}`)).then(() => keys.delete(`${demo ? 'demo-' : ''}${art}-${m}`)).catch(() => {}),
+      clear: () => tx('readwrite', (o) => o.clear()).then(() => keys.clear()).catch(() => {}),
+      count: () => keys.size,
+    };
+  })();
+  function zeigePdf(art, m) {
+    Ablage.get(art, m).then((blob) => {
+      if (!blob) { toast('PDF nicht mehr vorhanden', 2000); return; }
+      const url = URL.createObjectURL(blob);
+      sheet(`<h3>${art === 'lohn' ? 'Entgeltabrechnung' : 'Zeitnachweis'} ${monthName(m)}</h3>
+        <iframe class="pdfview" src="${url}" title="PDF"></iframe>
+        <div class="grid2 mt"><a class="btn ghost" href="${url}" target="_blank" rel="noopener">Öffnen / Teilen</a><button class="btn danger" id="pdfDel">Löschen</button></div>`, (el) => {
+        el.querySelector('#pdfDel').addEventListener('click', () => confirmBox('PDF löschen?', 'Das gespeicherte PDF wird von diesem Gerät gelöscht. Die eingelesenen Werte bleiben.', 'Löschen', () => { Ablage.del(art, m).then(render); }));
+      });
+      sheetOnClose = () => setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }).catch(() => toast('⚠ PDF konnte nicht geladen werden', 2500));
+  }
+
   // ---------- Hochgeladene Dokumente je Monat ----------
   function docBadges(m, labels = false) {
     const z = (st.nachweise || {})[m], a = (st.abrechnungen || {})[m];
@@ -3253,8 +3287,8 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
     const z = (st.nachweise || {})[m], a = (st.abrechnungen || {})[m];
     const when = (x) => (x && x.importiert ? new Date(x.importiert).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }) : '');
     return `<details class="fold doccard" ${ui.docOpen === false ? '' : 'open'} data-fold="docOpen"><summary><span>Dokumente ${MON[Number(m.slice(5, 7)) - 1]} <span class="docs mini" style="display:inline-flex;vertical-align:middle">${docBadges(m)}</span></span>${I.chev}</summary><div class="body">
-      <div class="docrow"><span>🕒 Zeitnachweis</span><span class="dstate ${z ? 'ok' : ''}">${z ? `✓ eingelesen ${when(z)}` : '– fehlt'}</span></div>
-      <div class="docrow"><span>💶 Entgeltabrechnung</span><span class="dstate ${a ? 'ok' : ''}">${a ? `✓ eingelesen ${when(a)}` : '– fehlt'}</span></div>
+      <div class="docrow"><span>🕒 Zeitnachweis</span><span class="dstate ${z ? 'ok' : ''}">${z ? `✓ eingelesen ${when(z)}` : '– fehlt'}</span>${Ablage.has('zeit', m) ? `<button class="docview" data-act="pdfView" data-art="zeit" data-m="${m}">anschauen</button>` : ''}</div>
+      <div class="docrow"><span>💶 Entgeltabrechnung</span><span class="dstate ${a ? 'ok' : ''}">${a ? `✓ eingelesen ${when(a)}` : '– fehlt'}</span>${Ablage.has('lohn', m) ? `<button class="docview" data-act="pdfView" data-art="lohn" data-m="${m}">anschauen</button>` : ''}</div>
       <label class="btn docbtn">⬆ Upload<input type="file" accept=".pdf,application/pdf" multiple data-act="docFile"></label>
       <p class="xs muted docnote">Monat und Art (Zeitnachweis oder Abrechnung) werden automatisch erkannt. Mehrere PDFs auf einmal möglich – sie kommen nacheinander zur Prüfung.</p>
       ${slipCard(m)}</div></details>`;
@@ -3302,6 +3336,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
       if (on('nurZ')) s.lohn.mehrNurZuschlag = true;
       const keep = { ...a }; delete keep.lines;
       st.abrechnungen = { ...(st.abrechnungen || {}), [a.month]: { ...keep, korr: v.korr, importiert: Date.now() } };
+      if (s.dokumente.lohn) Ablage.put('lohn', a.month, buf).then(render);
       ui.nmonth = a.month; ui.nmode = 'ist'; ui.gmode = 'auszahlung';
       save(); closeSheet(); render();
       toast(`✓ Abrechnung ${monthName(a.month)} gespeichert`, 2600, 'ok');
@@ -3378,6 +3413,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
       <div class="grid2 mt"><button class="btn ghost" data-act="close">Nur prüfen</button><button class="btn" id="pdfOk">Übernehmen</button></div>`,
     (el) => el.querySelector('#pdfOk').addEventListener('click', () => {
       C.applyImport(st, plan, Date.now(), uid);
+      if (S().dokumente.zeit) Ablage.put('zeit', pdf.month, buf).then(render);
       save(); closeSheet(); render();
       toast(`✓ ${monthName(pdf.month)} aus dem Zeitnachweis übernommen`, 3000, 'ok');
     }));
@@ -4216,6 +4252,10 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
       <label class="btn soft mt-s" style="position:relative;width:100%">💶 Entgeltabrechnung (PDF) einlesen<input type="file" accept=".pdf,application/pdf" data-act="slipFile" style="position:absolute;inset:0;opacity:0"></label>
       <button class="btn ghost mt-s" data-act="releases">📝 Release Notes</button>
       <label class="btn soft mt-s" style="position:relative;width:100%">📄 Zeitnachweis (PDF) einlesen<input type="file" accept=".pdf,application/pdf" data-act="pdfFile" style="position:absolute;inset:0;opacity:0"></label>
+      <div class="subh">📁 PDFs auf diesem Gerät aufbewahren</div>
+      ${sw('Zeitnachweise speichern', 'dokumente.zeit', s.dokumente.zeit, 'Beim Einlesen wird das PDF hier abgelegt – anschauen im Gehalt unter „Dokumente“')}
+      ${sw('Entgeltabrechnungen speichern', 'dokumente.lohn', s.dokumente.lohn, 'Bleiben nur auf diesem Gerät, werden nicht synchronisiert')}
+      ${Ablage.count() ? `<p class="xs muted">${Ablage.count()} PDF${Ablage.count() === 1 ? '' : 's'} gespeichert.</p><button class="btn ghost sm" data-act="pdfClear">Gespeicherte PDFs löschen</button>` : ''}
       <button class="btn danger mt" data-act="reset">Alle Daten löschen</button>`)}
     ${demo ? '<button class="btn danger big mt" data-act="demoExit">🎬 Demo-Modus verlassen</button>' : ''}
     <p class="xs muted onbg" style="text-align:center">Toki · Feierabend, Mehrarbeit & Urlaub · v${RELEASES[0][0]}</p>
@@ -4407,7 +4447,9 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
     },
     importPaste: () => sheet(`<h3>Daten einfügen</h3><textarea class="field" style="height:160px;font-size:12px;padding:10px" id="imp" placeholder="Exportierten Text hier einfügen"></textarea><div class="grid2 mt"><button class="btn ghost" data-act="close">Abbrechen</button><button class="btn" id="go">Importieren</button></div>`,
       (el) => el.querySelector('#go').addEventListener('click', () => doImport(el.querySelector('#imp').value))),
-    reset: () => confirmBox('Alles löschen?', 'Alle Arbeitszeiten, Urlaube und Einstellungen werden auf diesem Gerät gelöscht. Das lässt sich nicht rückgängig machen.', 'Endgültig löschen', () => { st = norm({}); save(); loadDate(today); render(); toast('Alles gelöscht'); }),
+    pdfView: (t) => zeigePdf(t.dataset.art, t.dataset.m),
+    pdfClear: () => confirmBox('PDFs löschen?', 'Alle auf diesem Gerät gespeicherten PDFs werden gelöscht. Die eingelesenen Werte bleiben.', 'Löschen', () => Ablage.clear().then(render)),
+    reset: () => confirmBox('Alles löschen?', 'Alle Arbeitszeiten, Urlaube und Einstellungen werden auf diesem Gerät gelöscht. Das lässt sich nicht rückgängig machen.', 'Endgültig löschen', () => { st = norm({}); save(); Ablage.clear(); loadDate(today); render(); toast('Alles gelöscht'); }),
   };
   let pvT;
   function showPreview() {
@@ -4562,6 +4604,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
   if (TABS.some((x) => x[0] === h0)) ui.tab = h0;
   loadDate(today);
   render(false);
+  Ablage.init().then(() => { if (Ablage.count()) render(); });
   if (login && typeof login === 'string') { if (login !== Sync.code) connectCode(login, false); else syncNow(false); }
   else { if (login && login.error) toast(`⚠ ${login.error}`, 4000); if (Sync.code) syncNow(false); }
   // Update-Check: Startbildschirm-Apps und Browser halten die Seite gern im Cache – neue Version erkennen und anbieten
