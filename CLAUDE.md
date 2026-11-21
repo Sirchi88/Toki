@@ -7,7 +7,7 @@
 - Fachregeln (vom Nutzer vorgegeben):
   - 35-h-Woche, Tagessoll 7 h; Mehrarbeit erst über 7 h/Tag; max. 10 h/Tag (Warnung, Deckel).
   - Zuschläge je Woche: erste 6 Überstunden +25 %, ab der 7. +50 %.
-  - Samstag: keine Brotzeit, ab 6 h Anwesenheit 30 min Mittag (nie unter 6 h); alles Mehrarbeit; Samstag ins Zeitkonto +25 % (abschaltbar).
+  - Samstag: keine Brotzeit, ab 6 h Anwesenheit 30 min Mittag (nie unter 6 h); alles Mehrarbeit; Samstag ins Zeitkonto +25 % (abschaltbar). Zeitliche Reihenfolge: erst füllt das Plus der Wochentage das MEA-Kontingent, dann der Samstag; nur der Samstag-Rest, der ins Zeitkonto geht, bekommt 25 % Bonus obendrauf (Bsp. 1 h offen, Sa 5 h → 1 h Mehrarbeit, 4 h ZK + 1 h Bonus = ZK +5 h).
   - Reihenfolge: MEA-Kontingent des Monats → Rest ins Zeitkonto (±35 h, darüber Warnung + „Mehrarbeit nachbeantragen“). Monatswechsel in der Woche: jeder Tag zählt zum Kontingent seines Monats, Zuschläge und ZK-Verrechnung bleiben wochenweise.
   - Gehalt (früher Netto): Ansicht „Aktuell“ = Grundlohn + Mehrarbeit/Urlaubsgeld/Sonderzahlungen des Monats; „Auszahlung“ = Grundlohn des Monats + Mehrarbeit/Urlaubsgeld/einmalige Sonderzahlungen des Vormonats. Einstellungen fragen nur das Grundgehalt ab (inkl. fester Zulagen, keine eigenen Felder für Zulagen oder VL – vom Nutzer so gewünscht); Stundenlohn, Urlaubsgeld und Faktor-Sonderzahlungen kommen daraus.
   - Im Voraus eingetragene Arbeitszeiten: KW erscheint im Reiter Mehrarbeit sofort und zählt sofort in den Zeitkonto-Stand (Kopfleiste, Urlaub); künftige ZK-Urlaubstage nur als „verplant“. Reine Urlaubswochen erst, wenn die KW begonnen hat.
@@ -27,7 +27,7 @@
   - Design „Goldene Weihnacht“ (`noel`): dunkelgrün/gold/rot, Lichterkette, hängende Kugeln, Schnee, Playfair Display.
   - Gehalt hat Reiter Monat | Jahr | God. Jahr = `Core.gehaltJahr` (Abrechnung wenn vorhanden, sonst Toki „Auszahlung“, künftige Monate als Prognose).
   - Steuererklärung (Einstellungen → Steuer): `Core.steuerKlaerung` – Jahreswerte der letzten Abrechnung exakt, danach Toki; Entfernungspauschale 0,38 €/km ab km 1 × Arbeitstage, Werbungskostenpauschale 1.230 €, Tarif-Tipp (42 % ab 69.879 € bzw. 139.758 € Splitting). Werte jährlich prüfen.
-  - Reiter Mehrarbeit → Jahr: Statistik-Karte (`Core.yearStats`). Samstag-Bonus (25 %) fürs Zeitkonto in Wochen- und Monatskarte als Balken (Samstag-Stunden + gestreifter Bonus) und Zahl (`satBonus`).
+  - Reiter Mehrarbeit → Jahr: Statistik-Karte (`Core.yearStats`). Samstag-Bonus in Wochen- und Monatskarte als Balken (grün Mehrarbeit | blau Zeitkonto | gold Bonus) und Zahl (`satBonus`, Felder `satMehr/satZK/bonus`).
   - Designs: Klick fragt „Standard-Design“ (gespeichert) oder „Probieren“ (`ui.tryTheme`, nicht gespeichert, Leiste oben). Beim Wechsel wird `meta[theme-color]` ersetzt und `html` eingefärbt (Statusleiste). Designs Light Mode (`light`), Premium Gold (`gold`), Natur & Eco (`eco`) mit Oswald/Manrope.
   - Urlaub-Kacheln kompakt (3 je Reihe), nur Name + eine Zahl: Tarif/T-Zug = freie Tage, Zeitkonto/FZA = Stand (Plus ohne Vorzeichen, Minus mit −; ZK-Planung klein rot „x h geplant“), Sonder/Krank/Kurzarbeit = Tage bis heute. FZA mit 2 Nachkommastellen.
   - Jedes Fenster (`sheet()`) hat oben rechts ein ✕. Zahlenfelder: eine stehende 0 verschwindet beim Antippen, sonst wird der Inhalt markiert (direkt überschreiben).

@@ -50,7 +50,8 @@ test('Samstag ins Zeitkonto: +25 % Zeitzuschlag', () => {
   for (const d of ['2026-11-16', '2026-11-17', '2026-11-18', '2026-11-19', '2026-11-20']) st.entries[d] = ent('07:00', '16:45');
   st.entries['2026-11-21'] = ent('07:00', '11:00', 0);
   const w = C.compute(st, '2026-11-21').weekMap.get('2026-11-16');
-  assert.strictEqual(w.bonus, 0.5);
+  // Kontingent (2 h) ist schon durch Mo–Fr verbraucht → alle 4 Samstagsstunden ins Zeitkonto → +1 h Bonus
+  assert.strictEqual(w.bonus, 1);
 });
 
 test('Nachbeantragte Mehrarbeit wird separat ausgewiesen', () => {
@@ -323,6 +324,16 @@ test('Jahres-Statistik: Arbeitstage, stärkste Woche, Krankheitstage', () => {
   assert.strictEqual(t.topWeek.kw, 6);
   assert.strictEqual(t.longest.date, '2026-02-03');
   assert.strictEqual(t.krank, 2);
+});
+
+test('Samstag: Wochentage füllen zuerst das Kontingent, Rest vom Samstag ins Zeitkonto +25 %', () => {
+  const S = base();
+  const st = { settings: S, entries: {}, absences: [], kontingent: { '2026-11': 2 }, nach: [] };
+  st.entries['2026-11-09'] = ent('07:00', '15:45'); // Mo 8 h → +1
+  st.entries['2026-11-14'] = { start: '06:00', end: '11:00', pause: 0, hours: 5, raw: 5 }; // Sa 5 h
+  const w = C.compute(st, '2026-11-15').weeks.find((x) => x.monday === '2026-11-09');
+  // Mo +1 → Mehrarbeit (1 h offen bleibt), Sa: 1 h Mehrarbeit, 4 h Zeitkonto + 1 h Bonus
+  assert.deepStrictEqual([w.mehr, w.satMehr, w.satZK, w.bonus, w.zkChange], [2, 1, 4, 1, 5]);
 });
 
 (async () => {

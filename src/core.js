@@ -239,7 +239,7 @@ const Core = (() => {
       let offset = 0;
       if (zkDebit > 0 && T > 0) { offset = Math.min(T, zkDebit); T -= offset; }
       let zkChange = -zkDebit + offset;
-      let mehr = 0, mehrNach = 0, toZK = 0, bonus = 0, under = 0;
+      let mehr = 0, mehrNach = 0, toZK = 0, bonus = 0, under = 0, satMehr = 0, satZK = 0, satH = 0;
       const parts = [];
       if (T < 0) { under = -T; zkChange += T; }
       else if (T > 0) {
@@ -263,17 +263,18 @@ const Core = (() => {
           const baseK = Number(kont[sg.month]) || 0;
           const totalK = baseK + (nachByMonth[sg.month] || 0);
           const avail = Math.max(0, totalK - u);
-          // Samstag zuerst in Mehrarbeit, dann Wochentage
+          // Zeitlich: erst füllt das Plus der Wochentage das Kontingent, dann der Samstag;
+          // was vom Samstag danach übrig bleibt, geht ins Zeitkonto und bekommt den 25-%-Bonus
           const satEff = Math.min(sg.sat, share);
-          const satToMehr = Math.min(satEff, avail);
-          const wdToMehr = Math.min(share - satEff, avail - satToMehr);
+          const wdToMehr = Math.min(share - satEff, avail);
+          const satToMehr = Math.min(satEff, avail - wdToMehr);
           const m1 = satToMehr + wdToMehr;
           const nach1 = Math.max(0, m1 - Math.max(0, baseK - u));
           used[sg.month] = u + m1;
           const z1 = share - m1;
           const b1 = S.zk.samstagBonus ? (satEff - satToMehr) * 0.25 : 0;
-          parts.push({ month: sg.month, mehr: m1, mehrNach: nach1, toZK: z1, bonus: b1 });
-          mehr += m1; mehrNach += nach1; toZK += z1; bonus += b1;
+          parts.push({ month: sg.month, mehr: m1, mehrNach: nach1, toZK: z1, bonus: b1, satH: sg.sat, satMehr: satToMehr, satZK: satEff - satToMehr });
+          mehr += m1; mehrNach += nach1; toZK += z1; bonus += b1; satMehr += satToMehr; satZK += satEff - satToMehr; satH += sg.sat;
         }
         zkChange += toZK + bonus;
       }
@@ -306,7 +307,7 @@ const Core = (() => {
       fzaTodaySum += fzaNow;
       fza -= fzaUnits * soll;
       for (const day of w.days) if (day.absence && day.absence.type === 'zk' && day.date > today) { zkVerplant += day.absence.units * soll; zkVerplantTage += day.absence.units; }
-      Object.assign(w, { parts, worked, wd, sat, satOnly, zkUnits, zkDebit, offset, mehr, mehrNach, toZK, bonus, under, zkChange: zkEff, zkAfter: zk, fzaAfter: fza, pay, capped });
+      Object.assign(w, { parts, worked, wd, sat, satOnly, zkUnits, zkDebit, offset, mehr, mehrNach, toZK, bonus, satMehr, satZK, satH, under, zkChange: zkEff, zkAfter: zk, fzaAfter: fza, pay, capped });
     }
     // Nachträglich eingetragene ZK-/FZA-Tage, die vor dem Stichtag liegen, trotzdem abziehen
     let late = 0, lateF = 0;
@@ -323,7 +324,7 @@ const Core = (() => {
     // Monate
     const months = new Map();
     const mget = (m) => {
-      if (!months.has(m)) months.set(m, { month: m, worked: 0, mehr: 0, mehrNach: 0, toZK: 0, bonus: 0, zkChange: 0, under: 0, weeks: [], pay: { h25: 0, h50: 0, base: 0, z25: 0, z50: 0, total: 0 }, days: 0 });
+      if (!months.has(m)) months.set(m, { month: m, worked: 0, mehr: 0, mehrNach: 0, toZK: 0, bonus: 0, satMehr: 0, satZK: 0, satH: 0, zkChange: 0, under: 0, weeks: [], pay: { h25: 0, h50: 0, base: 0, z25: 0, z50: 0, total: 0 }, days: 0 });
       return months.get(m);
     };
     for (const [d, e] of Object.entries(entries)) { const m = mget(ym(d)); m.worked += e.hours; m.days++; }
@@ -335,7 +336,7 @@ const Core = (() => {
       for (const pt of w.parts) {
         const pm = mget(pt.month);
         if (pm !== m && !pm.weeks.includes(w)) pm.weeks.push(w);
-        for (const k of ['mehr', 'mehrNach', 'toZK', 'bonus']) pm[k] += pt[k];
+        for (const k of ['mehr', 'mehrNach', 'toZK', 'bonus', 'satMehr', 'satZK', 'satH']) pm[k] += pt[k] || 0;
         const share = w.mehr > 0 ? pt.mehr / w.mehr : 0;
         for (const k of Object.keys(pm.pay)) pm.pay[k] += w.pay[k] * share;
       }
