@@ -937,3 +937,87 @@ body[data-theme=noel] .notice.warn{background:rgb(217 180 94/.12);border-color:r
 .satb .satb-bar .b2{background:repeating-linear-gradient(-45deg,#f2b632 0 3px,#ffd36e 3px 6px);box-shadow:none}
 .satb-t{font-size:11px;color:var(--muted);line-height:1.3}
 .satb-t b{color:#e0a21b;font-weight:800}
+/* Mehrarbeit Nachtrag – klein */
+.nachmini{margin:-4px 0 14px;padding:6px 12px;border-radius:12px;background:var(--card);border:1px solid var(--border);opacity:.92}
+.nachmini .switch{font-size:13px;min-height:34px;margin:0}
+.nachin{display:flex;gap:8px;margin-top:6px}.nachin .field{flex:1}.nachin .btn{width:auto}
+/* Urlaub-Kacheln: Überschrift & Zahl immer auf gleicher Höhe, Zusatz klein ganz unten */
+.bal .b{position:relative;justify-content:flex-start;padding:8px 5px 16px;min-height:78px}
+.bal .s{position:absolute;left:0;right:0;bottom:3px;line-height:1.1}
+.bal .s .plan{font-size:10px}
+.stats.fun .stat{background:color-mix(in oklch,var(--primary) 9%,var(--secondary))}
+
+/* =====================================================================
+   Feiertage: Lebkuchen-Hütte · Weihnachtsmarkt · Nordpol-Express
+   ===================================================================== */
+body:is([data-theme=lebkuchen],[data-theme=markt],[data-theme=nordpol]){--font-b:'Toki Manrope',system-ui,sans-serif;--radius:18px}
+/* ---------- Lebkuchen-Hütte ---------- */
+body[data-theme=lebkuchen]{color-scheme:light;--bg:#8a5530;--card:#b8794a;--fg:#fff8ee;--muted:#f3dcc4;--primary:#d83a44;--on-primary:#fff;--secondary:rgb(255 255 255/.12);--accent:rgb(255 255 255/.2);--border:rgb(255 248 238/.55);
+  --success:#9fe0a8;--danger:#ffd1d1;--warn:#ffe08a;--onbg:#fff8ee;--c-zk:#ffd27a;--font-d:'Toki Bricolage XB','Arial Black',sans-serif;--shadow:0 8px 0 -2px #6b3f20,0 14px 24px -12px rgb(60 30 10/.7)}
+body[data-theme=lebkuchen] h1{color:#fff8ee;text-shadow:0 3px 0 #6b3f20;font-family:var(--font-d)}
+body[data-theme=lebkuchen] .card,body[data-theme=lebkuchen] details.fold{background:radial-gradient(circle at 20% 15%,rgb(255 255 255/.06) 0 2px,transparent 3px) 0 0/18px 18px,linear-gradient(#bf8152,#a96c3f);border:3px solid #fff8ee;outline:2px dotted rgb(255 248 238/.8);outline-offset:-9px}
+body[data-theme=lebkuchen] .card h2{color:#fff8ee;letter-spacing:.08em}
+body[data-theme=lebkuchen] .field,body[data-theme=lebkuchen] .datebtn{background:#fbecd8;color:#4a2a14;border:2px solid #fff;border-radius:14px}
+body[data-theme=lebkuchen] .field.big{color:#4a2a14}
+body[data-theme=lebkuchen] .worked,body[data-theme=lebkuchen] .amp,body[data-theme=lebkuchen] .tile,body[data-theme=lebkuchen] .kpi,body[data-theme=lebkuchen] .bal .b{background:#fbecd8;color:#4a2a14;border:2px solid #fff}
+body[data-theme=lebkuchen] :is(.worked,.amp,.tile,.kpi,.bal .b) :is(.v,.k,.tn,.s){color:#4a2a14}
+body[data-theme=lebkuchen] .worked .v{color:#c2303a}
+body[data-theme=lebkuchen] .btn:not(.ghost):not(.soft):not(.danger){background:repeating-linear-gradient(-45deg,#d83a44 0 10px,#e95560 10px 20px);border:2px solid #fff;color:#fff;font-weight:800}
+body[data-theme=lebkuchen] .btn.ghost{border-color:#fff8ee;color:#fff8ee}
+body[data-theme=lebkuchen] .seg{background:rgb(0 0 0/.15);border:2px solid #fff8ee}
+body[data-theme=lebkuchen] .seg button{color:#fff8ee}
+body[data-theme=lebkuchen] .seg button[aria-pressed=true]{background:#fbecd8;color:#7a4a26}
+body[data-theme=lebkuchen] nav.tabs .in{background:#fbecd8;border:3px solid #fff;border-radius:22px}
+body[data-theme=lebkuchen] nav.tabs button{color:#7a4a26}
+body[data-theme=lebkuchen] nav.tabs button[aria-current=page]{background:#7a4a26;color:#fff8ee}
+body[data-theme=lebkuchen] .sheet{background:#a96c3f;border-top:3px solid #fff}
+body[data-theme=lebkuchen] .progress i{background:repeating-linear-gradient(-45deg,#d83a44 0 6px,#fff 6px 12px)}
+/* ---------- Weihnachtsmarkt-Flair ---------- */
+body[data-theme=markt]{color-scheme:dark;--bg:#2a1d14;--card:rgb(30 21 15/.82);--fg:#f6e8d2;--muted:#c2a88a;--primary:#e9a94a;--on-primary:#2a1a08;--secondary:rgb(255 220 160/.06);--accent:rgb(233 169 74/.18);--border:rgb(233 169 74/.28);
+  --success:#a9d98a;--danger:#ff8a7a;--warn:#ffcf6e;--onbg:#f6e8d2;--c-zk:#e9a94a;--font-d:'Toki Oswald','Arial Narrow',sans-serif;--shadow:0 16px 30px -16px rgb(0 0 0/.85)}
+body[data-theme=markt] h1{font-family:'Toki PlayfairI',Georgia,serif;font-weight:400;color:#ffe2ad;text-shadow:0 0 18px rgb(255 190 90/.35)}
+body[data-theme=markt] .card,body[data-theme=markt] details.fold{border:1px solid rgb(233 169 74/.32);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+body[data-theme=markt] .card h2{font-family:'Toki PlayfairI',Georgia,serif;font-weight:400;font-size:19px;text-transform:none;letter-spacing:0;color:#ffd590}
+body[data-theme=markt] .field,body[data-theme=markt] .datebtn{background:linear-gradient(#5a3f2a,#4a3322);border:1px solid rgb(233 169 74/.35);color:#ffe2ad}
+body[data-theme=markt] :is(.worked .v,.tile .v,.amp .v,.big-r,.hero .v,.kpi .v,.bal .v,.ktrio b,.field.big){color:#ffcf7a}
+body[data-theme=markt] :is(.amp,.tile,.kpi,.bal .b,.worked){background:linear-gradient(#4a3322,#3a2819);border:1px solid rgb(233 169 74/.3)}
+body[data-theme=markt] .btn:not(.ghost):not(.soft):not(.danger){background:linear-gradient(#f0b85a,#d48f2e);color:#2a1a08;border:0;font-weight:800}
+body[data-theme=markt] .seg button[aria-pressed=true]{background:#7a1f1f;color:#ffe2ad}
+body[data-theme=markt] nav.tabs .in{background:rgb(42 29 20/.94);border:1px solid rgb(233 169 74/.35);border-radius:22px}
+body[data-theme=markt] nav.tabs button[aria-current=page]{background:#7a1f1f;color:#ffe2ad}
+body[data-theme=markt] .sheet{background:#2e2016;border-top:1px solid rgb(233 169 74/.45)}
+/* ---------- Nordpol-Express ---------- */
+body[data-theme=nordpol]{color-scheme:dark;--bg:#0b1016;--card:#141b24;--fg:#eef3f8;--muted:#9aa7b6;--primary:#22a35a;--on-primary:#fff;--secondary:#1a232e;--accent:rgb(212 42 42/.2);--border:#2a3542;
+  --success:#4fd18b;--danger:#ff6b6b;--warn:#ffcc66;--onbg:#eef3f8;--c-zk:#ff6b6b;--font-d:'Toki Oswald','Arial Narrow',sans-serif;--shadow:0 16px 30px -16px rgb(0 0 0/.9)}
+body[data-theme=nordpol] .card,body[data-theme=nordpol] details.fold{border:4px solid transparent;background:linear-gradient(#141b24,#141b24) padding-box,repeating-linear-gradient(-45deg,#d42a2a 0 9px,#f6f6f6 9px 18px) border-box}
+body[data-theme=nordpol] .card h2{color:#ff8b8b;letter-spacing:.1em}
+body[data-theme=nordpol] .field,body[data-theme=nordpol] .datebtn{background:#0f151d;border:1px solid #2f3b49;color:#eef3f8}
+body[data-theme=nordpol] .worked{background:#0f151d;border:1px solid #2f3b49}
+body[data-theme=nordpol] :is(.worked .v,.big-r,.hero .v){color:#ffffff}
+body[data-theme=nordpol] .btn:not(.ghost):not(.soft):not(.danger){background:linear-gradient(#2cb866,#1c8f4c);border:0;font-weight:800;box-shadow:0 4px 0 #136b38}
+body[data-theme=nordpol] .seg button[aria-pressed=true]{background:#d42a2a;color:#fff}
+body[data-theme=nordpol] nav.tabs .in{background:rgb(15 21 29/.95);border:2px solid transparent;background:linear-gradient(rgb(15 21 29),rgb(15 21 29)) padding-box,repeating-linear-gradient(-45deg,#d42a2a 0 8px,#f6f6f6 8px 16px) border-box;border-radius:22px}
+body[data-theme=nordpol] nav.tabs button[aria-current=page]{background:#1c8f4c;color:#fff}
+body[data-theme=nordpol] .brand{position:relative}
+body[data-theme=nordpol] .brand::before{content:'';position:absolute;left:-6px;top:-14px;width:34px;height:26px;transform:rotate(-18deg);background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 46'%3E%3Cpath d='M6 38C14 14 30 4 46 10c6 2 8 10 6 18-6-6-12-8-16-6' fill='%23d42a2a'/%3E%3Crect x='2' y='34' width='44' height='10' rx='5' fill='%23fff'/%3E%3Ccircle cx='52' cy='30' r='6' fill='%23fff'/%3E%3C/svg%3E") center/contain no-repeat;z-index:2}
+body[data-theme=nordpol] .sheet{background:#141b24;border-top:3px solid #d42a2a}
+body[data-theme=nordpol] .progress i{background:repeating-linear-gradient(-45deg,#d42a2a 0 6px,#fff 6px 12px)}
+/* Feiertage-Ordner im Design-Menü */
+.festfold{margin-top:12px;box-shadow:none}
+.festfold .body .themes{margin-top:4px}
+/* Walkthrough */
+.walk-hl{position:relative;z-index:61;box-shadow:0 0 0 3px var(--primary),0 0 0 9px color-mix(in oklch,var(--primary) 28%,transparent),0 0 40px 6px color-mix(in oklch,var(--primary) 35%,transparent)!important;border-radius:var(--radius);animation:walkpulse 1.6s ease-in-out infinite alternate}
+@keyframes walkpulse{to{box-shadow:0 0 0 3px var(--primary),0 0 0 13px color-mix(in oklch,var(--primary) 18%,transparent),0 0 50px 10px color-mix(in oklch,var(--primary) 30%,transparent)}}
+#walk{position:fixed;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 84px);z-index:120;display:flex;justify-content:center;padding:0 12px;pointer-events:none}
+.walk-card{pointer-events:auto;width:100%;max-width:440px;background:var(--card);color:var(--fg);border:1px solid var(--border);border-radius:22px;padding:14px 16px 14px;box-shadow:0 20px 50px -12px rgb(0 0 0/.6),0 0 0 1px color-mix(in oklch,var(--primary) 30%,transparent);animation:walkin .3s cubic-bezier(.2,.8,.2,1)}
+@keyframes walkin{from{transform:translateY(14px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+.walk-top{display:flex;align-items:center;gap:10px}
+.walk-ic{font-size:26px;width:44px;height:44px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,color-mix(in oklch,var(--primary) 35%,transparent),color-mix(in oklch,var(--primary) 10%,transparent))}
+.walk-dots{flex:1;display:flex;gap:4px;flex-wrap:wrap}.walk-dots i{width:6px;height:6px;border-radius:9px;background:var(--border)}.walk-dots i.done{background:color-mix(in oklch,var(--primary) 55%,transparent)}.walk-dots i.on{width:18px;background:var(--primary)}
+.walk-x{border:0;background:var(--secondary);color:var(--fg);width:32px;height:32px;border-radius:50%;cursor:pointer}
+.walk-card h3{margin:10px 0 4px;font-family:var(--font-d);font-size:24px;font-weight:400}
+.walk-card p{margin:0;font-size:14.5px;line-height:1.45;color:var(--muted)}
+.walk-b{display:grid;grid-template-columns:1fr 1.4fr;gap:8px;margin-top:12px}
+.walk-b .btn[disabled]{opacity:.35}
+/* Lebkuchen: Wochenbetrag lesbar */
+body[data-theme=lebkuchen] .big-r{color:#fff8ee;text-shadow:0 2px 0 #6b3f20}

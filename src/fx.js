@@ -37,6 +37,8 @@ const FX = (() => {
   const STEAM = `<svg viewBox="0 0 30 50" width="100%"><path d="M10 48c-8-10 8-14 0-24S8 6 14 2M20 48c-8-10 8-14 0-24" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" opacity=".8"/></svg>`;
 
   const css = `
+  .fx-steam{animation:fx-steam 2.6s ease-in-out infinite alternate}
+  @keyframes fx-steam{from{transform:translateY(2px);opacity:.25}to{transform:translateY(-3px);opacity:.7}}
   .fx-bulb{animation:fx-bulb 2.2s ease-in-out infinite alternate;filter:drop-shadow(0 0 6px currentColor)}
   @keyframes fx-bulb{from{opacity:.35}to{opacity:1}}
   .fx-bokeh{position:absolute;--w:auto;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#ffe19a,rgb(212 175 95/0) 70%);animation:fx-glim 5s ease-in-out infinite alternate}
@@ -420,6 +422,43 @@ const FX = (() => {
     cleanup.push(() => window.removeEventListener('resize', onR));
     if (!reduce()) raf = requestAnimationFrame(frame);
   }
+
+  // ---------- Lebkuchen-Hütte: Zuckerguss, Bonbons, Zuckerstangen ----------
+  function lebkuchen(back) {
+    back.style.background = 'radial-gradient(circle at 30% 20%,rgb(255 255 255/.05) 0 2px,transparent 3px) 0 0/22px 22px,linear-gradient(#93592f,#7a4826)';
+    const cane = (x, r, sc) => `<svg viewBox="0 0 40 120" style="position:absolute;left:${x};bottom:-14px;width:${34 * sc}px;transform:rotate(${r}deg)"><path d="M28 118V34a10 10 0 0 0-20 0v6" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round"/><path d="M28 118V34a10 10 0 0 0-20 0v6" fill="none" stroke="#d83a44" stroke-width="10" stroke-linecap="round" stroke-dasharray="7 7"/></svg>`;
+    const drop = (x, y, c) => `<svg viewBox="0 0 40 34" style="position:absolute;left:${x};bottom:${y};width:30px"><path d="M4 32C4 14 12 4 20 4s16 10 16 28z" fill="${c}"/><ellipse cx="14" cy="14" rx="4" ry="6" fill="#fff" opacity=".35"/><path d="M4 32C4 14 12 4 20 4s16 10 16 28" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="1 3" opacity=".6"/></svg>`;
+    const mint = (x, y, s) => `<svg viewBox="0 0 40 40" style="position:absolute;right:${x};top:${y};width:${s}px"><circle cx="20" cy="20" r="18" fill="#fff"/>${[0, 60, 120, 180, 240, 300].map((a) => `<path d="M20 20L20 3A17 17 0 0 1 34.7 11.5Z" fill="#d83a44" transform="rotate(${a} 20 20)"/>`).join('')}<circle cx="20" cy="20" r="18" fill="none" stroke="#fff" stroke-width="2"/></svg>`;
+    back.innerHTML = `<svg viewBox="0 0 400 30" preserveAspectRatio="none" style="position:absolute;left:0;top:0;width:100%;height:26px"><path d="M0 0H400V10${Array.from({ length: 20 }, (_, i) => `Q${i * 20 + 10} ${i % 2 ? 26 : 20} ${i * 20 + 20} 10`).join('')}Z" fill="#fff8ee"/></svg>
+      ${mint('4vw', '70px', 34)}${mint('22vw', '150px', 22)}
+      ${cane('3vw', -12, 1)}${cane('86vw', 10, .9)}
+      ${drop('14vw', '8px', '#e8495a')}${drop('24vw', '4px', '#5cbf6a')}${drop('70vw', '6px', '#f5c242')}${drop('78vw', '2px', '#e8495a')}`;
+  }
+  // ---------- Weihnachtsmarkt: Holzbuden, Lichter-Bokeh, Glühwein ----------
+  function markt(back, front) {
+    back.style.background = 'repeating-linear-gradient(90deg,#3a2a1d 0 46px,#33251a 46px 48px,#3d2c1f 48px 94px,#2c2016 94px 96px)';
+    let h = '<div style="position:absolute;inset:0;background:radial-gradient(130% 60% at 50% -5%,rgb(255 190 90/.25),transparent 60%),linear-gradient(transparent 40%,rgb(0 0 0/.45))"></div>';
+    for (let i = 0; i < 22; i++) h += `<i class="fx-bokeh" style="left:${rnd(0, 100)}%;top:${rnd(0, 34)}%;width:${rnd(10, 38)}px;animation-delay:${rnd(0, 6)}s;opacity:${rnd(.2, .6)};background:radial-gradient(circle,#ffd38a,rgb(255 180 80/0) 70%)"></i>`;
+    back.innerHTML = h;
+    front.innerHTML = `<div class="fx-mug" style="position:absolute;right:max(8px,calc(50vw - 245px));bottom:calc(env(safe-area-inset-bottom) + 78px);width:54px;opacity:.95">
+      <svg viewBox="0 0 70 80"><path class="fx-steam" d="M22 22c-6-8 6-10 0-18M34 22c-6-8 6-10 0-18M46 22c-6-8 6-10 0-18" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".55"/>
+      <path d="M10 28h44v30a14 14 0 0 1-14 14H24A14 14 0 0 1 10 58z" fill="#b3202f"/><path d="M54 36c10 0 12 14 0 16" fill="none" stroke="#b3202f" stroke-width="6"/>
+      <path d="M10 34h44" stroke="#fff" stroke-width="3" stroke-dasharray="4 4"/><circle cx="32" cy="52" r="7" fill="#fff" opacity=".9"/><path d="M32 46v12M26 52h12" stroke="#b3202f" stroke-width="2"/></svg></div>`;
+  }
+  // ---------- Nordpol-Express: Zuckerstangen-Rahmen & leiser Schnee ----------
+  function nordpol(back, front) {
+    back.style.background = 'radial-gradient(120% 60% at 50% 0,rgb(255 255 255/.06),transparent 60%),#0b1016';
+    snowLite(front, 55);
+  }
+  function snowLite(front, n) {
+    front.innerHTML = '<canvas style="position:absolute;inset:0;width:100%;height:100%"></canvas>';
+    const cv = front.querySelector('canvas'), ctx = cv.getContext('2d');
+    let W2, H2, fl;
+    const size = () => { const dpr = Math.min(2, window.devicePixelRatio || 1); W2 = innerWidth; H2 = innerHeight; cv.width = W2 * dpr; cv.height = H2 * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); fl = Array.from({ length: n }, () => ({ x: rnd(0, W2), y: rnd(-H2, H2), r: rnd(.8, 2.2), vy: rnd(.3, .8), ph: rnd(0, 6) })); };
+    const frame = () => { ctx.clearRect(0, 0, W2, H2); ctx.fillStyle = '#fff'; for (const f of fl) { f.y += f.vy; f.ph += .02; f.x += Math.sin(f.ph) * .3; if (f.y > H2 + 4) { f.y = -4; f.x = rnd(0, W2); } ctx.globalAlpha = .45 + f.r / 6; ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, 6.283); ctx.fill(); } ctx.globalAlpha = 1; raf = requestAnimationFrame(frame); };
+    size(); const onR = () => size(); window.addEventListener('resize', onR); cleanup.push(() => window.removeEventListener('resize', onR));
+    if (!reduce()) raf = requestAnimationFrame(frame);
+  }
   function set(theme) {
     ensureStyle();
     stop();
@@ -428,6 +467,9 @@ const FX = (() => {
     if (theme === 'arena') arena(back, front);
     else if (theme === 'xmas') xmas(back, front);
     else if (theme === 'noel') noel(back, front);
+    else if (theme === 'lebkuchen') lebkuchen(back);
+    else if (theme === 'markt') markt(back, front);
+    else if (theme === 'nordpol') nordpol(back, front);
     else if (theme === 'fryer') fryer(back);
     else if (theme === 'neon') neon(back);
     else if (theme === 'pop') pop(back);
@@ -447,6 +489,9 @@ const FX = (() => {
     werk: '<div style="position:absolute;left:0;right:0;top:0;height:6px;background:repeating-linear-gradient(90deg,#f2c200 0 8px,#1b1b1b 8px 16px)"></div><div style="position:absolute;left:10px;bottom:6px;width:46px;height:30px;border-radius:4px;background:#d9dde2"><div style="margin:5px;width:22px;height:16px;border-radius:2px;background:#0d141c;box-shadow:inset 0 -6px 10px #ffd36b88"></div></div>',
     schrank: '<div style="position:absolute;inset:6px 8px auto;height:8px;background:#b9bdb8;border-radius:2px"></div><div style="position:absolute;left:10px;top:20px;display:flex;gap:2px">' + ['#8c9196', '#8c9196', '#3c6fd1', '#e6c229', '#8c9196'].map((c) => `<i style="display:block;width:7px;height:22px;border-radius:1px;background:${c}"></i>`).join('') + '</div><div style="position:absolute;right:10px;bottom:6px;width:22px;height:22px;border-radius:50%;background:#f2c200;display:grid;place-items:center"><i style="display:block;width:14px;height:14px;border-radius:50%;background:#c4161c"></i></div>',
     pop: '<div style="position:absolute;right:-14px;top:-14px;width:46px;height:46px;border-radius:50%;background:#ff2e88;border:3px solid #121212"></div><div style="position:absolute;left:10px;bottom:-8px;width:30px;height:30px;background:#2d5bff;border:3px solid #121212;transform:rotate(18deg)"></div><div style="position:absolute;left:12px;top:10px;font:22px \'Toki Archivo\',Impact,sans-serif;color:#121212;background:linear-gradient(transparent 55%,#ffe36e 55%)">POP!</div>',
+    lebkuchen: '<div style="position:absolute;left:0;right:0;top:0;height:12px;background:radial-gradient(circle at 8px 0,#fff8ee 7px,transparent 8px) 0 0/16px 12px"></div><div style="position:absolute;left:12px;bottom:8px;width:22px;height:22px;border-radius:50%;background:conic-gradient(#d83a44 0 30deg,#fff 0 60deg,#d83a44 0 90deg,#fff 0 120deg,#d83a44 0 150deg,#fff 0 180deg,#d83a44 0 210deg,#fff 0 240deg,#d83a44 0 270deg,#fff 0 300deg,#d83a44 0 330deg,#fff 0)"></div>',
+    markt: '<div style="position:absolute;right:10px;bottom:6px;width:26px;height:26px;border-radius:0 0 8px 8px;background:#b3202f;box-shadow:inset 0 4px 0 rgb(255 255 255/.5)"></div><i style="position:absolute;left:14px;top:10px;width:16px;height:16px;border-radius:50%;background:radial-gradient(circle,#ffd38a,transparent 70%)"></i><i style="position:absolute;left:44px;top:18px;width:12px;height:12px;border-radius:50%;background:radial-gradient(circle,#ffd38a,transparent 70%)"></i>',
+    nordpol: '<div style="position:absolute;inset:8px;border-radius:10px;border:4px solid transparent;background:linear-gradient(#141b24,#141b24) padding-box,repeating-linear-gradient(-45deg,#d42a2a 0 6px,#fff 6px 12px) border-box"></div><div style="position:absolute;left:16px;bottom:14px;width:36px;height:10px;border-radius:6px;background:#22a35a"></div>',
     noel: `<div style="position:absolute;left:14px;top:-2px;width:26px">${BAUBLE('#9e1b2a', '#ff6b6b', 'pa')}</div><div style="position:absolute;right:16px;top:6px;width:20px">${BAUBLE('#a07a2c', '#ffe19a', 'pb')}</div><div style="position:absolute;left:0;right:0;bottom:6px;text-align:center;font:italic 600 19px 'Toki PlayfairI',Georgia,serif;color:#e6c97f">Frohe Weihnacht</div>`,
     doodle: `<div style="position:absolute;right:6px;bottom:-6px;width:40px">${BUDDY}</div><div style="position:absolute;left:10px;top:8px;width:26px;opacity:.7">${DOODLES.sun}</div>`,
     dark: '<div style="position:absolute;left:10px;top:12px;right:40%;height:8px;border-radius:4px;background:#3a3c42"></div><div style="position:absolute;left:10px;top:26px;right:55%;height:8px;border-radius:4px;background:#8fd1c1"></div>',

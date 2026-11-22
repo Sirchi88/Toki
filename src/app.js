@@ -6,6 +6,7 @@
   const LOGO = '__LOGO__';
   /** Release Notes – neueste zuerst: [Version, Datum, Themen] */
   const RELEASES = [
+    ['2.11', '22.11.2026', ['Walkthrough für neue Nutzer', 'Designs Lebkuchen-Hütte, Weihnachtsmarkt, Nordpol-Express im Ordner „Feiertage“', 'Mehrarbeit Nachtrag als kleiner Schalter', 'Lustige Jahres-Statistiken', 'Urlaub-Kacheln: Überschriften immer auf gleicher Höhe', 'Dokumente im Gehalt standardmäßig zugeklappt']],
     ['2.10', '22.11.2026', ['Samstag-Bonus schlank direkt unter dem Samstag']],
     ['2.9', '21.11.2026', ['Samstag-Bonus korrigiert: erst Wochentage ins Kontingent, Rest vom Samstag ins Zeitkonto +25 %', 'Samstag-Aufteilung Mehrarbeit / Zeitkonto / Bonus im Balken']],
     ['2.8', '20.11.2026', ['Samstag-Bonus (25 %) fürs Zeitkonto als Balken und Zahl']],
@@ -52,7 +53,12 @@
     ['fryer', 'Airfryer', 'repeating-linear-gradient(0deg,#f8e2b5 0 14px,#f1d49c 14px 16px)'],
     ['pop', 'Bold Pop', 'linear-gradient(135deg,#fff1cf 0 60%,#ffe36e 60%)'],
     ['doodle', 'Doodle', 'repeating-linear-gradient(#fbf8ef 0 9px,#dbe6f5 9px 10px)'],
+    ['lebkuchen', 'Lebkuchen-Hütte', 'radial-gradient(circle at 20% 30%,#fff 0 6%,transparent 7%),linear-gradient(135deg,#a4683a,#7a4a26)'],
+    ['markt', 'Weihnachtsmarkt', 'radial-gradient(circle at 70% 25%,rgb(255 200 110/.7) 0 8%,transparent 20%),repeating-linear-gradient(90deg,#3a2a1d 0 22px,#2e2117 22px 24px)'],
+    ['nordpol', 'Nordpol-Express', 'repeating-linear-gradient(-45deg,#d42a2a 0 8px,#fff 8px 16px)'],
   ];
+  /** Designs im Unterordner „Feiertage“ */
+  const FEST = ['xmas', 'noel', 'lebkuchen', 'markt', 'nordpol'];
   const THEME_IDS = THEMES.map((t) => t[0]);
   const themeName = (id) => (THEMES.find((x) => x[0] === id) || [])[1] || id;
   // Demo-Modus: erfundene Daten unter eigenem Schlüssel, echte Daten bleiben unberührt, kein Sync
@@ -302,6 +308,53 @@
     }).catch(() => toast('⚠ PDF konnte nicht geladen werden', 2500));
   }
 
+  // ---------- Walkthrough (läuft im Demo-Modus über die echte App) ----------
+  const WALK = [
+    { tab: 'feierabend', icon: '👋', t: 'Willkommen bei Toki', x: 'Feierabend, Mehrarbeit, Urlaub und Gehalt – alles an einem Ort. In zwei Minuten zeige ich dir das Wichtigste. Alles, was du hier siehst, sind erfundene Demo-Daten.' },
+    { tab: 'feierabend', sel: '#app section.card', icon: '⏱️', t: 'Zeiten eintragen', x: 'Beginn eintippen, Ende optional. Pausen rechnet Toki selbst (Samstag-Regel inklusive) und speichert sofort – ohne Speichern-Knopf.' },
+    { tab: 'feierabend', sel: '#fa-tiles', icon: '🏃', t: 'Wann darf ich gehen?', x: 'Für 7, 8, 9 und 10 Stunden siehst du sofort deine Gehzeit. Antippen übernimmt sie als Ende.' },
+    { tab: 'feierabend', sel: '.ampel', icon: '🚦', t: 'Alles im Blick', x: 'Zeitkonto, offene Mehrarbeit und Resturlaub – immer oben, auf jedem Reiter.' },
+    { tab: 'mehrarbeit', view: 'woche', sel: '.ktrio', card: true, icon: '📊', t: 'MEA-Kontingent', x: 'Wie viel Mehrarbeit du diesen Monat noch machen darfst. Ist es voll, läuft alles automatisch ins Zeitkonto.' },
+    { tab: 'mehrarbeit', view: 'woche', sel: '.days', card: true, icon: '📅', t: 'Deine Woche', x: 'Jeder Tag als Balken, Zuschläge 25 % / 50 % in Euro und der Samstag-Bonus fürs Zeitkonto. Tag antippen zum Bearbeiten.' },
+    { tab: 'mehrarbeit', view: 'jahr', sel: '.stats', card: true, icon: '🏆', t: 'Statistiken', x: 'Stärkste Woche, längster Tag, Krankheitstage – und ein paar Zahlen just for fun.' },
+    { tab: 'urlaub', sel: '.bal', icon: '🌴', t: 'Urlaub & Konten', x: 'Tarifurlaub, Zeitkonto, FZA, T-Zug, Sonderurlaub und Krank – je eine Zahl, fertig.' },
+    { tab: 'urlaub', sel: '.kwcal', card: true, icon: '✍️', t: 'Urlaub eintragen', x: 'Ersten Tag antippen, letzten Tag antippen, Art wählen. Toki prüft deine Tage – und schreibt dir auf Wunsch die Mail an den Chef.' },
+    { tab: 'netto', nmode: 'ist', sel: '.hero', card: true, icon: '💶', t: 'Dein Gehalt', x: 'Netto mit allen Abzügen. „Aktuell“ zeigt den Monat, „Auszahlung“ das, was wirklich aufs Konto kommt.' },
+    { tab: 'netto', nmode: 'ist', sel: 'details.doccard', icon: '📄', t: 'Dokumente hochladen', x: 'Zeitnachweis und Entgeltabrechnung als PDF – Monat und Art erkennt Toki selbst, vergleicht und lernt daraus.' },
+    { tab: 'netto', nmode: 'ist', sel: '.page .seg', icon: '🔮', t: 'Jahr & God Mode', x: 'Das ganze Jahr kumuliert – oder im God Mode durchspielen: Was bringt mir eine Gehaltserhöhung oder mehr Mehrarbeit?' },
+    { tab: 'netto', nmode: 'ist', sel: '.exportmini', icon: '📤', t: 'Berichte', x: 'Jeden Monat als PDF oder Excel exportieren – ganz unten im Gehalt.' },
+    { tab: 'einstellungen', open: 'design', sel: 'details[data-sec="design"]', icon: '🎨', t: 'Designs', x: 'Von Light Mode bis Goldene Weihnacht. Antippen und erst mal probieren – oder gleich als Standard merken.' },
+    { tab: 'einstellungen', open: 'konto', sel: 'details[data-sec="konto"]', icon: '🔄', t: 'Handy & Laptop', x: 'Mit deinem persönlichen Sync-Code (oder QR) sind alle Geräte gleich – ganz ohne Login.' },
+    { tab: 'einstellungen', icon: '🚀', t: 'Bereit!', x: 'Das war’s. Verlass die Demo und trag deinen ersten Tag ein – Toki macht den Rest.', last: true },
+  ];
+  let walkI = -1;
+  function walkStart() { walkI = 0; walkShow(); }
+  function walkEnd() { walkI = -1; document.querySelectorAll('.walk-hl').forEach((e) => e.classList.remove('walk-hl')); const c = document.getElementById('walk'); if (c) c.remove(); }
+  function walkShow() {
+    const w = WALK[walkI]; if (!w) return walkEnd();
+    if (w.view) ui.view = w.view;
+    if (w.nmode) ui.nmode = w.nmode;
+    if (w.open) ui.setOpen = w.open;
+    if (ui.tab !== w.tab) setTab(w.tab); else render(false);
+    let c = document.getElementById('walk');
+    if (!c) { c = document.createElement('div'); c.id = 'walk'; document.body.appendChild(c); }
+    c.innerHTML = `<div class="walk-card"><div class="walk-top"><span class="walk-ic">${w.icon}</span><div class="walk-dots">${WALK.map((_, i) => `<i class="${i === walkI ? 'on' : i < walkI ? 'done' : ''}"></i>`).join('')}</div><button class="walk-x" data-w="end" aria-label="Beenden">✕</button></div>
+      <h3>${w.t}</h3><p>${w.x}</p>
+      <div class="walk-b">${w.last ? `<button class="btn ghost" data-w="stay">In der Demo bleiben</button><button class="btn" data-w="exit">Demo verlassen</button>` : `<button class="btn ghost" data-w="back" ${walkI ? '' : 'disabled'}>Zurück</button><button class="btn" data-w="next">Weiter <span class="xs">${walkI + 1}/${WALK.length}</span></button>`}</div></div>`;
+    c.querySelectorAll('[data-w]').forEach((b) => b.addEventListener('click', () => {
+      const a = b.dataset.w;
+      if (a === 'next') { walkI++; walkShow(); } else if (a === 'back') { walkI--; walkShow(); }
+      else if (a === 'exit') { walkEnd(); setDemo(false); } else { walkEnd(); }
+    }));
+    setTimeout(() => {
+      document.querySelectorAll('.walk-hl').forEach((e) => e.classList.remove('walk-hl'));
+      let el = w.sel ? document.querySelector(w.sel) : null;
+      if (el && w.card) el = el.closest('section, details') || el;
+      if (el) { el.classList.add('walk-hl'); const r = el.getBoundingClientRect(); window.scrollTo({ top: Math.max(0, window.scrollY + r.top - 90), behavior: 'smooth' }); }
+      else window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 120);
+  }
+
   // ---------- Hochgeladene Dokumente je Monat ----------
   function docBadges(m, labels = false) {
     const z = (st.nachweise || {})[m], a = (st.abrechnungen || {})[m];
@@ -313,7 +366,7 @@
   function docCard(m) {
     const z = (st.nachweise || {})[m], a = (st.abrechnungen || {})[m];
     const when = (x) => (x && x.importiert ? new Date(x.importiert).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }) : '');
-    return `<details class="fold doccard" ${ui.docOpen === false ? '' : 'open'} data-fold="docOpen"><summary><span>Dokumente ${MON[Number(m.slice(5, 7)) - 1]} <span class="docs mini" style="display:inline-flex;vertical-align:middle">${docBadges(m)}</span></span>${I.chev}</summary><div class="body">
+    return `<details class="fold doccard" ${ui.docOpen ? 'open' : ''} data-fold="docOpen"><summary><span>Dokumente ${MON[Number(m.slice(5, 7)) - 1]} <span class="docs mini" style="display:inline-flex;vertical-align:middle">${docBadges(m)}</span></span>${I.chev}</summary><div class="body">
       <div class="docrow"><span>🕒 Zeitnachweis</span><span class="dstate ${z ? 'ok' : ''}">${z ? `✓ eingelesen ${when(z)}` : '– fehlt'}</span>${Ablage.has('zeit', m) ? `<button class="docview" data-act="pdfView" data-art="zeit" data-m="${m}">anschauen</button>` : ''}</div>
       <div class="docrow"><span>💶 Entgeltabrechnung</span><span class="dstate ${a ? 'ok' : ''}">${a ? `✓ eingelesen ${when(a)}` : '– fehlt'}</span>${Ablage.has('lohn', m) ? `<button class="docview" data-act="pdfView" data-art="lohn" data-m="${m}">anschauen</button>` : ''}</div>
       <label class="btn docbtn">⬆ Upload<input type="file" accept=".pdf,application/pdf" multiple data-act="docFile"></label>
@@ -720,7 +773,20 @@
       ${st1('🌴', 'Frei genommen', D1(t.urlaub), 'Urlaub, ZK, FZA, T-Zug, Sonder')}
       ${t.kurz ? st1('📉', 'Kurzarbeit', D1(t.kurz), 'Tage') : ''}
       ${st1('☕', 'Pausen gesamt', H(t.pauseH), `${t.over9} Tage über 9 h${t.capped ? ` · ${t.capped}× 10-h-Deckel` : ''}`)}
-    </div></section>`;
+    </div></section>
+    ${t.arbeitstage ? (() => {
+      const km = Number(S().steuer.km) || 0, weg = km * 2 * t.arbeitstage;
+      return `<section class="card"><h2>Just for fun 🎉</h2><div class="stats fun">
+        ${st1('🚽', 'Zeit auf dem Klo', H(t.arbeitstage * 0.25), '15 min pro Arbeitstag')}
+        ${st1('☕', 'Kaffee getrunken', `${nf(t.arbeitstage * 2, 0)} Tassen`, `≈ ${nf(t.arbeitstage * 2 * 0.2, 0)} Liter`)}
+        ${st1('⏰', 'Wecker überlebt', `${t.arbeitstage}×`, 'davon ehrlich gern: keine Angabe')}
+        ${st1('👋', '„Moin!“ gesagt', `${nf(t.arbeitstage * 6, 0)}×`, '≈ 6 Kollegen am Tag')}
+        ${st1('🎬', 'So viele Filme', `${nf(t.stunden / 2, 0)}`, 'hättest du stattdessen schauen können')}
+        ${st1('🍝', 'Mittagspausen', `${t.arbeitstage}`, `= ${H(t.pauseH)} Futter-Zeit`)}
+        ${weg ? st1('🚗', 'Arbeitsweg', `${nf(weg, 0)} km`, `${nf((weg / 40075) * 100, 1)} % einmal um die Erde`) : st1('📺', 'Serien-Staffeln', `${nf(t.stunden / 10, 0)}`, 'à 10 Stunden – nur so als Vergleich')}
+        ${st1('🏖️', 'Wochenenden verdient', `${Math.floor(t.arbeitstage / 5)}`, 'jedes einzelne!')}
+      </div></section>`;
+    })() : ''}`;
   }
   function pageMehrarbeit() {
     const s = S();
@@ -732,7 +798,7 @@
     if (isCur && k.has) {
       const end = `${m}-${String(new Date(Number(m.slice(0, 4)), Number(m.slice(5, 7)), 0).getDate()).padStart(2, '0')}`;
       const rest = C.workdaysBetween(today, end, opt(), (d) => !!absAt(d)).length;
-      avg = k.open <= 0 ? '<p class="small mt-s pos"><b>Kontingent erreicht.</b></p>' : rest ? `<p class="small mt-s"><b class="pos">Noch Ø ${nf(k.open / rest)} Std. Mehrarbeit pro Arbeitstag</b><br><span class="xs muted">${rest} verbleibende Arbeitstage im ${MON[Number(m.slice(5, 7)) - 1]} (ohne Feiertage & Urlaub, inkl. heute)</span></p>` : '<p class="small mt-s muted">Keine Arbeitstage mehr in diesem Monat.</p>';
+      avg = k.open <= 0 ? '<p class="xs muted mt-s" style="text-align:center">Mehrarbeit erschöpft – ab sofort Befüllung Zeitkonto</p>' : rest ? `<p class="small mt-s"><b class="pos">Noch Ø ${nf(k.open / rest)} Std. Mehrarbeit pro Arbeitstag</b><br><span class="xs muted">${rest} verbleibende Arbeitstage im ${MON[Number(m.slice(5, 7)) - 1]} (ohne Feiertage & Urlaub, inkl. heute)</span></p>` : '<p class="small mt-s muted">Keine Arbeitstage mehr in diesem Monat.</p>';
     }
     const z = calc.zk;
     const curK = kontInfo();
@@ -766,11 +832,10 @@
       ${avg}
       ${z > s.zk.max ? `<div class="notice danger">⚠ <div><b>Vorsicht, Stundenkonto voll!</b> Zeitkonto ${sH(z)} – es wird weiter mitgezählt.</div></div>` : ''}
     </section>
-    ${showNach ? `<section class="card" style="border:2px solid var(--warn)">
-      <h2>Mehrarbeit nachbeantragen</h2>
-      <p class="small">MEA-Kontingent für ${monthName(C.ym(today))} ist ${curK.has ? 'erschöpft' : 'nicht vorhanden'} und das Zeitkonto ist über ${s.zk.max} h. Trag die genehmigten Stunden ein – sie fließen ins Kontingent und zählen als Mehrarbeit (hervorgehoben).</p>
-      <div class="grid2 mt"><input class="field" id="nachH" inputmode="decimal" placeholder="Stunden"><button class="btn" data-act="addNach">Eintragen</button></div>
-    </section>` : ''}
+    <div class="nachmini">
+      <label class="switch sm"><span>Mehrarbeit Nachtrag?${showNach ? ' <span class="xs" style="color:var(--warn)">· Kontingent erschöpft, Zeitkonto über ' + s.zk.max + ' h</span>' : ''}</span><input type="checkbox" data-act="nachToggle" ${ui.nachOn ? 'checked' : ''}></label>
+      ${ui.nachOn ? `<div class="nachin"><input class="field sm" id="nachH" inputmode="decimal" placeholder="genehmigte Stunden"><button class="btn sm" data-act="addNach">Eintragen</button></div><p class="xs muted" style="margin:4px 0 0">Zählt ins Kontingent ${monthName(C.ym(today))} und als Mehrarbeit (hervorgehoben).</p>` : ''}
+    </div>
     ${nachList.length ? `<section class="card"><h2>Nachbeantragt</h2><div class="list">${nachList.map((n) => `<div class="li"><span class="badge nach">${H(num(n.hours))}</span><span class="grow">${monthName(n.month)}<br><span class="xs muted">eingetragen ${dShort(n.date)}${n.date.slice(0, 4)}</span></span><button class="btn sm danger" data-act="delNach" data-id="${n.id}">Löschen</button></div>`).join('')}</div></section>` : ''}
     <div class="seg" style="margin-bottom:14px">${[['woche', 'Wochen'], ['monat', 'Monate'], ['jahr', 'Jahr']].map(([kk, l]) => `<button aria-pressed="${ui.view === kk}" data-act="view" data-v="${kk}">${l}</button>`).join('')}</div>
     ${body}
@@ -1225,7 +1290,7 @@
     const zkInfo = s.zk.datum ? `Stand am ${dShort(s.zk.datum)}${s.zk.datum.slice(0, 4)}: <b>${sH(Number(s.zk.stand) || 0)}</b> → heute: <b>${sH(calc.zk)}</b>` : 'Stand eintragen – das Datum wird automatisch auf heute gesetzt.';
     return `${demoTop}<h1>Einstellungen</h1>
     ${!storageOk ? '<div class="notice danger" style="margin-bottom:14px">Dein Browser erlaubt hier kein dauerhaftes Speichern. Sichere deine Daten unter „Datentransport“.</div>' : ''}
-    ${sec('design', 'Design', `<div class="themes">${THEMES.map(([id, l, bg]) => `<button class="th" aria-pressed="${curTheme() === id}" data-act="theme" data-id="${id}"><div class="pv" style="background:${bg}">${FX.preview(id)}</div><div class="nm">${l}${s.theme === id ? ' <span class="xs">★</span>' : ui.tryTheme === id ? ' <span class="xs">(Probe)</span>' : ''}</div></button>`).join('')}</div>`)}
+    ${(() => { const thBtn = ([id, l, bg]) => `<button class="th" aria-pressed="${curTheme() === id}" data-act="theme" data-id="${id}"><div class="pv" style="background:${bg}">${FX.preview(id)}</div><div class="nm">${l}${s.theme === id ? ' <span class="xs">★</span>' : ui.tryTheme === id ? ' <span class="xs">(Probe)</span>' : ''}</div></button>`; return sec('design', 'Design', `<div class="themes">${THEMES.filter((t) => !FEST.includes(t[0])).map(thBtn).join('')}</div><details class="fold festfold" ${ui.festOpen || FEST.includes(curTheme()) ? 'open' : ''} data-fold="festOpen"><summary><span>📁 Feiertage <span class="xs muted">(${FEST.length})</span></span>${I.chev}</summary><div class="body"><div class="themes">${THEMES.filter((t) => FEST.includes(t[0])).map(thBtn).join('')}</div></div></details>`); })()}
     ${sec('arbeit', 'Arbeitszeit & Feiertage', `<div class="grid2"><div><label class="label">Wochenstunden</label><input class="field" data-set="arbeit.wochenstunden" value="${esc(deNum(s.arbeit.wochenstunden))}" inputmode="decimal"><div class="hint" id="tsoll">= ${D1(C.tagessoll(s))} Std./Tag</div></div><div></div>${fld('Brotzeit (min)', 'arbeit.brotzeit', s.arbeit.brotzeit, 'inputmode="numeric"')}${fld('Mittag (min)', 'arbeit.mittag', s.arbeit.mittag, 'inputmode="numeric"')}</div>
       <div class="mt"><label class="label">Bundesland (Feiertage)</label><select class="field" data-set="arbeit.land" data-struct="1">${Object.entries(C.LAENDER).map(([k, l]) => `<option value="${k}" ${s.arbeit.land === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
       ${s.arbeit.land === 'BY' ? sw('Mariä Himmelfahrt (15.08.) frei', 'arbeit.mariae', s.arbeit.mariae, 'gilt in überwiegend katholischen Gemeinden') : ''}
@@ -1293,7 +1358,7 @@
       <button class="btn danger mt" data-act="reset">Alle Daten löschen</button>`)}
     ${demo ? '<button class="btn danger big mt" data-act="demoExit">🎬 Demo-Modus verlassen</button>' : ''}
     <p class="xs muted onbg" style="text-align:center">Toki · Feierabend, Mehrarbeit & Urlaub · v${RELEASES[0][0]}</p>
-    ${demo ? '' : '<p style="text-align:center;margin:-4px 0 0"><button class="demolink" data-act="demoLogin">Demo</button></p>'}`;
+    <p style="text-align:center;margin:-4px 0 0"><button class="demolink" data-act="walk">Walkthrough</button>${demo ? '' : '<span class="demolink" style="cursor:default">·</span><button class="demolink" data-act="demoLogin">Demo</button>'}</p>`;
   }
 
   // ---------- Render ----------
@@ -1309,8 +1374,10 @@
     document.getElementById('nav').innerHTML = `<div class="in">${NAV.map(([id, l, ic]) => `<button data-act="tab" data-tab="${id}" ${ui.tab === id ? 'aria-current="page"' : ''}>${ic}<span>${l}</span></button>`).join('')}</div>`;
     if (keepScroll) window.scrollTo(0, y);
     applyTheme();
+    walkRefresh();
   }
   let lastTheme = null;
+  function walkRefresh() { if (walkI >= 0) { const w = WALK[walkI]; let el = w && w.sel ? document.querySelector(w.sel) : null; if (el && w.card) el = el.closest('section, details') || el; if (el) el.classList.add('walk-hl'); } }
   function curTheme() { return ui.tryTheme && THEME_IDS.includes(ui.tryTheme) ? ui.tryTheme : S().theme; }
   function applyTheme() {
     if (lastTheme === curTheme()) return;
@@ -1351,7 +1418,8 @@
     kEdit: () => { ui.kEdit = true; render(); const i = document.getElementById('kont'); if (i) { i.focus(); i.select(); } },
     kDone: () => { ui.kEdit = false; render(); },
     demoLogin: () => confirmBox('Demo-Modus', 'Wirklich in den fiktiven Demo-Modus wechseln? Deine echten Daten bleiben unberührt und kommen beim Verlassen zurück.', 'Ja, Demo starten', () => setDemo(true), false),
-    demoExit: () => setDemo(false),
+    demoExit: () => { walkEnd(); setDemo(false); },
+    walk: () => (demo ? walkStart() : confirmBox('Walkthrough', 'Ich zeige dir Toki in ein paar Schritten – mit erfundenen Demo-Daten. Deine echten Daten bleiben unberührt und kommen danach zurück.', 'Los geht’s', () => { setDemo(true); setTimeout(walkStart, 400); }, false)),
     gyear: (t) => { ui.gyear = (ui.gyear || Number(ui.nmonth.slice(0, 4))) + Number(t.dataset.d); render(); },
     gotoMonth: (t) => { ui.nmonth = t.dataset.m; ui.nmode = 'ist'; render(); window.scrollTo({ top: 0 }); },
     slipDel: (t) => confirmBox('Abrechnung entfernen', `Gespeicherte Werte der Abrechnung ${monthName(t.dataset.m)} löschen?`, 'Entfernen', () => { delete st.abrechnungen[t.dataset.m]; save(); render(); }),
@@ -1420,7 +1488,7 @@
     addNach: () => {
       const v = num(document.getElementById('nachH').value);
       if (v <= 0) return toast('Bitte Stunden eintragen');
-      st.nach.push({ id: uid(), month: C.ym(today), hours: v, date: today }); save(); toast('✓ Nachbeantragte Stunden eingetragen'); render();
+      st.nach.push({ id: uid(), month: C.ym(today), hours: v, date: today }); ui.nachOn = false; save(); toast('✓ Nachbeantragte Stunden eingetragen'); render();
     },
     delNach: (t) => confirmBox('Nachbeantragung löschen?', 'Die Stunden fallen wieder aus dem Kontingent.', 'Löschen', () => { st.nach = st.nach.filter((n) => n.id !== t.dataset.id); save(); render(); }),
     vyear: (t) => { ui.vyear += Number(t.dataset.d); render(); },
@@ -1605,6 +1673,7 @@
       else { const g = { ...godDefaults(), ...(st.pref.god || {}) }; g.kasse = name; if (k) g.kvZusatz = k[1]; else if (!name) g.kvZusatz = 2.9; st.pref.god = g; }
       save(); render(); return;
     }
+    if (t.dataset.act === 'nachToggle') { ui.nachOn = t.checked; render(); return; }
     if (t.dataset.act === 'docFile') {
       const fs = [...(t.files || [])]; t.value = '';
       if (fs.length) Promise.all(fs.map((f) => f.arrayBuffer())).then((bufs) => { docQueue.push(...bufs.slice(1)); docImport(bufs[0]); });
