@@ -6,6 +6,7 @@
   const LOGO = '__LOGO__';
   /** Release Notes – neueste zuerst: [Version, Datum, Themen] */
   const RELEASES = [
+    ['2.10', '22.11.2026', ['Samstag-Bonus schlank direkt unter dem Samstag']],
     ['2.9', '21.11.2026', ['Samstag-Bonus korrigiert: erst Wochentage ins Kontingent, Rest vom Samstag ins Zeitkonto +25 %', 'Samstag-Aufteilung Mehrarbeit / Zeitkonto / Bonus im Balken']],
     ['2.8', '20.11.2026', ['Samstag-Bonus (25 %) fürs Zeitkonto als Balken und Zahl']],
     ['2.7', '20.11.2026', ['PDFs auf Wunsch auf dem Gerät speichern und unter „Dokumente“ anschauen']],
@@ -633,7 +634,7 @@
       } else if (day.holiday) bar = `<div class="bar hol">🎉 ${esc(day.holiday)}</div>`;
       else if (ab && !ab.full) bar = `<div class="bar abs" style="background:var(--c-${ab.type});opacity:.7">½ ${C.TYPES[ab.type].label}</div>`;
       else bar = '<div class="bar empty"></div>';
-      return `<div class="day" ${e ? `data-act="dayMenu" data-date="${d}"` : ''}><div class="wd">${WD[wd]}<small>${dShort(d)}</small></div>${bar}${dv}</div>`;
+      return `<div class="day" ${e ? `data-act="dayMenu" data-date="${d}"` : ''}><div class="wd">${WD[wd]}<small>${dShort(d)}</small></div>${bar}${dv}</div>${wd === 6 && e ? satBonus(w) : ''}`;
     }).join('');
     const p = w.pay;
     const right = w.mehr > 0 ? (show ? EUR(p.total) : sH(w.mehr)) : w.zkChange ? `<span style="color:var(--c-zk)">${sH(w.zkChange)} ZK</span>` : '';
@@ -650,7 +651,6 @@
         <div class="kpi"><div class="k">Zeitkonto</div><div class="v num">${sH(w.zkChange)}</div></div>
       </div>
       ${zusTable(w.pay, w.mehr, w.mehrNach)}
-      ${satBonus(w, 'Samstag-Bonus')}
       <div class="days">${days}</div>
       <button class="morebtn" data-act="openWeek" data-w="${w.monday}">${open ? 'Diagramme ausblenden ▲' : 'Diagramme ▼'}</button>
       ${open && ws ? `${weekChart(w, ws)}
@@ -659,15 +659,13 @@
 ` : ''}
     </section>`;
   }
-  /** Samstag: Aufteilung Mehrarbeit / Zeitkonto + 25-%-Bonus als Balken und Zahl */
-  function satBonus(x, label) {
+  /** Samstag-Bonus: schmale Zeile direkt unter dem Samstag – nur wenn Bonus fürs Zeitkonto gewährt wurde */
+  function satBonus(x) {
     if (!(x.bonus > 0)) return '';
     const sm = x.satMehr || 0, sz = x.satZK || x.bonus / 0.25, tot = sm + sz + x.bonus;
     const pct = (v) => `${(v / tot) * 100}%`;
-    return `<div class="satb"><div class="satb-h"><span>🎁 ${label}</span><b class="num">+${H(x.bonus)} Bonus</b></div>
-      <div class="satb-bar">${sm > 0 ? `<i class="b0" style="width:${pct(sm)}"><span>${H(sm)}</span></i>` : ''}<i class="b1" style="width:${pct(sz)}"><span>${H(sz)}</span></i><i class="b2" style="width:${pct(x.bonus)}"><span>+${H(x.bonus)}</span></i></div>
-      <div class="satb-l">${sm > 0 ? `<span><i class="d0"></i>${H(sm)} Mehrarbeit</span>` : ''}<span><i class="d1"></i>${H(sz)} ins Zeitkonto</span><span><i class="d2"></i>${H(x.bonus)} Bonus geschenkt</span></div>
-      <div class="satb-f">Samstag gearbeitet: <b>${H(sm + sz)}</b>${sm > 0 ? ` – davon ${H(sm)} noch Mehrarbeit (Kontingent)` : ''}. Auf die ${H(sz)} im Zeitkonto gibt es 25 % = <b>${H(x.bonus)}</b> obendrauf → Zeitkonto <b>+${H(sz + x.bonus)}</b>.</div></div>`;
+    return `<div class="satb"><div class="satb-bar">${sm > 0 ? `<i class="b0" style="width:${pct(sm)}"></i>` : ''}<i class="b1" style="width:${pct(sz)}"></i><i class="b2" style="width:${pct(x.bonus)}"></i></div>
+      <div class="satb-t">🎁 ${sm > 0 ? `${H(sm)} MA · ` : ''}${H(sz)} ZK · <b>+${H(x.bonus)} Bonus</b></div></div>`;
   }
   function monthCard(m) {
     const show = S().lohn.zeigen, p = m.pay;
@@ -681,7 +679,6 @@
         <div class="kpi"><div class="k">Zeitkonto</div><div class="v num">${sH(m.zkChange)}</div></div>
       </div>
       ${zusTable(p, m.mehr, m.mehrNach)}
-      ${satBonus(m, 'Samstag-Bonus im Monat')}
       ${K ? `<div class="mt"><div class="xs muted">MEA-Kontingent ${H(m.used)} von ${H(K)}${m.nach ? ` · inkl. <span class="badge nach">${H(m.nach)} nachbeantragt</span>` : ''}</div><div class="progress mt-s"><i style="width:${usedPct}%"></i></div></div>` : ''}
       <p class="xs muted mt-s">${m.days} Tage erfasst · Zuschläge werden je Woche berechnet</p>
     </section>`;
