@@ -27,7 +27,7 @@
   - Design „Goldene Weihnacht“ (`noel`): dunkelgrün/gold/rot, Lichterkette, hängende Kugeln, Schnee, Playfair Display.
   - Gehalt hat Reiter Monat | Jahr | God. Jahr = `Core.gehaltJahr` (Abrechnung wenn vorhanden, sonst Toki „Auszahlung“, künftige Monate als Prognose).
   - Steuererklärung (Einstellungen → Steuer): `Core.steuerKlaerung` – Jahreswerte der letzten Abrechnung exakt, danach Toki; Entfernungspauschale 0,38 €/km ab km 1 × Arbeitstage, Werbungskostenpauschale 1.230 €, Tarif-Tipp (42 % ab 69.879 € bzw. 139.758 € Splitting). Werte jährlich prüfen.
-  - Reiter Mehrarbeit → Jahr: Statistik-Karte (`Core.yearStats`). Samstag-Bonus in Wochen- und Monatskarte als Balken (grün Mehrarbeit | blau Zeitkonto | gold Bonus) und Zahl (`satBonus`, Felder `satMehr/satZK/bonus`).
+  - Reiter Mehrarbeit → Jahr: Statistik-Karte (`Core.yearStats`). Samstag-Bonus nur wenn gewährt: schmale Zeile direkt unter dem Samstag in der Wochenkarte (dünner Balken grün MA | blau ZK | gold Bonus + kurzer Text, `satBonus`).
   - Designs: Klick fragt „Standard-Design“ (gespeichert) oder „Probieren“ (`ui.tryTheme`, nicht gespeichert, Leiste oben). Beim Wechsel wird `meta[theme-color]` ersetzt und `html` eingefärbt (Statusleiste). Designs Light Mode (`light`), Premium Gold (`gold`), Natur & Eco (`eco`) mit Oswald/Manrope.
   - Urlaub-Kacheln kompakt (3 je Reihe), nur Name + eine Zahl: Tarif/T-Zug = freie Tage, Zeitkonto/FZA = Stand (Plus ohne Vorzeichen, Minus mit −; ZK-Planung klein rot „x h geplant“), Sonder/Krank/Kurzarbeit = Tage bis heute. FZA mit 2 Nachkommastellen.
   - Jedes Fenster (`sheet()`) hat oben rechts ein ✕. Zahlenfelder: eine stehende 0 verschwindet beim Antippen, sonst wird der Inhalt markiert (direkt überschreiben).
