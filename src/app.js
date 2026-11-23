@@ -6,6 +6,7 @@
   const LOGO = '__LOGO__';
   /** Release Notes – neueste zuerst: [Version, Datum, Themen] */
   const RELEASES = [
+    ['2.12', '23.11.2026', ['Resturlaub: im Januar–März verplante Tage werden vom Vorjahresrest abgezogen']],
     ['2.11', '22.11.2026', ['Walkthrough für neue Nutzer', 'Designs Lebkuchen-Hütte, Weihnachtsmarkt, Nordpol-Express im Ordner „Feiertage“', 'Mehrarbeit Nachtrag als kleiner Schalter', 'Lustige Jahres-Statistiken', 'Urlaub-Kacheln: Überschriften immer auf gleicher Höhe', 'Dokumente im Gehalt standardmäßig zugeklappt']],
     ['2.10', '22.11.2026', ['Samstag-Bonus schlank direkt unter dem Samstag']],
     ['2.9', '21.11.2026', ['Samstag-Bonus korrigiert: erst Wochentage ins Kontingent, Rest vom Samstag ins Zeitkonto +25 %', 'Samstag-Aufteilung Mehrarbeit / Zeitkonto / Bonus im Balken']],
@@ -511,7 +512,8 @@
     const v = vac[y];
     if (!v) return { frei: Number(C.yearCfg(S(), y).tarif) || 0, carry: 0 };
     const carry = at <= `${y}-03-31` ? v.carryLeft : 0;
-    return { frei: v.rest + carry, carry, rest: v.rest };
+    // Jahr y: Rest abzüglich der Tage, die bis 31.03. des Folgejahres aus diesem Rest genommen werden
+    return { frei: (v.restFrei ?? v.rest) + carry, carry, rest: v.rest };
   }
 
   // ---------- Konto-Ampel ----------

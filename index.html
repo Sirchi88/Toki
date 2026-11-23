@@ -1457,6 +1457,12 @@ const Core = (() => {
       };
       carryIn = Math.max(0, rest); debt = Math.max(0, -rest);
     }
+    // Resturlaub eines Jahres, der bis 31.03. des Folgejahres genommen (bzw. verplant) wird, ist nicht mehr frei
+    for (const y of Object.keys(res).map(Number)) {
+      const nx = res[y + 1];
+      res[y].vortragGenutzt = nx ? nx.fromCarry : 0;
+      res[y].restFrei = res[y].rest - res[y].vortragGenutzt;
+    }
     return res;
   };
 
@@ -3133,6 +3139,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
   const LOGO = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjE1IDMgOTAgODgiPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJ0ZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzM2Yjk4MiIvPjxzdG9wIG9mZnNldD0iLjU1IiBzdG9wLWNvbG9yPSIjMmE5YzZiIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWQ3NjUwIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJ0eCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzJjOWY2YyIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzFlN2E1MSIvPjwvbGluZWFyR3JhZGllbnQ+CjxmaWx0ZXIgaWQ9InNoIiB4PSItMjAlIiB5PSItMjAlIiB3aWR0aD0iMTQwJSIgaGVpZ2h0PSIxNDAlIj48ZmVEcm9wU2hhZG93IGR4PSIwIiBkeT0iMS41IiBzdGREZXZpYXRpb249IjEuNiIgZmxvb2QtY29sb3I9IiMwMDAiIGZsb29kLW9wYWNpdHk9Ii4zNSIvPjwvZmlsdGVyPgo8ZmlsdGVyIGlkPSJpbiI+PGZlT2Zmc2V0IGR5PSIxLjIiLz48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIxIi8+PGZlQ29tcG9zaXRlIG9wZXJhdG9yPSJvdXQiIGluPSJTb3VyY2VHcmFwaGljIi8+PGZlQ29tcG9uZW50VHJhbnNmZXI+PGZlRnVuY0EgdHlwZT0ibGluZWFyIiBzbG9wZT0iLjciLz48L2ZlQ29tcG9uZW50VHJhbnNmZXI+PGZlQmxlbmQgaW4yPSJTb3VyY2VHcmFwaGljIiBtb2RlPSJub3JtYWwiLz48L2ZpbHRlcj4KPC9kZWZzPgo8ZyBmaWx0ZXI9InVybCgjc2gpIj4KPHJlY3QgeD0iMTkiIHk9IjYiIHdpZHRoPSI4MiIgaGVpZ2h0PSI4MCIgcng9IjE1IiBmaWxsPSJ1cmwoI3RnKSIvPgo8cmVjdCB4PSIxOS42IiB5PSI2LjYiIHdpZHRoPSI4MC44IiBoZWlnaHQ9Ijc4LjgiIHJ4PSIxNC40IiBmaWxsPSJub25lIiBzdHJva2U9IiM3ZmYwYmQiIHN0cm9rZS1vcGFjaXR5PSIuMjIiIHN0cm9rZS13aWR0aD0iMS4yIi8+CjwvZz4KPHBhdGggZD0iTTM3LjUgMjFIODAuNVYzNEg2NS41VjY5SDUyLjVWMzRIMzcuNVoiIGZpbGw9IiMxZDIwMjUiIGZpbHRlcj0idXJsKCNpbikiLz4KPC9zdmc+Cg==';
   /** Release Notes – neueste zuerst: [Version, Datum, Themen] */
   const RELEASES = [
+    ['2.12', '23.11.2026', ['Resturlaub: im Januar–März verplante Tage werden vom Vorjahresrest abgezogen']],
     ['2.11', '22.11.2026', ['Walkthrough für neue Nutzer', 'Designs Lebkuchen-Hütte, Weihnachtsmarkt, Nordpol-Express im Ordner „Feiertage“', 'Mehrarbeit Nachtrag als kleiner Schalter', 'Lustige Jahres-Statistiken', 'Urlaub-Kacheln: Überschriften immer auf gleicher Höhe', 'Dokumente im Gehalt standardmäßig zugeklappt']],
     ['2.10', '22.11.2026', ['Samstag-Bonus schlank direkt unter dem Samstag']],
     ['2.9', '21.11.2026', ['Samstag-Bonus korrigiert: erst Wochentage ins Kontingent, Rest vom Samstag ins Zeitkonto +25 %', 'Samstag-Aufteilung Mehrarbeit / Zeitkonto / Bonus im Balken']],
@@ -3638,7 +3645,8 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
     const v = vac[y];
     if (!v) return { frei: Number(C.yearCfg(S(), y).tarif) || 0, carry: 0 };
     const carry = at <= `${y}-03-31` ? v.carryLeft : 0;
-    return { frei: v.rest + carry, carry, rest: v.rest };
+    // Jahr y: Rest abzüglich der Tage, die bis 31.03. des Folgejahres aus diesem Rest genommen werden
+    return { frei: (v.restFrei ?? v.rest) + carry, carry, rest: v.rest };
   }
 
   // ---------- Konto-Ampel ----------
