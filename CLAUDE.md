@@ -43,7 +43,7 @@
   - Handy-Darstellung nicht verändern; PC-Optimierungen nur in `@media (min-width: 1000px)`.
   - Eingaben werden sofort gespeichert, ohne Speichern-Knopf und ohne Hinweis.
   - ZK-Urlaubstag senkt das Wochensoll um 7 h; Plus derselben Woche wird zuerst damit verrechnet.
-  - Tarifurlaub gilt bis 31.03. des Folgejahres; T-Zug nur im Kalenderjahr; halbe Tage nur bei Tarifurlaub oder Zeitkonto.
+  - Tarifurlaub gilt bis 31.03. des Folgejahres: Tage Jan–31.03. werden zuerst aus dem Vorjahresrest genommen und senken dessen freien Rest schon im alten Jahr (`vacation().restFrei`); T-Zug nur im Kalenderjahr; halbe Tage nur bei Tarifurlaub oder Zeitkonto.
   - Urlaubsgeld je Tarifurlaubstag: Grundlohn ÷ 21,75 × 0,5.
   - Urlaubsgeld und alle Sonderzahlungen zählen zum Block „Mehrarbeit“ (Netto Mehrarbeit, bei „Auszahlung“ aus dem Vormonat) – außer Zahlungen „mit dem Grundlohn“ wie Weihnachtsgeld (Feld `gruppe` je Sonderzahlung, Standard per Name).
   - Reiter Mehrarbeit: alle Stundenwerte mit zwei Nachkommastellen.

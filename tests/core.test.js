@@ -336,6 +336,19 @@ test('Samstag: Wochentage füllen zuerst das Kontingent, Rest vom Samstag ins Ze
   assert.deepStrictEqual([w.mehr, w.satMehr, w.satZK, w.bonus, w.zkChange], [2, 1, 4, 1, 5]);
 });
 
+test('Resturlaub: Urlaub bis 31.03. des Folgejahres zählt gegen den Vorjahresrest', () => {
+  const S = base(); S.urlaub.jahre = { 2026: { tarif: 30, rest: 10, restDatum: '2026-11-22' }, 2027: { tarif: 30 } };
+  const st = { settings: S, entries: {}, absences: [
+    { id: 'a', from: '2026-12-28', to: '2026-12-30', type: 'tarif' }, // 3 Tage
+    { id: 'b', from: '2027-03-08', to: '2027-03-16', type: 'tarif' }, // 7 Tage
+  ], kontingent: {}, nach: [] };
+  const v = C.vacation(st, '2026-11-23');
+  assert.strictEqual(v[2026].rest, 7);
+  assert.strictEqual(v[2027].fromCarry, 7);
+  assert.strictEqual(v[2026].restFrei, 0);
+  assert.strictEqual(v[2027].rest, 30);
+});
+
 (async () => {
   for (const [name, fn] of tests) { await fn(); passed++; console.log(`✓ ${name}`); }
   console.log(`\n${passed} Tests bestanden.`);

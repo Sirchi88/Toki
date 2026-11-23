@@ -395,6 +395,12 @@ const Core = (() => {
       };
       carryIn = Math.max(0, rest); debt = Math.max(0, -rest);
     }
+    // Resturlaub eines Jahres, der bis 31.03. des Folgejahres genommen (bzw. verplant) wird, ist nicht mehr frei
+    for (const y of Object.keys(res).map(Number)) {
+      const nx = res[y + 1];
+      res[y].vortragGenutzt = nx ? nx.fromCarry : 0;
+      res[y].restFrei = res[y].rest - res[y].vortragGenutzt;
+    }
     return res;
   };
 
