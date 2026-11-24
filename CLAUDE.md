@@ -49,5 +49,6 @@
   - Reiter Mehrarbeit: alle Stundenwerte mit zwei Nachkommastellen.
   - KV-Zusatzbeitrag über Auswahl der Krankenkasse (`Core.KASSEN`, Stand 01.11.2026 – jährlich zum 1.1. aktualisieren), „Andere“ = manueller Wert.
   - Navigation bleibt auch am PC unten.
+  - Easter Egg im Design „Auswechselspieler“ (`dorf`): Resturlaub in der Ampel auf Feierabend antippen → Vollbild-Krake (`krake(n)`, SVG) mit so vielen Armen wie Resturlaubstagen (halber Tag = halber Arm, max. 40), ~3 s animiert, Antippen schließt früher.
 - Sync: `src/sync.js` ruft per `fetch` die Supabase-Funktionen `toki_laden`/`toki_speichern` auf (kein Login, persönlicher 16-stelliger Sync-Code, in der DB nur dessen SHA-256-Hash). Schema in `supabase/schema.sql`. Nur der Publishable Key gehört in den Code, niemals der Secret Key.
 - Keine echten Vereins-/Markenlogos oder -namen in Designs.

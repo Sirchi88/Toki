@@ -6,6 +6,7 @@
   const LOGO = '__LOGO__';
   /** Release Notes – neueste zuerst: [Version, Datum, Themen] */
   const RELEASES = [
+    ['2.13', '24.11.2026', ['Geheimtipp im Design „Auswechselspieler“: Resturlaub antippen 🐙']],
     ['2.12', '23.11.2026', ['Resturlaub: im Januar–März verplante Tage werden vom Vorjahresrest abgezogen']],
     ['2.11', '22.11.2026', ['Walkthrough für neue Nutzer', 'Designs Lebkuchen-Hütte, Weihnachtsmarkt, Nordpol-Express im Ordner „Feiertage“', 'Mehrarbeit Nachtrag als kleiner Schalter', 'Lustige Jahres-Statistiken', 'Urlaub-Kacheln: Überschriften immer auf gleicher Höhe', 'Dokumente im Gehalt standardmäßig zugeklappt']],
     ['2.10', '22.11.2026', ['Samstag-Bonus schlank direkt unter dem Samstag']],
@@ -356,6 +357,64 @@
     }, 120);
   }
 
+  // ---------- Easter Egg (Design „Auswechselspieler“): Krake mit so vielen Armen wie Resturlaubstagen ----------
+  function krake(n) {
+    if (document.getElementById('krake')) return;
+    const half = n % 1 >= 0.5;
+    const full = Math.min(40, Math.max(0, Math.floor(n)));
+    const N = full + (half ? 1 : 0); // ein halber Urlaubstag = ein halber Arm
+    const w = N <= 8 ? 24 : N <= 16 ? 19 : 14;
+    const cx = 300, cy = 250;
+    const arms = [];
+    for (let i = 0; i < N; i++) {
+      // Arme fächern sich unten im Halbkreis auf (bei vielen Armen rundum)
+      const spread = N <= 10 ? Math.PI * 0.95 : Math.PI * 1.6;
+      const a = Math.PI / 2 + (N === 1 ? 0 : -spread / 2 + (spread * i) / (N - 1));
+      const isHalf = half && i === Math.floor(N / 2);
+      const L = (isHalf ? 0.5 : 1) * (250 + (i % 3) * 22);
+      const bx = cx + Math.cos(a) * 70, by = cy + 40 + Math.sin(a) * 45;
+      const ex = cx + Math.cos(a) * L, ey = cy + 40 + Math.sin(a) * (L * 0.9);
+      const side = i % 2 ? 1 : -1;
+      const c1x = bx + Math.cos(a + side * 0.9) * L * 0.45, c1y = by + Math.sin(a + side * 0.9) * L * 0.45;
+      const c2x = ex + Math.cos(a - side * 1.4) * 70, c2y = ey + Math.sin(a - side * 1.4) * 70;
+      const d = `M${bx - w * Math.sin(a)} ${by + w * Math.cos(a)} C${c1x} ${c1y} ${c2x} ${c2y} ${ex} ${ey} C${c2x + w * 0.7} ${c2y + w * 0.4} ${c1x + w * 1.2} ${c1y + w * 0.7} ${bx + w * Math.sin(a)} ${by - w * Math.cos(a)}Z`;
+      // Saugnäpfe entlang der Mitte
+      const cups = [0.25, 0.4, 0.55, 0.7, 0.83].map((t) => {
+        const u = 1 - t;
+        const x = u * u * u * bx + 3 * u * u * t * c1x + 3 * u * t * t * c2x + t * t * t * ex;
+        const y = u * u * u * by + 3 * u * u * t * c1y + 3 * u * t * t * c2y + t * t * t * ey;
+        return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${((w / 2.4) * (1 - t * 0.7)).toFixed(1)}" fill="#ffd0d8" stroke="#c2376b" stroke-width="1.5"/>`;
+      }).join('');
+      arms.push(`<g class="kr-arm" style="transform-origin:${bx.toFixed(0)}px ${by.toFixed(0)}px;animation-delay:${(-i * 0.17).toFixed(2)}s;--sw:${side * (6 + (i % 4) * 2)}deg"><path d="${d}" fill="url(#krArm)" stroke="#8f1d4d" stroke-width="2.5" stroke-linejoin="round"/>${cups}</g>`);
+    }
+    const zahl = `${full}${half ? '½' : ''}`, tage = `${full}${half ? ',5' : ''}`;
+    const ov = document.createElement('div');
+    ov.id = 'krake';
+    ov.innerHTML = `<div class="kr-wrap"><svg viewBox="20 40 560 620" class="kr-svg" aria-label="Krake mit ${N} Armen">
+      <defs>
+        <radialGradient id="krHead" cx="40%" cy="30%" r="75%"><stop offset="0" stop-color="#ff9ec2"/><stop offset=".55" stop-color="#e0457f"/><stop offset="1" stop-color="#8f1d4d"/></radialGradient>
+        <linearGradient id="krArm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ec5a92"/><stop offset="1" stop-color="#b52a62"/></linearGradient>
+      </defs>
+      <g class="kr-arms">${arms.join('')}</g>
+      <g class="kr-head">
+        <ellipse cx="${cx}" cy="${cy - 40}" rx="150" ry="165" fill="url(#krHead)" stroke="#8f1d4d" stroke-width="4"/>
+        <ellipse cx="${cx - 55}" cy="${cy - 120}" rx="36" ry="22" fill="#fff" opacity=".28" transform="rotate(-25 ${cx - 55} ${cy - 120})"/>
+        ${[[-70, -60, 14], [60, -90, 10], [20, -150, 8], [-20, 10, 9], [95, 0, 7]].map(([x, y, r]) => `<circle cx="${cx + x}" cy="${cy + y}" r="${r}" fill="#c2376b" opacity=".45"/>`).join('')}
+        <g class="kr-eyes"><ellipse cx="${cx - 55}" cy="${cy + 10}" rx="34" ry="40" fill="#fff" stroke="#8f1d4d" stroke-width="3"/><ellipse cx="${cx + 55}" cy="${cy + 10}" rx="34" ry="40" fill="#fff" stroke="#8f1d4d" stroke-width="3"/>
+          <circle class="kr-pupil" cx="${cx - 48}" cy="${cy + 18}" r="17" fill="#1b1020"/><circle class="kr-pupil" cx="${cx + 62}" cy="${cy + 18}" r="17" fill="#1b1020"/>
+          <circle cx="${cx - 54}" cy="${cy + 9}" r="6" fill="#fff"/><circle cx="${cx + 56}" cy="${cy + 9}" r="6" fill="#fff"/></g>
+        <ellipse cx="${cx - 105}" cy="${cy + 62}" rx="22" ry="12" fill="#ff8fb0" opacity=".7"/><ellipse cx="${cx + 105}" cy="${cy + 62}" rx="22" ry="12" fill="#ff8fb0" opacity=".7"/>
+        ${N > 0 ? `<path d="M${cx - 34} ${cy + 72} Q${cx} ${cy + 108} ${cx + 34} ${cy + 72}" fill="#5a0f2e" stroke="#8f1d4d" stroke-width="3"/><path d="M${cx - 16} ${cy + 88} Q${cx} ${cy + 100} ${cx + 16} ${cy + 88}" fill="#ff6f91"/>` : `<path d="M${cx - 30} ${cy + 92} Q${cx} ${cy + 66} ${cx + 30} ${cy + 92}" fill="none" stroke="#5a0f2e" stroke-width="6" stroke-linecap="round"/><path d="M${cx + 70} ${cy + 40} q-8 18 0 26 q8 -8 0 -26z" fill="#7fc8ff"/>`}
+      </g>
+      ${Array.from({ length: 9 }, (_, i) => `<circle class="kr-bub" cx="${60 + i * 60}" cy="${560 + (i % 3) * 25}" r="${6 + (i % 4) * 3}" fill="none" stroke="#bfe8ff" stroke-width="2" style="animation-delay:${(i * 0.23).toFixed(2)}s"/>`).join('')}
+    </svg>
+    <div class="kr-txt"><b>${zahl}</b> ${full === 1 && !half ? 'Arm' : 'Arme'} = ${tage} ${full === 1 && !half ? 'Tag' : 'Tage'} Resturlaub${N === 0 ? ' … die Krake ist traurig 🥲' : ' 🐙'}</div></div>`;
+    document.body.appendChild(ov);
+    const bye = () => { ov.classList.add('out'); setTimeout(() => ov.remove(), 600); };
+    const t = setTimeout(bye, 3000);
+    ov.addEventListener('click', () => { clearTimeout(t); bye(); });
+  }
+
   // ---------- Hochgeladene Dokumente je Monat ----------
   function docBadges(m, labels = false) {
     const z = (st.nachweise || {})[m], a = (st.abrechnungen || {})[m];
@@ -527,7 +586,7 @@
     return `<div class="ampel">
       <button class="amp" data-act="tab" data-tab="urlaub"><div class="k"><span class="dot ${zd}"></span>Zeitkonto</div><div class="v num">${z < -0.004 ? '-' : ''}${H(Math.abs(z))}</div></button>
       <button class="amp" data-act="tab" data-tab="mehrarbeit"><div class="k"><span class="dot ${kd}"></span>offene MEA</div><div class="v num">${k.has ? H(Math.max(0, k.open)) : '–'}</div></button>
-      <button class="amp" data-act="tab" data-tab="urlaub"><div class="k"><span class="dot ${ud}"></span>Resturlaub</div><div class="v num">${D1(ut)} T</div></button>
+      <button class="amp" ${curTheme() === 'dorf' && ui.tab === 'feierabend' ? `data-act="krake" data-n="${Math.max(0, ut)}"` : 'data-act="tab" data-tab="urlaub"'}><div class="k"><span class="dot ${ud}"></span>Resturlaub</div><div class="v num">${D1(ut)} T</div></button>
     </div>`;
   }
 
@@ -1421,6 +1480,7 @@
     kDone: () => { ui.kEdit = false; render(); },
     demoLogin: () => confirmBox('Demo-Modus', 'Wirklich in den fiktiven Demo-Modus wechseln? Deine echten Daten bleiben unberührt und kommen beim Verlassen zurück.', 'Ja, Demo starten', () => setDemo(true), false),
     demoExit: () => { walkEnd(); setDemo(false); },
+    krake: (t) => krake(Number(t.dataset.n) || 0),
     walk: () => (demo ? walkStart() : confirmBox('Walkthrough', 'Ich zeige dir Toki in ein paar Schritten – mit erfundenen Demo-Daten. Deine echten Daten bleiben unberührt und kommen danach zurück.', 'Los geht’s', () => { setDemo(true); setTimeout(walkStart, 400); }, false)),
     gyear: (t) => { ui.gyear = (ui.gyear || Number(ui.nmonth.slice(0, 4))) + Number(t.dataset.d); render(); },
     gotoMonth: (t) => { ui.nmonth = t.dataset.m; ui.nmode = 'ist'; render(); window.scrollTo({ top: 0 }); },
