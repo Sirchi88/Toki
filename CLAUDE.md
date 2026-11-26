@@ -49,7 +49,7 @@
   - Reiter Mehrarbeit: alle Stundenwerte mit zwei Nachkommastellen.
   - KV-Zusatzbeitrag über Auswahl der Krankenkasse (`Core.KASSEN`, Stand 01.11.2026 – jährlich zum 1.1. aktualisieren), „Andere“ = manueller Wert.
   - Navigation bleibt auch am PC unten.
-  - Feierabend: Feld „Gearbeitet (Industriestunden)“ antippen → Rückfrage „Möchtest du eine manuelle Zeit eingeben?“ → Stunden (7,75 oder 7:45, `Core.parseStunden`) → Gehen-Zeit aus Kommen + Stunden + Pausen. Bleibt als breite Kachel ✎ oben unter „Gehen um …“ (`st.pref.manT`), entfernbar im selben Fenster.
+  - Feierabend: Feld „Gearbeitet (Industriestunden)“ antippen → Rückfrage „Möchtest du eine manuelle Zeit eingeben?“ → Stunden (7,75 oder 7:45, `Core.parseStunden`) → Gehen-Zeit aus Kommen + Stunden + Pausen, nur einmalig als Ende eingetragen – NICHT als Kachel unter „Gehen um …“ (dort immer nur 7/8/9/10 Std., vom Nutzer so gewünscht).
   - Easter Egg im Design „Auswechselspieler“ (`dorf`): Resturlaub in der Ampel auf Feierabend antippen → Vollbild-Krake (`krake(n)`, SVG) mit so vielen Armen wie Resturlaubstagen (halber Tag = halber Arm, max. 40), ~3 s animiert, Antippen schließt früher.
 - Sync: `src/sync.js` ruft per `fetch` die Supabase-Funktionen `toki_laden`/`toki_speichern` auf (kein Login, persönlicher 16-stelliger Sync-Code, in der DB nur dessen SHA-256-Hash). Schema in `supabase/schema.sql`. Nur der Publishable Key gehört in den Code, niemals der Secret Key.
 - Keine echten Vereins-/Markenlogos oder -namen in Designs.

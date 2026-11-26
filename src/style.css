@@ -1042,5 +1042,3 @@ body[data-theme=lebkuchen] .big-r{color:#fff8ee;text-shadow:0 2px 0 #6b3f20}
 /* Industriestunden antippbar (manuelle Zeit) */
 button.worked{width:100%;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
 button.worked:active{transform:scale(.98)}
-.tile.man{grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:14px;border:1.5px dashed color-mix(in oklch,var(--primary) 55%,transparent)}
-.tile.man .k{color:var(--primary);font-size:14px}

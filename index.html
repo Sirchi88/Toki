@@ -1058,8 +1058,6 @@ body[data-theme=lebkuchen] .big-r{color:#fff8ee;text-shadow:0 2px 0 #6b3f20}
 /* Industriestunden antippbar (manuelle Zeit) */
 button.worked{width:100%;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
 button.worked:active{transform:scale(.98)}
-.tile.man{grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:14px;border:1.5px dashed color-mix(in oklch,var(--primary) 55%,transparent)}
-.tile.man .k{color:var(--primary);font-size:14px}
 </style>
 </head>
 <body data-theme="standard">
@@ -3171,6 +3169,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
   const LOGO = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjE1IDMgOTAgODgiPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJ0ZyIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzM2Yjk4MiIvPjxzdG9wIG9mZnNldD0iLjU1IiBzdG9wLWNvbG9yPSIjMmE5YzZiIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWQ3NjUwIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJ0eCIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzJjOWY2YyIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzFlN2E1MSIvPjwvbGluZWFyR3JhZGllbnQ+CjxmaWx0ZXIgaWQ9InNoIiB4PSItMjAlIiB5PSItMjAlIiB3aWR0aD0iMTQwJSIgaGVpZ2h0PSIxNDAlIj48ZmVEcm9wU2hhZG93IGR4PSIwIiBkeT0iMS41IiBzdGREZXZpYXRpb249IjEuNiIgZmxvb2QtY29sb3I9IiMwMDAiIGZsb29kLW9wYWNpdHk9Ii4zNSIvPjwvZmlsdGVyPgo8ZmlsdGVyIGlkPSJpbiI+PGZlT2Zmc2V0IGR5PSIxLjIiLz48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIxIi8+PGZlQ29tcG9zaXRlIG9wZXJhdG9yPSJvdXQiIGluPSJTb3VyY2VHcmFwaGljIi8+PGZlQ29tcG9uZW50VHJhbnNmZXI+PGZlRnVuY0EgdHlwZT0ibGluZWFyIiBzbG9wZT0iLjciLz48L2ZlQ29tcG9uZW50VHJhbnNmZXI+PGZlQmxlbmQgaW4yPSJTb3VyY2VHcmFwaGljIiBtb2RlPSJub3JtYWwiLz48L2ZpbHRlcj4KPC9kZWZzPgo8ZyBmaWx0ZXI9InVybCgjc2gpIj4KPHJlY3QgeD0iMTkiIHk9IjYiIHdpZHRoPSI4MiIgaGVpZ2h0PSI4MCIgcng9IjE1IiBmaWxsPSJ1cmwoI3RnKSIvPgo8cmVjdCB4PSIxOS42IiB5PSI2LjYiIHdpZHRoPSI4MC44IiBoZWlnaHQ9Ijc4LjgiIHJ4PSIxNC40IiBmaWxsPSJub25lIiBzdHJva2U9IiM3ZmYwYmQiIHN0cm9rZS1vcGFjaXR5PSIuMjIiIHN0cm9rZS13aWR0aD0iMS4yIi8+CjwvZz4KPHBhdGggZD0iTTM3LjUgMjFIODAuNVYzNEg2NS41VjY5SDUyLjVWMzRIMzcuNVoiIGZpbGw9IiMxZDIwMjUiIGZpbHRlcj0idXJsKCNpbikiLz4KPC9zdmc+Cg==';
   /** Release Notes – neueste zuerst: [Version, Datum, Themen] */
   const RELEASES = [
+    ['2.15', '26.11.2026', ['Manuelle Zeit wird nur einmalig als Ende eingetragen – „Gehen um …“ zeigt wieder 7/8/9/10 Std.']],
     ['2.14', '26.11.2026', ['Feierabend: Industriestunden antippen → eigene Zeit vorgeben, Toki rechnet die Gehen-Zeit']],
     ['2.13', '24.11.2026', ['Geheimtipp im Design „Auswechselspieler“: Resturlaub antippen 🐙']],
     ['2.12', '23.11.2026', ['Resturlaub: im Januar–März verplante Tage werden vom Vorjahresrest abgezogen']],
@@ -3758,13 +3757,12 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
 
   // ---------- Manuelle Industriestunden → Gehen-Zeit ----------
   function manHSheet() {
-    const cur = Number(st.pref.manT) || 0;
+    if (st.pref.manT !== undefined) { delete st.pref.manT; save(); } // frühere Dauer-Vorgabe (v2.14) aufräumen
     sheet(`<h3>Manuelle Zeit</h3>
       <label class="label" for="manIn">Industriestunden</label>
-      <input id="manIn" class="field big" inputmode="decimal" placeholder="z. B. 7,75 oder 7:45" value="${cur ? deNum(cur) : ''}">
+      <input id="manIn" class="field big" inputmode="decimal" placeholder="z. B. 7,75 oder 7:45" >
       <div class="notice info mt-s" id="manPrev">Gib die Stunden ein, die du arbeiten willst.</div>
-      <div class="grid2 mt">${cur ? '<button class="btn ghost" id="manDel">Entfernen</button>' : '<button class="btn ghost" data-act="close">Abbrechen</button>'}<button class="btn" id="manOk" disabled>Übernehmen</button></div>
-      <p class="xs muted" style="margin:10px 0 0">Die Zeit bleibt als eigene Kachel ✎ unter „Gehen um …“ – auch an den nächsten Tagen, mit deiner jeweiligen Kommen-Zeit.</p>`, (el) => {
+      <div class="grid2 mt"><button class="btn ghost" data-act="close">Abbrechen</button><button class="btn" id="manOk" disabled>Übernehmen</button></div>`, (el) => {
       const inp = el.querySelector('#manIn'), prev = el.querySelector('#manPrev'), ok = el.querySelector('#manOk');
       const calc = () => {
         const h = C.parseStunden(inp.value);
@@ -3777,10 +3775,8 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
       inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') ok.click(); });
       ok.addEventListener('click', () => {
         const r = calc(); if (!r) return;
-        st.pref.manT = r.h; ui.end = r.at; save(); closeSheet(); render();
+        ui.end = r.at; closeSheet(); render(); // nur einmalig als Ende eintragen
       });
-      const del = el.querySelector('#manDel');
-      if (del) del.addEventListener('click', () => { delete st.pref.manT; save(); closeSheet(); render(); });
       calc(); setTimeout(() => { inp.focus(); inp.select(); }, 60);
     });
   }
@@ -3806,8 +3802,6 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
     const soll = C.tagessoll(s);
     const half = ui.half || halfD || (ab && !ab.full);
     const targets = special ? [4, 6, 8, 10] : half ? [soll / 2] : [...new Set([soll, 8, 9, 10].filter((x) => x >= soll && x <= 10))];
-    const manT = Number(st.pref.manT) || 0; // eigene, manuell vorgegebene Industriestunden
-    if (manT) { const i = targets.indexOf(manT); if (i >= 0) targets.splice(i, 1); targets.unshift(manT); } // eigene Zeit als breite Kachel oben
     const pauseFor = (t) => (special ? (t > 6 ? 30 : 0) : pause);
     const entry = st.entries[d];
     const blocked = !!(ab && ab.full);
@@ -3824,7 +3818,7 @@ ${d.abwesend.length ? `<h2>Urlaub & Abwesenheit</h2><table>${d.abwesend.map((a) 
     const live = `<button type="button" class="worked" data-act="manH" title="Antippen: eigene Zeit vorgeben"><span class="k">Gearbeitet (Industriestunden)</span><span class="v num">${res ? H(res.hours) : '– h'}</span></button>
       ${notes}
       <button class="btn mt" data-act="saveEntry" ${!res || blocked ? 'disabled' : ''}>${entry ? 'Eintrag aktualisieren' : 'Zeit speichern'}</button>`;
-    const tiles = targets.map((t) => { const at = C.leaveAt(ui.start, pauseFor(t), t); const isMan = t === manT; return `<button type="button" class="tile ${targets.length === 1 ? 'single' : ''} ${isMan ? 'man' : ''} ${at && at === ui.end ? 'on' : ''}" data-act="setEnd" data-t="${at || ''}" ${at ? '' : 'disabled'}><div class="k">${isMan ? '✎ ' : ''}${isMan ? nf(t) : D1(t)} Std.</div><div class="v num">${at ?? '–'}</div></button>`; }).join('');
+    const tiles = targets.map((t) => { const at = C.leaveAt(ui.start, pauseFor(t), t); return `<button type="button" class="tile ${targets.length === 1 ? 'single' : ''} ${at && at === ui.end ? 'on' : ''}" data-act="setEnd" data-t="${at || ''}" ${at ? '' : 'disabled'}><div class="k">${D1(t)} Std.</div><div class="v num">${at ?? '–'}</div></button>`; }).join('');
     return { s, d, w, special, soll, live, tiles, pauseFor, summary: `${pauseLbl} · ${modeLbl}` };
   }
   function updateFA() {
