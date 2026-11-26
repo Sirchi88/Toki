@@ -6,6 +6,7 @@
   const LOGO = '__LOGO__';
   /** Release Notes – neueste zuerst: [Version, Datum, Themen] */
   const RELEASES = [
+    ['2.15', '26.11.2026', ['Manuelle Zeit wird nur einmalig als Ende eingetragen – „Gehen um …“ zeigt wieder 7/8/9/10 Std.']],
     ['2.14', '26.11.2026', ['Feierabend: Industriestunden antippen → eigene Zeit vorgeben, Toki rechnet die Gehen-Zeit']],
     ['2.13', '24.11.2026', ['Geheimtipp im Design „Auswechselspieler“: Resturlaub antippen 🐙']],
     ['2.12', '23.11.2026', ['Resturlaub: im Januar–März verplante Tage werden vom Vorjahresrest abgezogen']],
@@ -593,13 +594,12 @@
 
   // ---------- Manuelle Industriestunden → Gehen-Zeit ----------
   function manHSheet() {
-    const cur = Number(st.pref.manT) || 0;
+    if (st.pref.manT !== undefined) { delete st.pref.manT; save(); } // frühere Dauer-Vorgabe (v2.14) aufräumen
     sheet(`<h3>Manuelle Zeit</h3>
       <label class="label" for="manIn">Industriestunden</label>
-      <input id="manIn" class="field big" inputmode="decimal" placeholder="z. B. 7,75 oder 7:45" value="${cur ? deNum(cur) : ''}">
+      <input id="manIn" class="field big" inputmode="decimal" placeholder="z. B. 7,75 oder 7:45" >
       <div class="notice info mt-s" id="manPrev">Gib die Stunden ein, die du arbeiten willst.</div>
-      <div class="grid2 mt">${cur ? '<button class="btn ghost" id="manDel">Entfernen</button>' : '<button class="btn ghost" data-act="close">Abbrechen</button>'}<button class="btn" id="manOk" disabled>Übernehmen</button></div>
-      <p class="xs muted" style="margin:10px 0 0">Die Zeit bleibt als eigene Kachel ✎ unter „Gehen um …“ – auch an den nächsten Tagen, mit deiner jeweiligen Kommen-Zeit.</p>`, (el) => {
+      <div class="grid2 mt"><button class="btn ghost" data-act="close">Abbrechen</button><button class="btn" id="manOk" disabled>Übernehmen</button></div>`, (el) => {
       const inp = el.querySelector('#manIn'), prev = el.querySelector('#manPrev'), ok = el.querySelector('#manOk');
       const calc = () => {
         const h = C.parseStunden(inp.value);
@@ -612,10 +612,8 @@
       inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') ok.click(); });
       ok.addEventListener('click', () => {
         const r = calc(); if (!r) return;
-        st.pref.manT = r.h; ui.end = r.at; save(); closeSheet(); render();
+        ui.end = r.at; closeSheet(); render(); // nur einmalig als Ende eintragen
       });
-      const del = el.querySelector('#manDel');
-      if (del) del.addEventListener('click', () => { delete st.pref.manT; save(); closeSheet(); render(); });
       calc(); setTimeout(() => { inp.focus(); inp.select(); }, 60);
     });
   }
@@ -641,8 +639,6 @@
     const soll = C.tagessoll(s);
     const half = ui.half || halfD || (ab && !ab.full);
     const targets = special ? [4, 6, 8, 10] : half ? [soll / 2] : [...new Set([soll, 8, 9, 10].filter((x) => x >= soll && x <= 10))];
-    const manT = Number(st.pref.manT) || 0; // eigene, manuell vorgegebene Industriestunden
-    if (manT) { const i = targets.indexOf(manT); if (i >= 0) targets.splice(i, 1); targets.unshift(manT); } // eigene Zeit als breite Kachel oben
     const pauseFor = (t) => (special ? (t > 6 ? 30 : 0) : pause);
     const entry = st.entries[d];
     const blocked = !!(ab && ab.full);
@@ -659,7 +655,7 @@
     const live = `<button type="button" class="worked" data-act="manH" title="Antippen: eigene Zeit vorgeben"><span class="k">Gearbeitet (Industriestunden)</span><span class="v num">${res ? H(res.hours) : '– h'}</span></button>
       ${notes}
       <button class="btn mt" data-act="saveEntry" ${!res || blocked ? 'disabled' : ''}>${entry ? 'Eintrag aktualisieren' : 'Zeit speichern'}</button>`;
-    const tiles = targets.map((t) => { const at = C.leaveAt(ui.start, pauseFor(t), t); const isMan = t === manT; return `<button type="button" class="tile ${targets.length === 1 ? 'single' : ''} ${isMan ? 'man' : ''} ${at && at === ui.end ? 'on' : ''}" data-act="setEnd" data-t="${at || ''}" ${at ? '' : 'disabled'}><div class="k">${isMan ? '✎ ' : ''}${isMan ? nf(t) : D1(t)} Std.</div><div class="v num">${at ?? '–'}</div></button>`; }).join('');
+    const tiles = targets.map((t) => { const at = C.leaveAt(ui.start, pauseFor(t), t); return `<button type="button" class="tile ${targets.length === 1 ? 'single' : ''} ${at && at === ui.end ? 'on' : ''}" data-act="setEnd" data-t="${at || ''}" ${at ? '' : 'disabled'}><div class="k">${D1(t)} Std.</div><div class="v num">${at ?? '–'}</div></button>`; }).join('');
     return { s, d, w, special, soll, live, tiles, pauseFor, summary: `${pauseLbl} · ${modeLbl}` };
   }
   function updateFA() {
