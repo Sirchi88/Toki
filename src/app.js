@@ -6,6 +6,7 @@
   const LOGO = '__LOGO__';
   /** Release Notes – neueste zuerst: [Version, Datum, Themen] */
   const RELEASES = [
+    ['2.14', '26.11.2026', ['Feierabend: Industriestunden antippen → eigene Zeit vorgeben, Toki rechnet die Gehen-Zeit']],
     ['2.13', '24.11.2026', ['Geheimtipp im Design „Auswechselspieler“: Resturlaub antippen 🐙']],
     ['2.12', '23.11.2026', ['Resturlaub: im Januar–März verplante Tage werden vom Vorjahresrest abgezogen']],
     ['2.11', '22.11.2026', ['Walkthrough für neue Nutzer', 'Designs Lebkuchen-Hütte, Weihnachtsmarkt, Nordpol-Express im Ordner „Feiertage“', 'Mehrarbeit Nachtrag als kleiner Schalter', 'Lustige Jahres-Statistiken', 'Urlaub-Kacheln: Überschriften immer auf gleicher Höhe', 'Dokumente im Gehalt standardmäßig zugeklappt']],
@@ -590,6 +591,35 @@
     </div>`;
   }
 
+  // ---------- Manuelle Industriestunden → Gehen-Zeit ----------
+  function manHSheet() {
+    const cur = Number(st.pref.manT) || 0;
+    sheet(`<h3>Manuelle Zeit</h3>
+      <label class="label" for="manIn">Industriestunden</label>
+      <input id="manIn" class="field big" inputmode="decimal" placeholder="z. B. 7,75 oder 7:45" value="${cur ? deNum(cur) : ''}">
+      <div class="notice info mt-s" id="manPrev">Gib die Stunden ein, die du arbeiten willst.</div>
+      <div class="grid2 mt">${cur ? '<button class="btn ghost" id="manDel">Entfernen</button>' : '<button class="btn ghost" data-act="close">Abbrechen</button>'}<button class="btn" id="manOk" disabled>Übernehmen</button></div>
+      <p class="xs muted" style="margin:10px 0 0">Die Zeit bleibt als eigene Kachel ✎ unter „Gehen um …“ – auch an den nächsten Tagen, mit deiner jeweiligen Kommen-Zeit.</p>`, (el) => {
+      const inp = el.querySelector('#manIn'), prev = el.querySelector('#manPrev'), ok = el.querySelector('#manOk');
+      const calc = () => {
+        const h = C.parseStunden(inp.value);
+        const at = h ? C.leaveAt(ui.start, faParts().pauseFor(h), h) : null;
+        ok.disabled = !at;
+        prev.innerHTML = at ? `Kommen <b>${esc(ui.start)}</b> + ${nf(h)} Std. + Pausen → <b>Gehen um ${at}</b>` : inp.value.trim() ? 'Bitte Stunden zwischen 0 und 10 eingeben (z. B. 7,75 oder 7:45).' : 'Gib die Stunden ein, die du arbeiten willst.';
+        return at && { h, at };
+      };
+      inp.addEventListener('input', calc);
+      inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') ok.click(); });
+      ok.addEventListener('click', () => {
+        const r = calc(); if (!r) return;
+        st.pref.manT = r.h; ui.end = r.at; save(); closeSheet(); render();
+      });
+      const del = el.querySelector('#manDel');
+      if (del) del.addEventListener('click', () => { delete st.pref.manT; save(); closeSheet(); render(); });
+      calc(); setTimeout(() => { inp.focus(); inp.select(); }, 60);
+    });
+  }
+
   // ---------- Seite: Feierabend ----------
   function dayPause(d) {
     const s = S(), w = C.dow(d);
@@ -611,6 +641,8 @@
     const soll = C.tagessoll(s);
     const half = ui.half || halfD || (ab && !ab.full);
     const targets = special ? [4, 6, 8, 10] : half ? [soll / 2] : [...new Set([soll, 8, 9, 10].filter((x) => x >= soll && x <= 10))];
+    const manT = Number(st.pref.manT) || 0; // eigene, manuell vorgegebene Industriestunden
+    if (manT) { const i = targets.indexOf(manT); if (i >= 0) targets.splice(i, 1); targets.unshift(manT); } // eigene Zeit als breite Kachel oben
     const pauseFor = (t) => (special ? (t > 6 ? 30 : 0) : pause);
     const entry = st.entries[d];
     const blocked = !!(ab && ab.full);
@@ -624,11 +656,11 @@
     if (res && res.capped) notes += `<div class="notice danger">⚠ <div><b>Zeitverstoß:</b> mehr als 10 Std. gearbeitet (${nf(raw)} h). Gezählt werden nur 10 Std.</div></div>`;
     const pauseLbl = special ? `Wochenende: ${pause ? '30 min Mittag' : 'keine Pause'}` : `Pausen ${pause} min`;
     const modeLbl = ui.half ? '½ Urlaubstag' : 'normaler Tag';
-    const live = `<div class="worked"><span class="k">Gearbeitet (Industriestunden)</span><span class="v num">${res ? H(res.hours) : '– h'}</span></div>
+    const live = `<button type="button" class="worked" data-act="manH" title="Antippen: eigene Zeit vorgeben"><span class="k">Gearbeitet (Industriestunden)</span><span class="v num">${res ? H(res.hours) : '– h'}</span></button>
       ${notes}
       <button class="btn mt" data-act="saveEntry" ${!res || blocked ? 'disabled' : ''}>${entry ? 'Eintrag aktualisieren' : 'Zeit speichern'}</button>`;
-    const tiles = targets.map((t) => { const at = C.leaveAt(ui.start, pauseFor(t), t); return `<button type="button" class="tile ${targets.length === 1 ? 'single' : ''} ${at && at === ui.end ? 'on' : ''}" data-act="setEnd" data-t="${at || ''}" ${at ? '' : 'disabled'}><div class="k">${D1(t)} Std.</div><div class="v num">${at ?? '–'}</div></button>`; }).join('');
-    return { s, d, w, special, soll, live, tiles, summary: `${pauseLbl} · ${modeLbl}` };
+    const tiles = targets.map((t) => { const at = C.leaveAt(ui.start, pauseFor(t), t); const isMan = t === manT; return `<button type="button" class="tile ${targets.length === 1 ? 'single' : ''} ${isMan ? 'man' : ''} ${at && at === ui.end ? 'on' : ''}" data-act="setEnd" data-t="${at || ''}" ${at ? '' : 'disabled'}><div class="k">${isMan ? '✎ ' : ''}${isMan ? nf(t) : D1(t)} Std.</div><div class="v num">${at ?? '–'}</div></button>`; }).join('');
+    return { s, d, w, special, soll, live, tiles, pauseFor, summary: `${pauseLbl} · ${modeLbl}` };
   }
   function updateFA() {
     if (ui.tab !== 'feierabend') return;
@@ -1529,6 +1561,7 @@
     close: () => closeSheet(),
     info: (t) => { const [h, b] = INFO[t.dataset.k]; sheet(`<h3>${h}</h3><div class="infotext">${b}</div><button class="btn mt" data-act="close">Alles klar</button>`); },
     toggle: (t) => { ui[t.dataset.k] = !ui[t.dataset.k]; save(); render(); },
+    manH: () => confirmBox('Manuelle Zeit', 'Möchtest du eine manuelle Zeit eingeben? Du gibst die Industriestunden vor – Toki ermittelt daraus anhand deiner Kommen-Zeit die Gehen-Zeit.', 'Ja, eingeben', manHSheet, false),
     setEnd: (t) => { if (!t.dataset.t) return; ui.end = t.dataset.t; const inp = document.getElementById('work-end'); if (inp) inp.value = ui.end; updateFA(); },
     saveEntry: () => {
       const d = ui.date;

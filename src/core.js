@@ -15,6 +15,15 @@ const Core = (() => {
     const s = toMin(start);
     return s === null ? null : fmtClock(s + hours * 60 + pauseMin);
   };
+  /** Manuelle Industriestunden: „7,5“, „7.75“ oder „7:45“ → Stunden (0 < h ≤ 10), sonst null */
+  const parseStunden = (v) => {
+    const t = String(v ?? '').trim().replace(/\s|h|std\.?/gi, '');
+    let h = null;
+    const m = t.match(/^(\d{1,2}):(\d{1,2})$/);
+    if (m) { if (Number(m[2]) < 60) h = Number(m[1]) + Number(m[2]) / 60; }
+    else if (/^\d{1,2}([.,]\d+)?$/.test(t)) h = parseFloat(t.replace(',', '.'));
+    return h !== null && h > 0 && h <= MAX_DAY ? Math.round(h * 10000) / 10000 : null;
+  };
   const workedRaw = (start, end, pauseMin) => {
     const s = toMin(start), e = toMin(end);
     if (s === null || e === null) return null;
@@ -1068,7 +1077,7 @@ const Core = (() => {
   };
 
   return {
-    toMin, fmtClock, leaveAt, workedRaw, capDay, MAX_DAY, D, iso, addDays, dow, monday, isoWeek, ym, todayIso, range,
+    toMin, fmtClock, leaveAt, parseStunden, workedRaw, capDay, MAX_DAY, D, iso, addDays, dow, monday, isoWeek, ym, todayIso, range,
     LAENDER, easter, holidays, holidayName, isWorkday, workdaysBetween, defaults, merge, tagessoll, stundenlohn, holOpt,
     TYPES, specialPause, presence, absenceDays, halfDay, dayNeed, yearCfg, dayTarget, zuschlag, compute, vacation, est, steuerJahr, netto, monthPay, monatsentgelt, sonderGruppe, prevMonth, KASSEN, P, parseZeitnachweis, parseAbrechnung, abrechnungVergleich, lernKorrektur, gehaltJahr, steuerKlaerung, yearStats, importPlan, applyImport, kontenAm, kurzPlan, mavRollover, demoState,
   };

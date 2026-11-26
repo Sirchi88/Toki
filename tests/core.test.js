@@ -336,6 +336,11 @@ test('Samstag: Wochentage füllen zuerst das Kontingent, Rest vom Samstag ins Ze
   assert.deepStrictEqual([w.mehr, w.satMehr, w.satZK, w.bonus, w.zkChange], [2, 1, 4, 1, 5]);
 });
 
+test('Manuelle Industriestunden: Eingabe lesen und Gehen-Zeit ermitteln', () => {
+  assert.deepStrictEqual(['7,5', '7.75', '7:45', '8 h', '0', '11', '7:75', 'abc'].map(C.parseStunden), [7.5, 7.75, 7.75, 8, null, null, null, null]);
+  assert.strictEqual(C.leaveAt('06:30', 45, C.parseStunden('7:45')), '15:00');
+});
+
 test('Resturlaub: Urlaub bis 31.03. des Folgejahres zählt gegen den Vorjahresrest', () => {
   const S = base(); S.urlaub.jahre = { 2026: { tarif: 30, rest: 10, restDatum: '2026-11-22' }, 2027: { tarif: 30 } };
   const st = { settings: S, entries: {}, absences: [
